@@ -2,9 +2,9 @@ import { useEffect } from "react";
 import axios from "axios";
 
 export default function Home() {
-  useEffect(() => {
-    axios.get("/api/hello").then((res) => console.log(res));
-  }, []);
+  // useEffect(() => {
+  //   axios.get("/api/hello").then((res) => console.log(res));
+  // }, []);
 
   return (
     <>
