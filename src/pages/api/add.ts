@@ -13,5 +13,9 @@ export default async function handler(
   console.log(process.env.NEXT_PUBLIC_MONGODB_URL);
   console.log(process.env.NEXT_PUBLIC_MONGODB_DATABASE);
 
-  res.status(200).json({ message: "Ok" });
+  res.status(200).json({
+    message: "Ok",
+    a: process.env.NEXT_PUBLIC_MONGODB_URL,
+    b: process.env.NEXT_PUBLIC_MONGODB_DATABASE,
+  });
 }
