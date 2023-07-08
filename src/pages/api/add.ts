@@ -7,8 +7,11 @@ export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse
 ) {
-  const connectedToDB = await clientMongo();
+  // const connectedToDB = await clientMongo();
   // const r = await StockModel.findOne({ ticker: "AAPL" });
 
-  res.status(200).json({ message: "Ok", connectedToDB });
+  console.log(process.env.NEXT_PUBLIC_MONGODB_URL);
+  console.log(process.env.NEXT_PUBLIC_MONGODB_DATABASE);
+
+  res.status(200).json({ message: "Ok" });
 }
