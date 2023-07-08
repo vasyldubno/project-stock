@@ -7,8 +7,8 @@ export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse
 ) {
-  await clientMongo();
-  const r = await StockModel.findOne({ ticker: "AAPL" });
+  // await clientMongo();
+  // const r = await StockModel.findOne({ ticker: "AAPL" });
 
-  res.status(200).json({ message: "Ok", r });
+  res.status(200).json({ message: "Ok" });
 }
