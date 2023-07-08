@@ -8,11 +8,11 @@ export default async function handler(
   res: NextApiResponse
 ) {
   const xata = getXataClient();
-  // const a = await xata.db.stock.getAll();
+  const a = await xata.db.stock.getAll();
 
   res.status(200).json({
     message: "Ok",
-    // a,
+    a,
     xata,
   });
 }
