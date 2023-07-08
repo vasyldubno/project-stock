@@ -11,19 +11,19 @@ export default function Home() {
     <>
       <button
         onClick={async () => {
-          // const res = await axios.get("/api/add");
-          // console.log(res.data);
+          const res = await axios.get("/api/add");
+          console.log(res.data);
 
-          try {
-            console.log("XATA");
-            const xata = getXataClient();
-            const a = await xata.db.stock
-              .select(["gics.sector.name", "gics.subIndustry.name"])
-              .getMany();
-            console.log(a);
-          } catch (error) {
-            console.log(error);
-          }
+          // try {
+          //   console.log("XATA");
+          //   const xata = getXataClient();
+          //   const a = await xata.db.stock
+          //     .select(["gics.sector.name", "gics.subIndustry.name"])
+          //     .getMany();
+          //   console.log(a);
+          // } catch (error) {
+          //   console.log(error);
+          // }
         }}
       >
         add
