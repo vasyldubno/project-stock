@@ -37,4 +37,4 @@ const stockSchema = new mongoose.Schema(
   }
 );
 
-export const StockModel = mongoose.model("Stock", stockSchema);
+export const StockModel = mongoose.model("Kest", stockSchema);

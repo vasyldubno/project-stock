@@ -2,17 +2,12 @@
 import { getXataClient } from "@/types/xata";
 import type { NextApiRequest, NextApiResponse } from "next";
 
-type Data = {
-  name: string;
-  second: any;
-};
-
 export default async function handler(
   req: NextApiRequest,
-  res: NextApiResponse<Data>
+  res: NextApiResponse
 ) {
   const xata = getXataClient();
-  const a = await xata.db.index.getAll();
+  const stocks = await xata.db.stock.filter("marketCap", 0).getAll();
 
-  res.status(200).json({ name: "John Doe", second: a });
+  res.status(200).json({ name: "John Doe", stocks });
 }

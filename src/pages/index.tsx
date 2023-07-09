@@ -1,6 +1,4 @@
-import { useEffect } from "react";
 import axios from "axios";
-import { getXataClient } from "@/types/xata";
 
 export default function Home() {
   // useEffect(() => {
@@ -9,25 +7,49 @@ export default function Home() {
 
   return (
     <>
-      <button
-        onClick={async () => {
-          const res = await axios.get("/api/add");
-          console.log(res.data);
+      <div>
+        <button
+          onClick={async () => {
+            const res = await axios.get("/api/hello");
+            console.log(res.data);
+          }}
+        >
+          /api/hello
+        </button>
+      </div>
 
-          // try {
-          //   console.log("XATA");
-          //   const xata = getXataClient();
-          //   const a = await xata.db.stock
-          //     .select(["gics.sector.name", "gics.subIndustry.name"])
-          //     .getMany();
-          //   console.log(a);
-          // } catch (error) {
-          //   console.log(error);
-          // }
-        }}
-      >
-        add
-      </button>
+      <div>
+        <button
+          onClick={async () => {
+            const res = await axios.get("/api/market-cap");
+            console.log(res.data);
+          }}
+        >
+          /api/market-cap
+        </button>
+      </div>
+
+      <div>
+        <button
+          onClick={async () => {
+            const res = await axios.get("/api/price-current");
+            console.log(res.data);
+          }}
+        >
+          /api/price-current
+        </button>
+      </div>
+
+      <div>
+        <button
+          onClick={async () => {
+            const res = await axios.get("/api/price-target");
+            console.log(res.data);
+          }}
+        >
+          /api/price-target
+        </button>
+      </div>
     </>
   );
 }

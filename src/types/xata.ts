@@ -28,20 +28,13 @@ const tables = [
       { name: "isDividendAristocrat", type: "bool" },
       { name: "isDividendKing", type: "bool" },
       { name: "index", type: "link", link: { table: "index" } },
-      { name: "gics", type: "link", link: { table: "gic" } },
+      { name: "sector", type: "string" },
+      { name: "subIndustry", type: "string" },
+      { name: "analystRating", type: "link", link: { table: "analystRating" } },
     ],
   },
   { name: "index", columns: [{ name: "title", type: "string" }] },
-  {
-    name: "gic",
-    columns: [
-      { name: "sector", type: "link", link: { table: "sector" } },
-      { name: "subIndustry", type: "link", link: { table: "subIndustry" } },
-    ],
-  },
-  { name: "analystRating", columns: [{ name: "buy", type: "string" }] },
-  { name: "sector", columns: [{ name: "name", type: "string" }] },
-  { name: "subIndustry", columns: [{ name: "name", type: "string" }] },
+  { name: "analystRating", columns: [{ name: "buy", type: "int" }] },
 ] as const;
 
 export type SchemaTables = typeof tables;
@@ -53,32 +46,19 @@ export type StockRecord = Stock & XataRecord;
 export type Index = InferredTypes["index"];
 export type IndexRecord = Index & XataRecord;
 
-export type Gic = InferredTypes["gic"];
-export type GicRecord = Gic & XataRecord;
-
 export type AnalystRating = InferredTypes["analystRating"];
 export type AnalystRatingRecord = AnalystRating & XataRecord;
-
-export type Sector = InferredTypes["sector"];
-export type SectorRecord = Sector & XataRecord;
-
-export type SubIndustry = InferredTypes["subIndustry"];
-export type SubIndustryRecord = SubIndustry & XataRecord;
 
 export type DatabaseSchema = {
   stock: StockRecord;
   index: IndexRecord;
-  gic: GicRecord;
   analystRating: AnalystRatingRecord;
-  sector: SectorRecord;
-  subIndustry: SubIndustryRecord;
 };
 
 const DatabaseClient = buildClient();
 
-const defaultOptions: BaseClientOptions = {
+const defaultOptions = {
   databaseURL: "https://s-workspace-8e3sca.us-east-1.xata.sh/db/stock",
-  enableBrowser: true,
   apiKey: XATA_API_KEY,
 };
 
