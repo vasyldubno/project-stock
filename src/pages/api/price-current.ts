@@ -1,4 +1,4 @@
-import { xataClient } from "@/types/xata";
+import { xataClient } from "@/config/xataClient";
 import axios from "axios";
 import { NextApiRequest, NextApiResponse } from "next";
 
