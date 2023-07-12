@@ -1,5 +1,6 @@
 import { PortfolioService } from "@/services/PortfolioService";
 import { IPortfolioStock } from "@/types/types";
+import axios from "axios";
 import { useEffect, useState } from "react";
 
 export const PortfolioScreen = () => {
@@ -19,6 +20,8 @@ export const PortfolioScreen = () => {
       }
     };
     fetch();
+
+    axios.get("/api/hello");
   }, []);
 
   return (
