@@ -47,6 +47,8 @@ export class PortfolioService {
   }
 
   static async updatePortfolio() {
-    return axios.get("/api/portfolio/update-portfolio");
+    return axios.get(
+      `${process.env.NEXT_PUBLIC_CLIENT_URL}/api/portfolio/update-portfolio`
+    );
   }
 }
