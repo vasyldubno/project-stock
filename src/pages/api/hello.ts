@@ -31,6 +31,6 @@ export default async function handler(
       Number(price.data.data.primaryData.lastSalePrice.split("$")[1]).toFixed(2)
     );
 
-    res.status(200).json({ message: "Ok", marketPrice });
+    res.status(200).json({ message: "Ok" });
   }
 }
