@@ -45,4 +45,8 @@ export class PortfolioService {
   static async getPortfolio() {
     return axios.get<IResponseGetPortfolio>("/api/portfolio/get-portfolio");
   }
+
+  static async updatePortfolio() {
+    return axios.get("/api/portfolio/update-portfolio");
+  }
 }
