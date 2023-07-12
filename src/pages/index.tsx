@@ -1,55 +1,37 @@
+import { FormAddStock } from "@/components/FormAddStock/FormAddStock";
+import { PortfolioService } from "@/services/PortfolioService";
 import axios from "axios";
+import Link from "next/link";
+import { useEffect } from "react";
 
 export default function Home() {
-  // useEffect(() => {
-  //   axios.get("/api/hello").then((res) => console.log(res));
-  // }, []);
+  useEffect(() => {
+    const fetch = async () => {
+      await axios.get("/api/cron");
+    };
 
+    fetch();
+  }, []);
   return (
     <>
-      <div>
-        <button
-          onClick={async () => {
-            const res = await axios.get("/api/hello");
-            console.log(res.data);
-          }}
-        >
-          /api/hello
-        </button>
-      </div>
-
-      <div>
-        <button
-          onClick={async () => {
-            const res = await axios.get("/api/market-cap");
-            console.log(res.data);
-          }}
-        >
-          /api/market-cap
-        </button>
-      </div>
-
-      <div>
-        <button
-          onClick={async () => {
-            const res = await axios.get("/api/price-current");
-            console.log(res.data);
-          }}
-        >
-          /api/price-current
-        </button>
-      </div>
-
-      <div>
-        <button
-          onClick={async () => {
-            const res = await axios.get("/api/price-target");
-            console.log(res.data);
-          }}
-        >
-          /api/price-target
-        </button>
-      </div>
+      <FormAddStock />
+      <button
+        onClick={async () => {
+          const response = await PortfolioService.getStocks();
+          console.log(response.data.stocks);
+        }}
+      >
+        get stocks
+      </button>
+      <button
+        onClick={async () => {
+          const response = await PortfolioService.getPortfolio();
+          console.log(response.data);
+        }}
+      >
+        get portfolio
+      </button>
+      <Link href={"/portfolio"}>Portfolio</Link>
     </>
   );
 }

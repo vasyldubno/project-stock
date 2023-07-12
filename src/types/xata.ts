@@ -31,10 +31,47 @@ const tables = [
       { name: "sector", type: "string" },
       { name: "subIndustry", type: "string" },
       { name: "analystRating", type: "link", link: { table: "analystRating" } },
+      { name: "eps", type: "float" },
     ],
   },
   { name: "index", columns: [{ name: "title", type: "string" }] },
   { name: "analystRating", columns: [{ name: "buy", type: "int" }] },
+  {
+    name: "portfolioStock",
+    columns: [
+      { name: "ticker", type: "string", unique: true },
+      { name: "exchange", type: "string" },
+      { name: "averageCostPerShare", type: "float" },
+      { name: "gainUnrealizedPercentage", type: "float" },
+      { name: "gainUnrealizedValue", type: "float" },
+      { name: "marketPrice", type: "float" },
+      { name: "isTrading", type: "bool", defaultValue: "false" },
+      { name: "startTradeDate", type: "datetime" },
+      { name: "gainRealizedPercentage", type: "float" },
+      { name: "gainRealizedValue", type: "float" },
+      { name: "lastDividendPayDate", type: "datetime" },
+    ],
+  },
+  {
+    name: "dividend",
+    columns: [
+      { name: "dividendValue", type: "float" },
+      { name: "dividendYield", type: "float" },
+      { name: "payDate", type: "datetime" },
+      { name: "totalAmount", type: "float" },
+      { name: "ticker", type: "string" },
+    ],
+  },
+  {
+    name: "transaction",
+    columns: [
+      { name: "price", type: "float" },
+      { name: "count", type: "int" },
+      { name: "type", type: "string" },
+      { name: "ticker", type: "string" },
+      { name: "date", type: "datetime" },
+    ],
+  },
 ] as const;
 
 export type SchemaTables = typeof tables;
@@ -49,10 +86,22 @@ export type IndexRecord = Index & XataRecord;
 export type AnalystRating = InferredTypes["analystRating"];
 export type AnalystRatingRecord = AnalystRating & XataRecord;
 
+export type PortfolioStock = InferredTypes["portfolioStock"];
+export type PortfolioStockRecord = PortfolioStock & XataRecord;
+
+export type Dividend = InferredTypes["dividend"];
+export type DividendRecord = Dividend & XataRecord;
+
+export type Transaction = InferredTypes["transaction"];
+export type TransactionRecord = Transaction & XataRecord;
+
 export type DatabaseSchema = {
   stock: StockRecord;
   index: IndexRecord;
   analystRating: AnalystRatingRecord;
+  portfolioStock: PortfolioStockRecord;
+  dividend: DividendRecord;
+  transaction: TransactionRecord;
 };
 
 const DatabaseClient = buildClient();
