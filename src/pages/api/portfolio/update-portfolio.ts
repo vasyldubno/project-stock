@@ -12,28 +12,14 @@ export default async function handler(
     .filter("isTrading", true)
     .getAll();
 
-  portfolio.forEach(async (stock, index) => {
-    if (stock.ticker) {
-      try {
-        console.log(index, stock.ticker);
-
-        // const price = await axios.get(
-        //   `https://markets.sh/api/v1/symbols/${stock.exchange}:${stock.ticker}?api_token=7ea62693bd4ebc0ae34595335732676b`
-        // );
-
-        // const marketPrice = Number(price.data.last_price);
-
-        const price = await axios.get<{
-          data: { primaryData: { lastSalePrice: string } };
-        }>(
-          `https://api.nasdaq.com/api/quote/${stock.ticker}/info?assetclass=stocks`
+  portfolio.forEach((stock, index) => {
+    setTimeout(async () => {
+      if (stock.ticker) {
+        const responsePrice = await axios.get(
+          `https://markets.sh/api/v1/symbols/${stock.exchange}:${stock.ticker}?api_token=7ea62693bd4ebc0ae34595335732676b`
         );
 
-        const marketPrice = Number(
-          Number(
-            price.data.data.primaryData.lastSalePrice.split("$")[1]
-          ).toFixed(2)
-        );
+        const marketPrice = Number(responsePrice.data.last_price);
 
         await xataClient.db.portfolioStock.update(stock.id, {
           marketPrice,
@@ -46,10 +32,8 @@ export default async function handler(
             marketPrice
           ),
         });
-      } catch {
-        console.log("ERROR", stock.ticker);
       }
-    }
+    }, 0 * index);
   });
 
   res.json({ message: "Ok", portfolio });
