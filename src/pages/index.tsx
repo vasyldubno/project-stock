@@ -1,5 +1,6 @@
 import { FormAddStock } from "@/components/FormAddStock/FormAddStock";
 import { Table } from "@/components/Table/Table";
+import { xataClient } from "@/config/xataClient";
 import { PortfolioService } from "@/services/PortfolioService";
 import axios from "axios";
 import dynamic from "next/dynamic";
@@ -11,7 +12,8 @@ const TableDynamic = dynamic(
   { ssr: false }
 );
 
-export default function Home() {
+export default function Home(props: { b: number }) {
+  console.log(props.b);
   return (
     <>
       <FormAddStock />
@@ -37,3 +39,19 @@ export default function Home() {
     </>
   );
 }
+
+export const getStaticProps = async () => {
+  const a = await xataClient.db.transaction.getAll();
+  const b = a.reduce((acc, item) => {
+    if (item.price && item.count) {
+      const res = item.price * item.count;
+      return (acc += res);
+    } else {
+      return acc;
+    }
+  }, 0);
+
+  return {
+    props: { b },
+  };
+};
