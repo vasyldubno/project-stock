@@ -1,7 +1,6 @@
 // Next.js API route support: https://nextjs.org/docs/api-routes/introduction
-import axios from "axios";
 import type { NextApiRequest, NextApiResponse } from "next";
-import fetch from "node-fetch";
+import axios from "axios";
 
 export default async function handler(
   req: NextApiRequest,
@@ -12,13 +11,11 @@ export default async function handler(
   // }>(`https://api.nasdaq.com/api/quote/USB/info?assetclass=stocks`);
 
   try {
-    const response = await fetch(
-      "https://api.nasdaq.com/api/quote/USB/info?assetclass=stocks"
+    const response = await axios.get(
+      "https://finnhub.io/api/v1/quote?symbol=USB&token=cenkaeiad3i2t1u14mvgcenkaeiad3i2t1u14n00"
     );
 
-    const data = response.json();
-
-    res.json({ data });
+    res.json({ price: response.data.c });
   } catch {
     res.status(500).send("Error fetching data");
   }
