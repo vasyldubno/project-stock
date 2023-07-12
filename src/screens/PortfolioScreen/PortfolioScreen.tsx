@@ -21,6 +21,14 @@ export const PortfolioScreen = () => {
       // }
 
       await axios.get("/api/hello");
+
+      // const price = await axios.get<{
+      //   data: { primaryData: { lastSalePrice: string } };
+      // }>(`https://api.nasdaq.com/api/quote/USB/info?assetclass=stocks`, {
+      //   headers: {},
+      // });
+
+      // console.log(price);
     };
     fetch();
   }, []);

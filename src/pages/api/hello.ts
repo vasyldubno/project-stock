@@ -1,30 +1,25 @@
 // Next.js API route support: https://nextjs.org/docs/api-routes/introduction
 import axios from "axios";
 import type { NextApiRequest, NextApiResponse } from "next";
-
-interface INasdaqDividends {
-  data: {
-    dividends: {
-      rows: {
-        exOrEffDate: string;
-        type: string;
-        amount: string;
-        declarationDate: string;
-        recordDate: string;
-        paymentDate: string;
-        currency: string;
-      }[];
-    };
-  };
-}
+import fetch from "node-fetch";
 
 export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse
 ) {
-  const price = await axios.get<{
-    data: { primaryData: { lastSalePrice: string } };
-  }>(`https://api.nasdaq.com/api/quote/USB/info?assetclass=stocks`);
+  // const price = await axios.get<{
+  //   data: { primaryData: { lastSalePrice: string } };
+  // }>(`https://api.nasdaq.com/api/quote/USB/info?assetclass=stocks`);
 
-  res.status(200).json({ message: "Ok" });
+  try {
+    const response = await fetch(
+      "https://api.nasdaq.com/api/quote/USB/info?assetclass=stocks"
+    );
+
+    const data = response.json();
+
+    res.json({ data });
+  } catch {
+    res.status(500).send("Error fetching data");
+  }
 }

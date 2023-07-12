@@ -12,3 +12,19 @@ export interface IPortfolioStock {
   startTradeDate: string;
   ticker: string;
 }
+
+interface INasdaqDividends {
+  data: {
+    dividends: {
+      rows: {
+        exOrEffDate: string;
+        type: string;
+        amount: string;
+        declarationDate: string;
+        recordDate: string;
+        paymentDate: string;
+        currency: string;
+      }[];
+    };
+  };
+}
