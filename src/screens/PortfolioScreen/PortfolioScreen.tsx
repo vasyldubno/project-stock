@@ -12,12 +12,9 @@ export const PortfolioScreen = () => {
     // );
 
     const fetch = async () => {
-      const responseUpdatePortfolio = await PortfolioService.updatePortfolio();
-      if (responseUpdatePortfolio) {
-        const responseGetPortfolio = await PortfolioService.getPortfolio();
-        if (responseGetPortfolio) {
-          setPortfolio(responseGetPortfolio.data.portfolio);
-        }
+      const responseGetPortfolio = await PortfolioService.getPortfolio();
+      if (responseGetPortfolio) {
+        setPortfolio(responseGetPortfolio.data.portfolio);
       }
 
       // await axios.get("/api/hello");
