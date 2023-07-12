@@ -1,3 +1,4 @@
+import { IPortfolioStock } from "@/types/types";
 import axios from "axios";
 
 interface IResponseGetStocks {
@@ -7,20 +8,7 @@ interface IResponseGetStocks {
 interface IResponseGetPortfolio {
   gainRealizedPercentage: number;
   gainUnrealizedPercentage: number;
-  portfolio: {
-    averageCostPerShare: number;
-    exchange: string;
-    gainRealizedPercentage: number;
-    gainRealizedValue: number;
-    gainUnrealizedPercentage: number;
-    gainUnrealizedValue: number;
-    id: string;
-    isTrading: true;
-    lastDividendPayDate: string;
-    marketPrice: number;
-    startTradeDate: string;
-    ticker: string;
-  }[];
+  portfolio: IPortfolioStock[];
 }
 
 export class PortfolioService {

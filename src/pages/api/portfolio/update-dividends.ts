@@ -95,6 +95,40 @@ export default async function handler(
                         100
                       ).toFixed(2)
                     ),
+                dividendValue: stock.dividendValue
+                  ? {
+                      $increment: Number(
+                        (
+                          (await getAmountActiveShares(stock.ticker)) *
+                          Number(Number(last.amount.split("$")[1]).toFixed(2))
+                        ).toFixed(2)
+                      ),
+                    }
+                  : Number(
+                      (
+                        (await getAmountActiveShares(stock.ticker)) *
+                        Number(Number(last.amount.split("$")[1]).toFixed(2))
+                      ).toFixed(2)
+                    ),
+                dividendPercentage: stock.dividendPercentage
+                  ? {
+                      $increment: Number(
+                        (
+                          (Number(
+                            Number(last.amount.split("$")[1]).toFixed(2)
+                          ) /
+                            stock.averageCostPerShare) *
+                          100
+                        ).toFixed(2)
+                      ),
+                    }
+                  : Number(
+                      (
+                        (Number(Number(last.amount.split("$")[1]).toFixed(2)) /
+                          stock.averageCostPerShare) *
+                        100
+                      ).toFixed(2)
+                    ),
               });
               await xataClient.db.dividend.create({
                 dividendValue: Number(

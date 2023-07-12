@@ -11,6 +11,8 @@ export interface IPortfolioStock {
   marketPrice: number;
   startTradeDate: string;
   ticker: string;
+  dividendValue: null | number;
+  dividendPercentage: null | number;
 }
 
 interface INasdaqDividends {

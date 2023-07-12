@@ -7,27 +7,15 @@ export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse
 ) {
-  // const price = await axios.get<{
-  //   data: { primaryData: { lastSalePrice: string } };
-  // }>(`https://api.nasdaq.com/api/quote/USB/info?assetclass=stocks`);
+  const existTest = await xataClient.db.test.getFirst();
 
-  try {
-    const xataPortfolio = await xataClient.db.portfolioStock.getAll();
-
-    if (xataPortfolio) {
-      xataPortfolio.forEach((item, index) => {
-        setTimeout(async () => {
-          const response = await axios.get(
-            `https://markets.sh/api/v1/symbols/${item.exchange}:${item.ticker}?api_token=7ea62693bd4ebc0ae34595335732676b `
-          );
-
-          console.log(index, response.data.last_price);
-        }, 0 * index);
-      });
-    }
-
-    res.json({ message: "Ok" });
-  } catch {
-    res.status(500).send("Error fetching data");
+  if (existTest) {
+    await xataClient.db.test.update(existTest.id, {
+      amount: { $increment: 1 },
+    });
+  } else {
+    await xataClient.db.test.create({ amount: 0 });
   }
+
+  res.json({ message: "Ok" });
 }

@@ -50,6 +50,8 @@ const tables = [
       { name: "gainRealizedPercentage", type: "float" },
       { name: "gainRealizedValue", type: "float" },
       { name: "lastDividendPayDate", type: "datetime" },
+      { name: "dividendValue", type: "float" },
+      { name: "dividendPercentage", type: "float" },
     ],
   },
   {
@@ -71,6 +73,10 @@ const tables = [
       { name: "ticker", type: "string" },
       { name: "date", type: "datetime" },
     ],
+  },
+  {
+    name: "test",
+    columns: [{ name: "amount", type: "int", defaultValue: "0" }],
   },
 ] as const;
 
@@ -95,6 +101,9 @@ export type DividendRecord = Dividend & XataRecord;
 export type Transaction = InferredTypes["transaction"];
 export type TransactionRecord = Transaction & XataRecord;
 
+export type Test = InferredTypes["test"];
+export type TestRecord = Test & XataRecord;
+
 export type DatabaseSchema = {
   stock: StockRecord;
   index: IndexRecord;
@@ -102,6 +111,7 @@ export type DatabaseSchema = {
   portfolioStock: PortfolioStockRecord;
   dividend: DividendRecord;
   transaction: TransactionRecord;
+  test: TestRecord;
 };
 
 const DatabaseClient = buildClient();
