@@ -26,13 +26,21 @@ export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse
 ) {
-  const job = new cron.CronJob("*/1 * * * *", async () => {
-    await axios.get(
-      `${process.env.NEXT_PUBLIC_CLIENT_URL}/api/portfolio/update-portfolio`
-    );
-  });
+  // const job = new cron.CronJob("*/1 * * * *", async () => {
+  //   await axios.get(
+  //     `${process.env.NEXT_PUBLIC_CLIENT_URL}/api/portfolio/update-portfolio`
+  //   );
+  // });
 
-  job.start();
+  // job.start();
 
-  res.status(200).json({ message: "Ok" });
+  const price = await axios.get<{
+    data: { primaryData: { lastSalePrice: string } };
+  }>(`https://api.nasdaq.com/api/quote/USB/info?assetclass=stocks`);
+
+  const marketPrice = Number(
+    Number(price.data.data.primaryData.lastSalePrice.split("$")[1]).toFixed(2)
+  );
+
+  res.status(200).json({ message: "Ok", marketPrice });
 }

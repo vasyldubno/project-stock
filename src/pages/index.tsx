@@ -5,14 +5,6 @@ import Link from "next/link";
 import { useEffect } from "react";
 
 export default function Home() {
-  // useEffect(() => {
-  //   const fetch = async () => {
-  //     await axios.get("/api/cron");
-  //   };
-
-  //   fetch();
-  // }, []);
-
   return (
     <>
       <FormAddStock />
