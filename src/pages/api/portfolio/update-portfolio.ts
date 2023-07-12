@@ -14,25 +14,41 @@ export default async function handler(
 
   portfolio.forEach(async (stock, index) => {
     if (stock.ticker) {
-      console.log(index, stock.ticker);
+      try {
+        console.log(index, stock.ticker);
 
-      const price = await axios.get(
-        `https://markets.sh/api/v1/symbols/${stock.exchange}:${stock.ticker}?api_token=7ea62693bd4ebc0ae34595335732676b`
-      );
+        // const price = await axios.get(
+        //   `https://markets.sh/api/v1/symbols/${stock.exchange}:${stock.ticker}?api_token=7ea62693bd4ebc0ae34595335732676b`
+        // );
 
-      const marketPrice = Number(price.data.last_price);
+        // const marketPrice = Number(price.data.last_price);
 
-      await xataClient.db.portfolioStock.update(stock.id, {
-        marketPrice,
-        gainUnrealizedValue: await getUnrealizedValue(
-          stock.ticker,
-          marketPrice
-        ),
-        gainUnrealizedPercentage: await getUnrealizedPercentage(
-          stock.ticker,
-          marketPrice
-        ),
-      });
+        const price = await axios.get<{
+          data: { primaryData: { lastSalePrice: string } };
+        }>(
+          `https://api.nasdaq.com/api/quote/${stock.ticker}/info?assetclass=stocks`
+        );
+
+        const marketPrice = Number(
+          Number(
+            price.data.data.primaryData.lastSalePrice.split("$")[1]
+          ).toFixed(2)
+        );
+
+        await xataClient.db.portfolioStock.update(stock.id, {
+          marketPrice,
+          gainUnrealizedValue: await getUnrealizedValue(
+            stock.ticker,
+            marketPrice
+          ),
+          gainUnrealizedPercentage: await getUnrealizedPercentage(
+            stock.ticker,
+            marketPrice
+          ),
+        });
+      } catch {
+        console.log("ERROR", stock.ticker);
+      }
     }
   });
 

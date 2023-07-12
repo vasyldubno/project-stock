@@ -27,7 +27,9 @@ export default async function handler(
   res: NextApiResponse
 ) {
   const job = new cron.CronJob("*/1 * * * *", async () => {
-    await axios.get("http://localhost:3000/api/portfolio/update-portfolio");
+    await axios.get(
+      `${process.env.NEXT_PUBLIC_CLIENT_URL}/api/portfolio/update-portfolio`
+    );
   });
 
   job.start();
