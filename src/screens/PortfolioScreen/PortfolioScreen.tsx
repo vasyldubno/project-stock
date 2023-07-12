@@ -18,10 +18,10 @@ export const PortfolioScreen = () => {
           setPortfolio(responseGetPortfolio.data.portfolio);
         }
       }
+
+      await axios.get("/api/hello");
     };
     fetch();
-
-    axios.get("/api/hello");
   }, []);
 
   return (
