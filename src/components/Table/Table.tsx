@@ -59,16 +59,12 @@ export const Table = () => {
     onSortingChange: setSorting,
   });
 
-  console.log(sorting);
-
   const toggleSortingHandler = (columnId: string) => () => {
     const sortConfig = sorting.find((sort) => sort.id === columnId);
     if (sortConfig) {
       if (sortConfig.desc) {
-        // If already descending, remove sorting for the column
         setSorting(sorting.filter((sort) => sort.id !== columnId));
       } else {
-        // If ascending, switch to descending
         setSorting(
           sorting.map((sort) =>
             sort.id === columnId ? { ...sort, desc: true } : sort
@@ -76,13 +72,11 @@ export const Table = () => {
         );
       }
     } else {
-      // No sorting for the column, add ascending sorting
       setSorting([{ id: columnId, desc: false }]);
     }
   };
 
   return (
-    // <div>
     <table className={s.table}>
       <thead>
         {table.getHeaderGroups().map((headerGroup) => (
@@ -131,12 +125,5 @@ export const Table = () => {
         </tbody>
       ))}
     </table>
-    // </div>
   );
 };
-
-// { asc: "+", desc: "-" }[
-//                           header.column.getIsSorted() ?? false
-//                         ]
-
-// header.column.getToggleSortingHandler()
