@@ -14,6 +14,7 @@ export default async function handler(
 
   portfolio.forEach((stock, index) => {
     setTimeout(async () => {
+      console.log(index, stock.ticker);
       if (stock.ticker) {
         // const responsePrice = await axios.get(
         //   `https://markets.sh/api/v1/symbols/${stock.exchange}:${stock.ticker}?api_token=7ea62693bd4ebc0ae34595335732676b`
@@ -39,7 +40,7 @@ export default async function handler(
           ),
         });
       }
-    }, 0 * index);
+    }, 1000 * index);
   });
 
   res.json({ message: "Ok", portfolio });

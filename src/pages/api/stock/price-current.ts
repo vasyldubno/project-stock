@@ -13,7 +13,7 @@ export default async function handler(
     setTimeout(async () => {
       try {
         const response = await axios.get<{ last_price: number }>(
-          `https://markets.sh/api/v1/symbols/${stock.exchange}:${stock.ticker}?api_token=7ea62693bd4ebc0ae34595335732676b`
+          `https://finnhub.io/api/v1/quote?symbol=${stock.ticker}&token=cenkaeiad3i2t1u14mvgcenkaeiad3i2t1u14n00`
         );
         if (stock.ticker) {
           const xataStock = await xataClient.db.stock
@@ -53,7 +53,7 @@ export default async function handler(
       } catch (error) {
         console.log(`${stock.ticker} ${error}`);
       }
-    }, 300 * index);
+    }, 1000 * index);
   });
 
   res.json({ stocks });
