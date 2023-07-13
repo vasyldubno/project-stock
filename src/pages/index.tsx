@@ -1,19 +1,14 @@
 import { FormAddStock } from "@/components/FormAddStock/FormAddStock";
-import { Table } from "@/components/Table/Table";
 import { xataClient } from "@/config/xataClient";
 import { PortfolioService } from "@/services/PortfolioService";
-import axios from "axios";
-import dynamic from "next/dynamic";
 import Link from "next/link";
-import { useEffect } from "react";
 
-const TableDynamic = dynamic(
-  () => import("@/components/Table/Table").then((res) => res.Table),
-  { ssr: false }
-);
-
-export default function Home(props: { b: number }) {
-  console.log(props.b);
+export default function Home(props: {
+  totalCost: number;
+  totalReturn: number;
+  totalUnrealizedReturn: number;
+  totalUnrealizedPercentage: number;
+}) {
   return (
     <>
       <FormAddStock />
@@ -25,24 +20,20 @@ export default function Home(props: { b: number }) {
       >
         get stocks
       </button>
-      <button
-        onClick={async () => {
-          const response = await PortfolioService.getPortfolio();
-          console.log(response.data);
-        }}
-      >
-        get portfolio
-      </button>
       <Link href={"/portfolio"}>Portfolio</Link>
-      {/* <Table /> */}
-      <TableDynamic />
+      <p>Total cost: {props.totalCost.toFixed(2)}</p>
+      <p>Total return: {props.totalReturn}</p>
+      <p>
+        Total Unrealized: {props.totalUnrealizedReturn.toFixed(2)} /{" "}
+        {props.totalUnrealizedPercentage.toFixed(2)}%
+      </p>
     </>
   );
 }
 
 export const getStaticProps = async () => {
-  const a = await xataClient.db.transaction.getAll();
-  const b = a.reduce((acc, item) => {
+  const responseAllTransactions = await xataClient.db.transaction.getAll();
+  const totalCost = responseAllTransactions.reduce((acc, item) => {
     if (item.price && item.count) {
       const res = item.price * item.count;
       return (acc += res);
@@ -51,7 +42,40 @@ export const getStaticProps = async () => {
     }
   }, 0);
 
+  const responsePortfolioStock = await xataClient.db.portfolioStock
+    // .filter("gainRealizedValue", { $gt: 0 })
+    .getAll();
+
+  const totalReturn = responsePortfolioStock.reduce((acc, item) => {
+    if (item.gainRealizedValue) {
+      return (acc += item.gainRealizedValue);
+    }
+    return acc;
+  }, 0);
+
+  const totalUnrealizedReturn = responsePortfolioStock.reduce((acc, item) => {
+    if (item.gainUnrealizedValue) {
+      return (acc += item.gainUnrealizedValue);
+    }
+    return acc;
+  }, 0);
+
+  const totalUnrealizedPercentage = responsePortfolioStock.reduce(
+    (acc, item) => {
+      if (item.gainUnrealizedPercentage) {
+        return (acc += item.gainUnrealizedPercentage);
+      }
+      return acc;
+    },
+    0
+  );
+
   return {
-    props: { b },
+    props: {
+      totalCost,
+      totalReturn,
+      totalUnrealizedReturn,
+      totalUnrealizedPercentage,
+    },
   };
 };
