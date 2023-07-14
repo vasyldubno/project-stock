@@ -17,10 +17,10 @@ export default async function handler(
       try {
         if (stock.ticker) {
           const responsePrice = await axios.get(
-            `https://finnhub.io/api/v1/quote?symbol=${stock.ticker}&token=cenkaeiad3i2t1u14mvgcenkaeiad3i2t1u14n00`
+            `https://markets.sh/api/v1/symbols/${stock.exchange}:${stock.ticker}?api_token=7ea62693bd4ebc0ae34595335732676b`
           );
 
-          const marketPrice = responsePrice.data.c;
+          const marketPrice = responsePrice.data.last_price;
 
           console.log(index, stock.ticker, marketPrice);
 
@@ -39,7 +39,7 @@ export default async function handler(
       } catch {
         console.log("ERROR", index, stock.ticker);
       }
-    }, 1000 * index);
+    }, 600 * index);
   });
 
   res.json({ message: "Ok", portfolio });
