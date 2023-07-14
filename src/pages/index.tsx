@@ -2,6 +2,7 @@ import { FormAddStock } from "@/components/FormAddStock/FormAddStock";
 import { xataClient } from "@/config/xataClient";
 import { PortfolioService } from "@/services/PortfolioService";
 import Link from "next/link";
+import { useEffect, useState } from "react";
 
 export default function Home(props: {
   totalCost: number;
@@ -9,6 +10,19 @@ export default function Home(props: {
   totalUnrealizedReturn: number;
   totalUnrealizedPercentage: number;
 }) {
+  // useEffect(() => {
+  //   const socket = new WebSocket(
+  //     "wss://ws.finnhub.io?token=cenkaeiad3i2t1u14mvgcenkaeiad3i2t1u14n00"
+  //   );
+  //   socket.addEventListener("open", () => {
+  //     socket.send(JSON.stringify({ type: "subscribe", symbol: "HAL" }));
+  //   });
+  //   socket.addEventListener("message", (event) => {
+  //     const response = JSON.parse(event.data);
+  //     console.log(response);
+  //   });
+  // }, []);
+
   return (
     <>
       <FormAddStock />
