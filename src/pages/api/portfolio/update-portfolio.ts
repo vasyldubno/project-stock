@@ -42,5 +42,5 @@ export default async function handler(
     }, 600 * index);
   });
 
-  res.json({ message: "Ok", portfolio });
+  res.json({ message: "Ok" });
 }
