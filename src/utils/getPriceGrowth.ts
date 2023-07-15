@@ -2,15 +2,12 @@ import { StockRecord } from "@/types/xata";
 import { SelectedPick } from "@xata.io/client";
 
 export const getPriceGrowth = (
-  xataStock: Readonly<SelectedPick<StockRecord, ["*"]>>
+  priceTarget: number | null,
+  priceCurrent: number | null
 ) => {
-  if (xataStock.priceTarget && xataStock.priceCurrent) {
+  if (priceTarget && priceCurrent) {
     return Number(
-      (
-        ((xataStock.priceTarget - xataStock.priceCurrent) /
-          xataStock.priceCurrent) *
-        100
-      ).toFixed(2)
+      (((priceTarget - priceCurrent) / priceCurrent) * 100).toFixed(2)
     );
   }
   return null;

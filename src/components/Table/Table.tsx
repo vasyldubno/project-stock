@@ -12,13 +12,76 @@ import {
 import axios from "axios";
 import { useEffect, useMemo, useState } from "react";
 import s from "./Table.module.scss";
+import { supabaseClient } from "@/config/supabaseClient";
 
 export const Table = () => {
   const [data, setData] = useState<IPortfolioStock[]>([]);
   const [sorting, setSorting] = useState<SortingState>([]);
 
+  console.log(data);
+
   useEffect(() => {
-    PortfolioService.getPortfolio().then((res) => setData(res.data.portfolio));
+    PortfolioService.getPortfolio().then((res) => {
+      if (res.portfolio) {
+        setData(res.portfolio);
+      }
+    });
+
+    supabaseClient
+      .channel("stock-update")
+      .on(
+        "postgres_changes",
+        {
+          event: "UPDATE",
+          schema: "public",
+          table: "stock",
+        },
+        async (payload) => {
+          console.log(payload);
+          // const portfolio = await PortfolioService.getPortfolio();
+          // if (portfolio.portfolio) {
+          //   setData(portfolio.portfolio);
+          // }
+
+          const updatedStock = await supabaseClient
+            .from("stock_portfolio")
+            .select()
+            .eq("ticker", payload.new.ticker)
+            .single();
+
+          if (updatedStock.data) {
+            setData((prev) => {
+              const result = prev
+                .map((item) =>
+                  item.ticker === payload.new.ticker ? updatedStock.data : item
+                )
+                .sort((a, b) => {
+                  if (
+                    a.gain_unrealized_percentage === null &&
+                    b.gain_unrealized_percentage === null
+                  ) {
+                    return 0;
+                  }
+
+                  if (a.gain_unrealized_percentage === null) {
+                    return 1;
+                  }
+
+                  if (b.gain_unrealized_percentage === null) {
+                    return -1;
+                  }
+
+                  return (
+                    b.gain_unrealized_percentage - a.gain_unrealized_percentage
+                  );
+                });
+
+              return result;
+            });
+          }
+        }
+      )
+      .subscribe();
   }, []);
 
   const columnHelper = createColumnHelper<IPortfolioStock>();
@@ -28,11 +91,19 @@ export const Table = () => {
       header: "Ticker",
       cell: (info) => <p style={{ textAlign: "center" }}>{info.getValue()}</p>,
     }),
-    columnHelper.accessor("gainUnrealizedPercentage", {
+    columnHelper.accessor("gain_unrealized_percentage", {
       header: "Total Gain (Unrealized)",
-      cell: (info) => <p style={{ textAlign: "center" }}>{info.getValue()}%</p>,
+      cell: (info) => (
+        <>
+          {info.row.original.is_trading ? (
+            <p style={{ textAlign: "center" }}>{info.getValue()}%</p>
+          ) : (
+            <p style={{ textAlign: "center" }}>-- ---</p>
+          )}
+        </>
+      ),
     }),
-    columnHelper.accessor("marketPrice", {
+    columnHelper.accessor("market_price", {
       header: "Market Price",
       cell: (info) => <p style={{ textAlign: "center" }}>{info.getValue()}</p>,
     }),

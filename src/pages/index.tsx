@@ -1,5 +1,6 @@
 import { Button } from "@/components/Button/Button";
 import { FormAddStock } from "@/components/FormAddStock/FormAddStock";
+import { supabaseClient } from "@/config/supabaseClient";
 import { xataClient } from "@/config/xataClient";
 import { PortfolioService } from "@/services/PortfolioService";
 import axios from "axios";
@@ -12,27 +13,13 @@ export default function Home(props: {
   totalUnrealizedReturn: number;
   totalUnrealizedPercentage: number;
 }) {
-  // useEffect(() => {
-  //   const socket = new WebSocket(
-  //     "wss://ws.finnhub.io?token=cenkaeiad3i2t1u14mvgcenkaeiad3i2t1u14n00"
-  //   );
-  //   socket.addEventListener("open", () => {
-  //     socket.send(JSON.stringify({ type: "subscribe", symbol: "HAL" }));
-  //   });
-  //   socket.addEventListener("message", (event) => {
-  //     const response = JSON.parse(event.data);
-  //     console.log(response);
-  //   });
-  // }, []);
-
   return (
     <div style={{ margin: "1rem" }}>
-      {/* <FormAddStock /> */}
       <div style={{ display: "flex", gap: "1rem" }}>
         <Button
           onClick={async () => {
             const response = await PortfolioService.getStocks();
-            console.log(response.data.stocks);
+            console.log(response);
           }}
           title="Get Stocks"
         />

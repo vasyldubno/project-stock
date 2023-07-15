@@ -1,13 +1,18 @@
 import axios from "axios";
 
 interface IResponse {
-  c: number;
+  last_price: number;
 }
 
-export const getPriceCurrent = async (ticker: string) => {
-  const response = await axios.get<IResponse>(
-    `https://finnhub.io/api/v1/quote?symbol=${ticker}&token=cenkaeiad3i2t1u14mvgcenkaeiad3i2t1u14n00`
-  );
+export const getPriceCurrent = async (
+  ticker: string,
+  exchange: string | null
+) => {
+  if (ticker && exchange) {
+    const response = await axios.get<IResponse>(
+      `https://markets.sh/api/v1/symbols/${exchange}:${ticker}?api_token=7ea62693bd4ebc0ae34595335732676b`
+    );
 
-  return Number(response.data.c.toFixed(2));
+    return Number(response.data.last_price.toFixed(2));
+  }
 };
