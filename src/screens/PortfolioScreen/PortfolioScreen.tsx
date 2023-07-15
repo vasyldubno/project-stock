@@ -10,6 +10,14 @@ const TableDynamic = dynamic(
 );
 
 export const PortfolioScreen = () => {
+  useEffect(() => {
+    const fetch = async () => {
+      await axios.get(
+        `${process.env.NEXT_PUBLIC_CLIENT_URL}/api/stock/price-current`
+      );
+    };
+    // fetch();
+  }, []);
   return (
     <>
       <TableDynamic />

@@ -52,6 +52,9 @@ export default function Home(props: {
         Total Unrealized: {props.totalUnrealizedReturn.toFixed(2)} /{" "}
         {props.totalUnrealizedPercentage.toFixed(2)}%
       </p>
+      <p>
+        MarketCap: {(props.totalCost + props.totalUnrealizedReturn).toFixed(2)}
+      </p>
     </div>
   );
 }
