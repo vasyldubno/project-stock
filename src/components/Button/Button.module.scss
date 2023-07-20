@@ -3,10 +3,12 @@
   border-radius: 0.5rem;
   color: #fff;
   background-color: #827878;
-  transition-duration: 0.3s;
+  transition: all 0.3s ease;
 
   &:hover {
-    transform: scale(1.1);
-    transition-duration: 0.3s;
+    // transform: scale(1.1);
+    background-color: #665151;
+    // transition-duration: 0.3s;
+    transition: all 0.3s ease;
   }
 }

@@ -1,3 +1,27 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+:root {
+  --color-gray: #dadce0;
+}
+
+.react-tabs__tab-panel--selected {
+  border-left: 1px solid #aaa !important;
+  border-right: 1px solid #aaa !important;
+  border-bottom: 1px solid #aaa !important;
+  padding: 10px !important;
+}
+
+.react-tabs__tab-list {
+  margin: 0 !important;
+}
+
+.react-tabs {
+  padding-bottom: 10px !important;
+}
+
+/* .react-tabs__tab:first-child {
+  margin-left: 0 !important;
+  padding-left: 0 !important;
+} */

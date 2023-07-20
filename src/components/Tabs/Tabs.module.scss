@@ -1,0 +1,30 @@
+.tab_list {
+  border-bottom: 1px solid black;
+}
+
+.tab {
+  display: inline-block;
+  padding: 5px 1rem;
+  border: 1px solid transparent;
+  border-bottom: none;
+  position: relative;
+}
+
+.tab__active {
+  border-radius: 5px 5px 0px 0px;
+  border-color: black;
+  background-color: #fff;
+  font-weight: 700;
+}
+
+.tab_panel {
+  display: none;
+}
+
+.tab_panel__active {
+  display: block;
+  border-left: 1px solid black;
+  border-right: 1px solid black;
+  border-bottom: 1px solid black;
+  padding: 1rem;
+}

@@ -6,6 +6,7 @@ interface ButtonProps {
   color?: string;
   title: string;
   onClick?: () => void;
+  type?: "submit" | "reset" | "button";
 }
 
 export const Button: FC<ButtonProps> = ({
@@ -13,6 +14,7 @@ export const Button: FC<ButtonProps> = ({
   title,
   backgroundColor,
   color,
+  type,
 }) => {
   return (
     <button
@@ -22,6 +24,7 @@ export const Button: FC<ButtonProps> = ({
         color,
       }}
       className={s.button}
+      type={type}
     >
       {title}
     </button>

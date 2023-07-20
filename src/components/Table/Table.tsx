@@ -1,7 +1,7 @@
+import { ArrowRight } from "@/icons/ArrowRight";
 import { PortfolioService } from "@/services/PortfolioService";
-import { IPortfolioStock } from "@/types/types";
+import { IPortfolioStock, ISupaStock } from "@/types/types";
 import {
-  ColumnDef,
   SortingState,
   createColumnHelper,
   flexRender,
@@ -9,16 +9,24 @@ import {
   getSortedRowModel,
   useReactTable,
 } from "@tanstack/react-table";
-import axios from "axios";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
+import { TableCardPrice } from "../TableCardPrice/TableCardPrice";
+import { TableDetails } from "../TableDetails/TableDetails";
+import { TableDivider } from "../TableDivider/TableDivider";
 import s from "./Table.module.scss";
-import { supabaseClient } from "@/config/supabaseClient";
+import { supabaseStockUpdate } from "./supabase";
+import { Button } from "../Button/Button";
+import { Modal } from "../Modal/Modal";
+import { FormAddStock } from "../FormAddStock/FormAddStock";
 
 export const Table = () => {
   const [data, setData] = useState<IPortfolioStock[]>([]);
   const [sorting, setSorting] = useState<SortingState>([]);
-
-  console.log(data);
+  const [selectedTicker, setSelectedTicker] = useState<string[]>([]);
+  const [selectedStock, setSelectedStock] = useState<IPortfolioStock | null>(
+    null
+  );
+  const [isOpenModal, setIsOpenModal] = useState(false);
 
   useEffect(() => {
     PortfolioService.getPortfolio().then((res) => {
@@ -27,66 +35,40 @@ export const Table = () => {
       }
     });
 
-    supabaseClient
-      .channel("stock-update")
-      .on(
-        "postgres_changes",
-        {
-          event: "UPDATE",
-          schema: "public",
-          table: "stock",
-        },
-        async (payload) => {
-          console.log(payload);
-          // const portfolio = await PortfolioService.getPortfolio();
-          // if (portfolio.portfolio) {
-          //   setData(portfolio.portfolio);
-          // }
-
-          const updatedStock = await supabaseClient
-            .from("stock_portfolio")
-            .select()
-            .eq("ticker", payload.new.ticker)
-            .single();
-
-          if (updatedStock.data) {
-            setData((prev) => {
-              const result = prev
-                .map((item) =>
-                  item.ticker === payload.new.ticker ? updatedStock.data : item
-                )
-                .sort((a, b) => {
-                  if (
-                    a.gain_unrealized_percentage === null &&
-                    b.gain_unrealized_percentage === null
-                  ) {
-                    return 0;
-                  }
-
-                  if (a.gain_unrealized_percentage === null) {
-                    return 1;
-                  }
-
-                  if (b.gain_unrealized_percentage === null) {
-                    return -1;
-                  }
-
-                  return (
-                    b.gain_unrealized_percentage - a.gain_unrealized_percentage
-                  );
-                });
-
-              return result;
-            });
-          }
-        }
-      )
-      .subscribe();
+    supabaseStockUpdate(setData);
   }, []);
+
+  const showDetail = async (ticker: string) => {
+    setSelectedTicker((prev) => {
+      const exist = prev.find((item) => item.includes(ticker));
+      if (exist) {
+        const updatedState = prev.filter((item) => !item.includes(ticker));
+        return updatedState;
+      } else {
+        const updatedState = [...prev, ticker];
+        return updatedState;
+      }
+    });
+  };
 
   const columnHelper = createColumnHelper<IPortfolioStock>();
 
   const columns = [
+    columnHelper.accessor("ticker", {
+      header(props) {
+        return <></>;
+      },
+      cell(props) {
+        return (
+          <div
+            style={{ cursor: "pointer" }}
+            onClick={() => showDetail(props.row.original.ticker)}
+          >
+            <ArrowRight />
+          </div>
+        );
+      },
+    }),
     columnHelper.accessor("ticker", {
       header: "Ticker",
       cell: (info) => <p style={{ textAlign: "center" }}>{info.getValue()}</p>,
@@ -96,28 +78,79 @@ export const Table = () => {
       cell: (info) => (
         <>
           {info.row.original.is_trading ? (
-            <p style={{ textAlign: "center" }}>{info.getValue()}%</p>
+            <TableCardPrice content={info.getValue()?.toFixed(2)} />
           ) : (
-            <p style={{ textAlign: "center" }}>-- ---</p>
+            <TableCardPrice content={null} />
           )}
         </>
       ),
     }),
     columnHelper.accessor("market_price", {
       header: "Market Price",
-      cell: (info) => <p style={{ textAlign: "center" }}>{info.getValue()}</p>,
+      cell: (info) => (
+        <p style={{ textAlign: "center" }}>{info.getValue()?.toFixed(2)}</p>
+      ),
     }),
-    columnHelper.accessor("dividendValue", {
+    columnHelper.accessor("total_dividend_income", {
       header: "Total Dividends",
-      cell: (info) => <p style={{ textAlign: "center" }}>{info.getValue()}</p>,
+      cell: (info) => (
+        <>
+          {info.getValue() ? (
+            <p style={{ textAlign: "center" }}>{info.getValue()?.toFixed(2)}</p>
+          ) : (
+            <p style={{ textAlign: "center" }}>-- --</p>
+          )}
+        </>
+      ),
     }),
-    columnHelper.accessor("gainRealizedPercentage", {
+    columnHelper.accessor("total_return_margin", {
       header: "Total Return",
-      cell: (info) => {
-        if (info.getValue()) {
-          return <p style={{ textAlign: "center" }}>{info.getValue()}%</p>;
-        }
-      },
+      cell: (info) => (
+        <div style={{ textAlign: "center" }}>
+          {info.row.original.total_return_margin ? (
+            <p style={{ fontSize: "0.8rem" }}>
+              {info.row.original.total_return_margin.toFixed(2)}%
+            </p>
+          ) : (
+            <p style={{ fontSize: "0.8rem" }}>-- --</p>
+          )}
+
+          {info.row.original.total_return_value ? (
+            <p style={{ fontSize: "0.8rem" }}>
+              {info.row.original.total_return_value.toFixed(2)}
+            </p>
+          ) : (
+            <p style={{ fontSize: "0.8rem" }}>-- --</p>
+          )}
+        </div>
+      ),
+    }),
+    columnHelper.accessor("price_target", {
+      header: "Target",
+      cell: (info) => (
+        <div style={{ textAlign: "center" }}>
+          {info.row.original.price_target ? (
+            <p style={{ fontSize: "0.8rem" }}>
+              {info.row.original.price_target.toFixed(2)}
+            </p>
+          ) : (
+            <p style={{ fontSize: "0.8rem" }}>-- --</p>
+          )}
+          {info.row.original.price_target && info.row.original.market_price ? (
+            <p style={{ fontSize: "0.8rem" }}>
+              {`${(
+                ((info.row.original.price_target -
+                  info.row.original.market_price) /
+                  info.row.original.market_price) *
+                100
+              ).toFixed(2)}`}
+              %
+            </p>
+          ) : (
+            <p style={{ fontSize: "0.8rem" }}>-- --</p>
+          )}
+        </div>
+      ),
     }),
   ];
 
@@ -132,6 +165,7 @@ export const Table = () => {
 
   const toggleSortingHandler = (columnId: string) => () => {
     const sortConfig = sorting.find((sort) => sort.id === columnId);
+    console.log(sortConfig);
     if (sortConfig) {
       if (sortConfig.desc) {
         setSorting(sorting.filter((sort) => sort.id !== columnId));
@@ -143,58 +177,109 @@ export const Table = () => {
         );
       }
     } else {
-      setSorting([{ id: columnId, desc: false }]);
+      setSorting([{ id: columnId, desc: true }]);
     }
   };
 
   return (
-    <table className={s.table}>
-      <thead>
-        {table.getHeaderGroups().map((headerGroup) => (
-          <tr key={headerGroup.id}>
-            {headerGroup.headers.map((header) => (
-              <th
-                key={header.id}
-                onClick={toggleSortingHandler(header.column.id)}
-              >
-                {header.isPlaceholder ? null : (
-                  <div
-                    style={{
-                      display: "flex",
-                      justifyContent: "center",
-                    }}
-                  >
-                    {flexRender(
-                      header.column.columnDef.header,
-                      header.getContext()
-                    )}
-                    {sorting.some((sort) => sort.id === header.column.id) && (
-                      <span>
-                        {sorting.find((sort) => sort.id === header.column.id)
-                          ?.desc
-                          ? "🔽"
-                          : "🔼"}
-                      </span>
-                    )}
-                  </div>
-                )}
-              </th>
-            ))}
-          </tr>
-        ))}
-      </thead>
+    <>
+      <table className={s.table}>
+        <thead>
+          {table.getHeaderGroups().map((headerGroup, headerGroupIndex) => (
+            <tr key={`${headerGroup.id}-${headerGroupIndex}`}>
+              {headerGroup.headers.map((header, headerIndex) => (
+                <th
+                  key={`${header.id}-${headerIndex}`}
+                  onClick={toggleSortingHandler(header.column.id)}
+                >
+                  {header.isPlaceholder ? null : (
+                    <div
+                      style={{
+                        display: "flex",
+                        justifyContent: "center",
+                      }}
+                    >
+                      <div style={{ cursor: "pointer" }}>
+                        {flexRender(
+                          header.column.columnDef.header,
+                          header.getContext()
+                        )}
+                      </div>
+                      {sorting.some((sort) => sort.id === header.column.id) && (
+                        <span>
+                          {sorting.find((sort) => sort.id === header.column.id)
+                            ?.desc
+                            ? "🔽"
+                            : "🔼"}
+                        </span>
+                      )}
+                    </div>
+                  )}
+                </th>
+              ))}
+            </tr>
+          ))}
+        </thead>
 
-      {table.getRowModel().rows.map((row) => (
-        <tbody key={row.id}>
-          <tr key={row.id}>
-            {row.getVisibleCells().map((cell) => (
-              <td key={cell.id}>
-                {flexRender(cell.column.columnDef.cell, cell.getContext())}
-              </td>
-            ))}
-          </tr>
-        </tbody>
-      ))}
-    </table>
+        {table.getRowModel().rows.map((row, rowIndex) => (
+          <>
+            <tbody key={`divider-${row.id}-${rowIndex}`}>
+              <tr>
+                <td colSpan={columns.length}>
+                  <TableDivider />
+                </td>
+              </tr>
+            </tbody>
+            <tbody key={`data-${row.id}-${rowIndex}`}>
+              <tr>
+                {row.getVisibleCells().map((cell, cellIndex) => (
+                  <td
+                    key={`${cell.id}-${cellIndex}`}
+                    style={{ padding: "5px 0" }}
+                  >
+                    {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                  </td>
+                ))}
+                <div
+                  style={{
+                    padding: "5px 0",
+                    display: "flex",
+                    justifyContent: "center",
+                  }}
+                >
+                  <Button
+                    title="SELL"
+                    onClick={() => {
+                      setIsOpenModal(true);
+                      setSelectedStock(row.original);
+                    }}
+                  />
+                </div>
+              </tr>
+              {selectedTicker.includes(row.original.ticker) && (
+                <>
+                  <tr>
+                    <td colSpan={columns.length}>
+                      <TableDetails
+                        ticker={selectedTicker.find((item) =>
+                          item.includes(row.original.ticker)
+                        )}
+                      />
+                    </td>
+                  </tr>
+                </>
+              )}
+            </tbody>
+          </>
+        ))}
+      </table>
+      <Modal open={isOpenModal} onClose={() => setIsOpenModal(false)}>
+        <FormAddStock
+          onClose={() => setIsOpenModal(false)}
+          stock={selectedStock}
+          type="sell"
+        />
+      </Modal>
+    </>
   );
 };

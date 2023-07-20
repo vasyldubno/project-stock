@@ -2,10 +2,21 @@ import { z } from "zod";
 import { SubmitHandler, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { PortfolioService } from "@/services/PortfolioService";
+import { Button } from "../Button/Button";
+import { IPortfolioStock, ISupaStock } from "@/types/types";
 
-export const FormAddStock = () => {
+type Stock = IPortfolioStock | ISupaStock;
+
+export const FormAddStock = ({
+  stock,
+  onClose,
+  type,
+}: {
+  stock: Stock | null;
+  onClose: () => void;
+  type: "buy" | "sell";
+}) => {
   const formSchema = z.object({
-    ticker: z.string().min(1, "Require"),
     count: z.string().transform((value) => Number(value)),
     price: z.string().transform((value) => Number(value)),
   });
@@ -23,17 +34,19 @@ export const FormAddStock = () => {
   });
 
   const onSubmit: SubmitHandler<FormSchema> = async (data) => {
-    const response = await PortfolioService.addTransaction(
-      data.ticker,
-      data.price,
-      data.count,
-      "buy"
-    );
+    if (stock) {
+      const response = await PortfolioService.addTransaction(
+        stock.ticker,
+        data.price,
+        data.count,
+        type
+      );
 
-    if (response) {
-      setValue("ticker", "");
-      setValue("count", 0);
-      setValue("price", 0);
+      if (response) {
+        setValue("count", 0);
+        setValue("price", 0);
+        onClose();
+      }
     }
   };
 
@@ -42,7 +55,6 @@ export const FormAddStock = () => {
       <div style={{ display: "flex", flexDirection: "column" }}>
         <label htmlFor="ticker">Ticker</label>
         <input
-          {...register("ticker")}
           id="ticker"
           type="text"
           style={{
@@ -50,8 +62,8 @@ export const FormAddStock = () => {
             paddingLeft: "0.2rem",
             outline: "transparent",
           }}
+          value={stock?.ticker}
         />
-        {errors.ticker && <p>{errors.ticker.message}</p>}
       </div>
 
       <div style={{ display: "flex", flexDirection: "column" }}>
@@ -85,7 +97,8 @@ export const FormAddStock = () => {
         {errors.price && <p>{errors.price.message}</p>}
       </div>
 
-      <button type="submit">Add Stock</button>
+      {type === "buy" && <Button title="BUY" type="submit" />}
+      {type === "sell" && <Button title="SELL" type="submit" />}
     </form>
   );
 };

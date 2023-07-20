@@ -1,4 +1,4 @@
-import { xataClient } from "@/config/xataClient";
+import { supabaseClient } from "@/config/supabaseClient";
 import { getUnrealizedPercentage } from "@/utils/getUnrealizedPercentage";
 import { getUnrealizedValue } from "@/utils/getUnrealizedValue";
 import axios from "axios";
@@ -8,39 +8,41 @@ export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse
 ) {
-  const portfolio = await xataClient.db.portfolioStock
-    .filter("isTrading", true)
-    .getAll();
+  const stocks = await supabaseClient
+    .from("stock_portfolio")
+    .select()
+    .eq("is_trading", true)
+    .order("ticker", { ascending: true });
 
-  portfolio.forEach((stock, index) => {
-    setTimeout(async () => {
-      try {
-        if (stock.ticker) {
+  if (stocks.data) {
+    stocks.data.forEach((stock, index) => {
+      setTimeout(async () => {
+        try {
           const responsePrice = await axios.get(
             `https://markets.sh/api/v1/symbols/${stock.exchange}:${stock.ticker}?api_token=7ea62693bd4ebc0ae34595335732676b`
           );
 
           const marketPrice = responsePrice.data.last_price;
 
-          console.log(index, stock.ticker, marketPrice);
+          await supabaseClient
+            .from("stock_portfolio")
+            .update({
+              market_price: marketPrice,
+              gain_unrealized_value:
+                (await getUnrealizedValue(stock.ticker, marketPrice)) ?? null,
+              gain_unrealized_percentage:
+                (await getUnrealizedPercentage(stock.ticker, marketPrice)) ??
+                null,
+            })
+            .eq("ticker", stock.ticker);
 
-          await xataClient.db.portfolioStock.update(stock.id, {
-            marketPrice,
-            gainUnrealizedValue: await getUnrealizedValue(
-              stock.ticker,
-              marketPrice
-            ),
-            gainUnrealizedPercentage: await getUnrealizedPercentage(
-              stock.ticker,
-              marketPrice
-            ),
-          });
+          console.log(index, stock.ticker, marketPrice);
+        } catch {
+          console.log("ERROR", index, stock.ticker);
         }
-      } catch {
-        console.log("ERROR", index, stock.ticker);
-      }
-    }, 600 * index);
-  });
+      }, index * 600);
+    });
+  }
 
   res.json({ message: "Ok" });
 }

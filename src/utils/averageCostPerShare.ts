@@ -1,3 +1,4 @@
+import { supabaseClient } from "@/config/supabaseClient";
 import { xataClient } from "@/config/xataClient";
 
 export const averageCostPerShare = async (
@@ -6,28 +7,35 @@ export const averageCostPerShare = async (
   count: number,
   type: "buy" | "sell"
 ) => {
-  const xataStock = await xataClient.db.transaction
-    .filter("ticker", ticker)
-    .getAll();
+  // const xataStock = await xataClient.db.transaction
+  //   .filter("ticker", ticker)
+  //   .getAll();
 
-  if (!xataStock) {
+  const stock = await supabaseClient
+    .from("transaction")
+    .select()
+    .eq("ticker", ticker);
+
+  // if (!xataStock) {
+  //   return price;
+  // }
+
+  if (!stock.data) {
     return price;
   }
 
-  if (xataStock) {
-    const prevSumm = xataStock.reduce((acc, item) => {
+  if (stock.data) {
+    const prevSumm = stock.data.reduce((acc, item) => {
       if (item.price && item.count && item.type === "buy") {
         return (acc += item.price * item.count);
       }
-
       if (item.price && item.count && item.type === "sell") {
         return (acc -= item.price * item.count);
       }
-
       return acc;
     }, 0);
 
-    const prevCount = xataStock.reduce((acc, item) => {
+    const prevCount = stock.data.reduce((acc, item) => {
       if (item.count && item.type === "buy") {
         return (acc += item.count);
       }
@@ -63,4 +71,54 @@ export const averageCostPerShare = async (
 
     return result;
   }
+
+  // if (xataStock) {
+  //   const prevSumm = xataStock.reduce((acc, item) => {
+  //     if (item.price && item.count && item.type === "buy") {
+  //       return (acc += item.price * item.count);
+  //     }
+
+  //     if (item.price && item.count && item.type === "sell") {
+  //       return (acc -= item.price * item.count);
+  //     }
+
+  //     return acc;
+  //   }, 0);
+
+  //   const prevCount = xataStock.reduce((acc, item) => {
+  //     if (item.count && item.type === "buy") {
+  //       return (acc += item.count);
+  //     }
+
+  //     if (item.count && item.type === "sell") {
+  //       return (acc -= item.count);
+  //     }
+
+  //     return acc;
+  //   }, 0);
+
+  //   const updatedSumm = () => {
+  //     if (type === "buy") {
+  //       return prevSumm + price * count;
+  //     }
+  //     if (type === "sell") {
+  //       return prevSumm - price * count;
+  //     }
+  //     return 0;
+  //   };
+
+  //   const updatedCount = () => {
+  //     if (type === "buy") {
+  //       return prevCount + count;
+  //     }
+  //     if (type === "sell") {
+  //       return prevCount - count;
+  //     }
+  //     return 0;
+  //   };
+
+  //   const result = updatedSumm() / updatedCount();
+
+  //   return result;
+  // }
 };

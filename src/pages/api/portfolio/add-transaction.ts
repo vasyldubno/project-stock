@@ -1,11 +1,46 @@
-import { xataClient } from "@/config/xataClient";
+import { supabaseClient } from "@/config/supabaseClient";
 import { averageCostPerShare } from "@/utils/averageCostPerShare";
-import axios from "axios";
-import { NextApiRequest, NextApiResponse } from "next";
-import moment from "moment";
 import { getRealizedValue } from "@/utils/getRealizedValue";
-import { getRealizedPercentage } from "@/utils/getRealizedPercentage";
-import { getAmountActiveShares } from "@/utils/amountActiveShares";
+import { getTotalReturnMarginStock } from "@/utils/stockPortfolio/getTotalReturnMarginStock";
+import axios from "axios";
+import moment from "moment";
+import { NextApiRequest, NextApiResponse } from "next";
+
+const getUnrealizedValueAfterSell = (
+  countSell: number,
+  amountActiveShares: number,
+  averageCostPerShare: number,
+  marketPrice: number
+) => {
+  const updatedAmountActiveShares = amountActiveShares - countSell;
+  const buyCost = updatedAmountActiveShares * averageCostPerShare;
+  const sellCost = updatedAmountActiveShares * marketPrice;
+  const result = sellCost - buyCost;
+  return result;
+};
+
+const getUnrealizedMarginAftelSell = (
+  countSell: number,
+  amountActiveShares: number,
+  averageCostPerShare: number,
+  marketPrice: number
+) => {
+  const updatedAmountActiveShares = amountActiveShares - countSell;
+  const marketCap = updatedAmountActiveShares * marketPrice;
+  const result = Number(
+    (
+      (getUnrealizedValueAfterSell(
+        countSell,
+        amountActiveShares,
+        averageCostPerShare,
+        marketPrice
+      ) /
+        marketCap) *
+      100
+    ).toFixed(2)
+  );
+  return result;
+};
 
 export default async function handler(
   req: NextApiRequest,
@@ -13,57 +48,77 @@ export default async function handler(
 ) {
   const { ticker, price, count, type } = req.body;
 
-  const updatedDate = new Date(
-    moment(new Date(), "DD.MM.YYYY").format("YYYY-MM-DD")
-  );
+  const updatedDate = moment(new Date(), "DD.MM.YYYY").format("YYYY-MM-DD");
 
   if (type === "buy") {
     const responseExchange = await axios.get<{ Exchange: string }>(
       `https://www.alphavantage.co/query?function=OVERVIEW&symbol=${ticker}&apikey=U0366SZHJEG1GO6E`
     );
 
-    await xataClient.db.transaction.create({
-      ticker,
-      count,
-      price,
-      type: "buy",
-      date: updatedDate,
-    });
+    await supabaseClient
+      .from("transaction")
+      .insert({ count: count, date: updatedDate, price, ticker, type });
 
-    const existStock = await xataClient.db.portfolioStock
-      .filter("ticker", ticker)
-      .getFirst();
+    const existStock = await supabaseClient
+      .from("stock_portfolio")
+      .select()
+      .eq("ticker", ticker)
+      .single();
 
-    if (existStock && responseExchange) {
-      await xataClient.db.portfolioStock.update(existStock.id, {
-        isTrading: true,
-        marketPrice: price,
-        averageCostPerShare: await averageCostPerShare(
-          ticker,
-          price,
-          count,
-          type
-        ),
-      });
-      if (!existStock.isTrading) {
-        await xataClient.db.portfolioStock.update(existStock.id, {
-          startTradeDate: updatedDate,
-        });
+    const portfolio = await supabaseClient.from("portfolio").select().single();
+    const priceTarget = await supabaseClient
+      .from("stock")
+      .select("price_target")
+      .eq("ticker", ticker)
+      .single();
+
+    if (existStock.data && responseExchange) {
+      if (portfolio.data && priceTarget.data) {
+        await supabaseClient
+          .from("stock_portfolio")
+          .update({
+            is_trading: true,
+            market_price: price,
+            average_cost_per_share: await averageCostPerShare(
+              ticker,
+              price,
+              count,
+              "buy"
+            ),
+            amount_active_shares: existStock.data.amount_active_shares
+              ? existStock.data.amount_active_shares + count
+              : count,
+            portfolio_id: portfolio.data.id,
+            price_target: priceTarget.data.price_target,
+          })
+          .eq("ticker", ticker);
+
+        if (!existStock.data.is_trading) {
+          await supabaseClient
+            .from("stock_portfolio")
+            .update({ startTradeDate: updatedDate })
+            .eq("ticker", ticker);
+        }
       }
     } else {
-      await xataClient.db.portfolioStock.create({
-        ticker,
-        exchange: responseExchange.data.Exchange,
-        isTrading: true,
-        marketPrice: price,
-        startTradeDate: updatedDate,
-        averageCostPerShare: price,
-      });
+      if (portfolio.data && priceTarget.data) {
+        await supabaseClient.from("stock_portfolio").insert({
+          ticker,
+          exchange: responseExchange.data.Exchange,
+          is_trading: true,
+          market_price: price,
+          startTradeDate: updatedDate,
+          average_cost_per_share: price,
+          amount_active_shares: count,
+          portfolio_id: portfolio.data.id,
+          price_target: priceTarget.data.price_target,
+        });
+      }
     }
   }
 
   if (type === "sell") {
-    await xataClient.db.transaction.create({
+    await supabaseClient.from("transaction").insert({
       ticker,
       count,
       price,
@@ -71,46 +126,75 @@ export default async function handler(
       date: updatedDate,
     });
 
-    const xataStock = await xataClient.db.portfolioStock
-      .filter("ticker", ticker)
-      .getFirst();
+    const stock = await supabaseClient
+      .from("stock_portfolio")
+      .select()
+      .eq("ticker", ticker)
+      .single();
 
-    if (xataStock) {
-      // const activeShares = await xataClient.db.transaction
-      //   .filter({ ticker, type: "buy" })
-      //   .getAll();
-
-      // const amountActiveShares = activeShares.reduce((acc, item) => {
-      //   if (item.count) {
-      //     return (acc += item.count);
-      //   }
-      //   return acc;
-      // }, 0);
-
-      const amountActiveShares = await getAmountActiveShares(ticker);
-
-      if (amountActiveShares === count) {
-        await xataClient.db.portfolioStock.update(xataStock.id, {
-          startTradeDate: null,
-          isTrading: false,
-        });
+    if (
+      stock.data &&
+      stock.data.amount_active_shares &&
+      stock.data.average_cost_per_share
+    ) {
+      if (stock.data.amount_active_shares === count) {
+        await supabaseClient
+          .from("stock_portfolio")
+          .update({
+            startTradeDate: null,
+            is_trading: false,
+            amount_active_shares: null,
+            market_price: price,
+            total_return_value: stock.data.total_return_value
+              ? stock.data.total_return_value +
+                getRealizedValue(
+                  price,
+                  count,
+                  stock.data.average_cost_per_share
+                )
+              : getRealizedValue(
+                  price,
+                  count,
+                  stock.data.average_cost_per_share
+                ),
+            total_return_margin: getTotalReturnMarginStock(
+              stock.data.total_return_value,
+              getRealizedValue(price, count, stock.data.average_cost_per_share),
+              stock.data.amount_active_shares,
+              stock.data.average_cost_per_share
+            ),
+            gain_unrealized_value: null,
+            gain_unrealized_percentage: null,
+          })
+          .eq("ticker", ticker);
       }
 
-      if (amountActiveShares >= count && xataStock.averageCostPerShare) {
-        await xataClient.db.portfolioStock.update(xataStock.id, {
-          marketPrice: price,
-          gainRealizedValue: getRealizedValue(
-            price,
-            count,
-            xataStock.averageCostPerShare
+      if (stock.data.amount_active_shares >= count) {
+        await supabaseClient.from("stock_portfolio").update({
+          market_price: price,
+          total_return_value: stock.data.total_return_value
+            ? stock.data.total_return_value +
+              getRealizedValue(price, count, stock.data.average_cost_per_share)
+            : getRealizedValue(price, count, stock.data.average_cost_per_share),
+          total_return_margin: getTotalReturnMarginStock(
+            stock.data.total_return_value,
+            getRealizedValue(price, count, stock.data.average_cost_per_share),
+            stock.data.amount_active_shares,
+            stock.data.average_cost_per_share
           ),
-          gainRealizedPercentage: getRealizedPercentage(
-            price,
+          gain_unrealized_value: getUnrealizedValueAfterSell(
             count,
-            xataStock.averageCostPerShare
+            stock.data.amount_active_shares,
+            stock.data.average_cost_per_share,
+            price
           ),
-          gainUnrealizedPercentage: 0,
-          gainUnrealizedValue: 0,
+          gain_unrealized_percentage: getUnrealizedMarginAftelSell(
+            count,
+            stock.data.amount_active_shares,
+            stock.data.average_cost_per_share,
+            price
+          ),
+          amount_active_shares: stock.data.amount_active_shares - count,
         });
       }
     }

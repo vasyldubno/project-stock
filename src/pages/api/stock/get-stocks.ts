@@ -8,16 +8,6 @@ export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse
 ) {
-  // const stocks = await xataClient.db.stock
-  //   .select(["roe", "priceGrowth", "analystRating.*", "pe", "ticker"])
-  //   .filter({
-  //     roe: { $ge: 20 },
-  //     priceGrowth: { $ge: 20 },
-  //     analystRating: { buy: { $ge: 10 } },
-  //     pe: { $le: 30, $gt: 0 },
-  //   })
-  //   .getAll();
-
   const stocks = await supabaseClient
     .from("stock")
     .select()
@@ -27,12 +17,7 @@ export default async function handler(
     .lte("pe", 30)
     .gt("pe", 0);
 
-  // const xataPortfolioStocks = await xataClient.db.portfolioStock
-  //   .filter("isTrading", true)
-  //   .getAll();
-
   const stockPortfolio = await supabaseClient.from("stock_portfolio").select();
-  // .eq("isTrading", true);
 
   if (stocks.data && stockPortfolio.data) {
     res.json({

@@ -1,6 +1,4 @@
 import { supabaseClient } from "@/config/supabaseClient";
-import { averageCostPerShare } from "../averageCostPerShare";
-import { getAmountActiveShares } from "../amountActiveShares";
 
 export const getMarketCap = async () => {
   const stockPortfolio = await supabaseClient
@@ -8,15 +6,12 @@ export const getMarketCap = async () => {
     .select()
     .eq("is_trading", true);
 
-  const result = stockPortfolio.data?.reduce(async (accPromise, item) => {
-    const acc = await accPromise;
-    if (item.market_price) {
-      return (
-        acc + item.market_price * (await getAmountActiveShares(item.ticker))
-      );
+  const result = stockPortfolio.data?.reduce((acc, item) => {
+    if (item.market_price && item.amount_active_shares) {
+      return (acc += item.market_price * item.amount_active_shares);
     }
     return acc;
-  }, Promise.resolve(0));
+  }, 0);
 
-  return result;
+  return Number(result?.toFixed(2));
 };

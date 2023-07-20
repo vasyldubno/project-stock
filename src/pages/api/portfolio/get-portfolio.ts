@@ -1,10 +1,5 @@
 import { xataClient } from "@/config/xataClient";
-import { averageCostPerShare } from "@/utils/averageCostPerShare";
-import axios from "axios";
 import { NextApiRequest, NextApiResponse } from "next";
-import moment from "moment";
-import { getRealizedValue } from "@/utils/getRealizedValue";
-import { getRealizedPercentage } from "@/utils/getRealizedPercentage";
 
 export default async function handler(
   req: NextApiRequest,
