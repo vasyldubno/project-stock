@@ -247,13 +247,15 @@ export const Table = () => {
                     justifyContent: "center",
                   }}
                 >
-                  <Button
-                    title="SELL"
-                    onClick={() => {
-                      setIsOpenModal(true);
-                      setSelectedStock(row.original);
-                    }}
-                  />
+                  {row.original.is_trading && (
+                    <Button
+                      title="SELL"
+                      onClick={() => {
+                        setIsOpenModal(true);
+                        setSelectedStock(row.original);
+                      }}
+                    />
+                  )}
                 </div>
               </tr>
               {selectedTicker.includes(row.original.ticker) && (

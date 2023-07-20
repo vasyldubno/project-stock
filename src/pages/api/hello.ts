@@ -10,25 +10,15 @@ export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse
 ) {
-  const stocks = await supabaseClient
-    .from("stock")
-    .select()
-    .order("ticker", { ascending: true });
+  const {
+    data: { last_price },
+  } = await axios.get(
+    "https://markets.sh/api/v1/symbols/NYSE:SQ?api_token=7ea62693bd4ebc0ae34595335732676b"
+  );
 
-  const portfolio = await supabaseClient.from("stock_portfolio").select();
+  await supabaseClient.from("test").insert({ content: last_price });
 
-  if (stocks.data && portfolio.data) {
-    const portfolioArrayTicker = portfolio.data.map((item) => item.ticker);
-
-    const a = stocks.data.filter(
-      (item) =>
-        item.report_date?.includes("2023-07") &&
-        portfolioArrayTicker.includes(item.ticker)
-    );
-
-    res.json({
-      message: "Ok",
-      stocks: a,
-    });
-  }
+  res.json({
+    message: "Ok",
+  });
 }

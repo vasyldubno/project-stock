@@ -254,6 +254,24 @@ export interface Database {
           }
         ]
       }
+      test: {
+        Row: {
+          content: string | null
+          created_at: string | null
+          id: string
+        }
+        Insert: {
+          content?: string | null
+          created_at?: string | null
+          id?: string
+        }
+        Update: {
+          content?: string | null
+          created_at?: string | null
+          id?: string
+        }
+        Relationships: []
+      }
       transaction: {
         Row: {
           count: number
