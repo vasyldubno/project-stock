@@ -305,6 +305,27 @@ export interface Database {
         }
         Relationships: []
       }
+      user: {
+        Row: {
+          balance: number
+          created_at: string | null
+          id: string
+          username: string
+        }
+        Insert: {
+          balance?: number
+          created_at?: string | null
+          id?: string
+          username: string
+        }
+        Update: {
+          balance?: number
+          created_at?: string | null
+          id?: string
+          username?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never

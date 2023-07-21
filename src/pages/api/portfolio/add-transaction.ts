@@ -115,6 +115,18 @@ export default async function handler(
         });
       }
     }
+
+    const user = await supabaseClient
+      .from("user")
+      .select()
+      .eq("username", "vasyldubno")
+      .single();
+
+    if (user.data) {
+      await supabaseClient.from("user").update({
+        balance: user.data.balance - price * count,
+      });
+    }
   }
 
   if (type === "sell") {
@@ -195,6 +207,20 @@ export default async function handler(
             price
           ),
           amount_active_shares: stock.data.amount_active_shares - count,
+        });
+      }
+    }
+
+    const user = await supabaseClient
+      .from("user")
+      .select()
+      .eq("username", "vasyldubno")
+      .single();
+
+    if (user.data && stock.data) {
+      if (stock.data.average_cost_per_share) {
+        await supabaseClient.from("user").update({
+          balance: user.data.balance + price * count,
         });
       }
     }
