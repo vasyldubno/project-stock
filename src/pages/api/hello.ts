@@ -10,15 +10,19 @@ export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse
 ) {
-  const tickers = ["A", "AAP"];
-  const exchange = "NYSE";
+  const tickers: { ticker: string; exchange: string }[] = [
+    { ticker: "A", exchange: "NYSE" },
+    { ticker: "AAL", exchange: "NASDAQ" },
+    { ticker: "AAP", exchange: "NYSE" },
+    { ticker: "AAPL", exchange: "NASDAQ" },
+  ];
 
   tickers.forEach((stock, index) => {
     setTimeout(async () => {
       const {
         data: { last_price },
       } = await axios.get(
-        `https://markets.sh/api/v1/symbols/${exchange}:${stock}?api_token=7ea62693bd4ebc0ae34595335732676b`
+        `https://markets.sh/api/v1/symbols/${stock.exchange}:${stock.ticker}?api_token=7ea62693bd4ebc0ae34595335732676b`
       );
 
       const stockSupa = await supabaseClient
