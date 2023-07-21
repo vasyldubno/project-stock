@@ -7,7 +7,7 @@ export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse
 ) {
-  console.log("STOCK/PRICE-CURRENT");
+  console.log("API/STOCK/PRICE-CURRENT");
   const stocks = await supabaseClient
     .from("stock")
     .select()
@@ -41,7 +41,7 @@ export default async function handler(
             }
           }
         } catch (error) {
-          console.log("ERROR", index, stock.ticker);
+          // console.log("ERROR", index, stock.ticker);
         }
       }, 600 * index);
     });

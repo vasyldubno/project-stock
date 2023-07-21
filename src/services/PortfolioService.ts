@@ -36,6 +36,8 @@ export class PortfolioService {
       .gte("analystRatingBuy", 10)
       .lte("pe", 30)
       .gt("pe", 0)
+      .gte("gfValue", 10)
+      .lte("de", 3)
       .order("price_growth", { ascending: false });
 
     const stockPortfolio = await supabaseClient

@@ -10,7 +10,7 @@ const TableDynamic = dynamic(
 
 export const PortfolioScreen = () => {
   useEffect(() => {
-    PortfolioService.updatePortfolio();
+    // PortfolioService.updatePortfolio();
   }, []);
   return (
     <div style={{ margin: "1rem" }}>

@@ -104,6 +104,7 @@ export interface Database {
           analystRatingBuy: number | null
           annualDividend: number | null
           created_at: string | null
+          de: number | null
           dividendYield: number | null
           eps: number | null
           exchange: string | null
@@ -130,6 +131,7 @@ export interface Database {
           analystRatingBuy?: number | null
           annualDividend?: number | null
           created_at?: string | null
+          de?: number | null
           dividendYield?: number | null
           eps?: number | null
           exchange?: string | null
@@ -156,6 +158,7 @@ export interface Database {
           analystRatingBuy?: number | null
           annualDividend?: number | null
           created_at?: string | null
+          de?: number | null
           dividendYield?: number | null
           eps?: number | null
           exchange?: string | null

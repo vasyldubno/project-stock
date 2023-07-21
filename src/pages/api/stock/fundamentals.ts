@@ -4,6 +4,7 @@ import { NextApiRequest, NextApiResponse } from "next";
 import cheerio from "cheerio";
 import { supabaseClient } from "@/config/supabaseClient";
 import { updateReportDate } from "@/utils/stock/updateReportDate";
+import { getGFValue } from "@/utils/stock/getGFValue";
 
 const convertMarketCap = (numberString: string) => {
   if (typeof numberString !== "string") {
@@ -37,7 +38,11 @@ export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse
 ) {
-  const stocks = await supabaseClient.from("stock").select();
+  console.log("/API/STOCK/FUNDAMENTALS");
+  const stocks = await supabaseClient
+    .from("stock")
+    .select()
+    .order("ticker", { ascending: true });
   // .eq("ticker", "FMC");
 
   if (stocks.data) {
@@ -47,7 +52,7 @@ export default async function handler(
           const html = await getHTML(
             `https://finviz.com/quote.ashx?t=${stock.ticker}`
           );
-          console.log(index, stock.ticker);
+          // console.log(index, stock.ticker);
 
           const $ = cheerio.load(html);
 
@@ -75,6 +80,25 @@ export default async function handler(
           const marketCap = $(
             ".snapshot-table-wrapper > table > tbody > tr:nth-child(2) td:nth-child(2)"
           ).text();
+          const de = $(
+            ".snapshot-table-wrapper > table > tbody > tr:nth-child(10) td:nth-child(4)"
+          ).text();
+
+          const GFValue = (await getGFValue(stock.ticker)) ?? null;
+
+          const getGFValueMargin = () => {
+            if (GFValue && stock.price_current) {
+              const result = Number(
+                (
+                  ((GFValue - stock.price_current) / stock.price_current) *
+                  100
+                ).toFixed(2)
+              );
+              return result;
+            } else {
+              return 0;
+            }
+          };
 
           await supabaseClient
             .from("stock")
@@ -86,12 +110,15 @@ export default async function handler(
               dividendYield: Number(dividendYield.split("%")[0]),
               payoutRation: Number(payoutRation.split("%")[0]),
               marketCap: convertMarketCap(marketCap),
+              gfValue: GFValue,
+              gfValueMargin: getGFValueMargin(),
+              de: Number(de),
             })
             .eq("ticker", stock.ticker);
 
           updateReportDate(stock.ticker);
         } catch {
-          console.log("ERROR =>", stock.ticker);
+          // console.log("ERROR => /API/STOCK/FUNDAMENTALS", stock.ticker);
         }
       }, 300 * index);
     });

@@ -7,7 +7,7 @@ import { useEffect } from "react";
 
 const ScreenerPage = ({ data }: { data: ISupaStock[] }) => {
   useEffect(() => {
-    StockService.updatePriceCurrent();
+    // StockService.updatePriceCurrent();
   }, []);
 
   return <ScreenerScreen data={data} />;
