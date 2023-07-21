@@ -27,6 +27,8 @@ export const Layout: FC<PropsWithChildren> = ({ children }) => {
         setBalance(result.data.balance);
       }
     };
+
+    fetch();
   }, []);
 
   return (

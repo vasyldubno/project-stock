@@ -9,6 +9,7 @@ import { TableDivider } from "@/components/TableDivider/TableDivider";
 import moment from "moment-timezone";
 import { PortfolioService } from "@/services/PortfolioService";
 import { ChartSectors } from "@/components/ChartSectors/ChartSectors";
+import { CalendarEarnings } from "@/components/CalendarEarnings/CalendarEarnings";
 
 interface IPortfolio {
   active_cost: number | null;
@@ -134,62 +135,7 @@ export const DashboardScreen = () => {
           </div>
 
           <div style={{ display: "flex" }}>
-            {calendarEarning.length > 0 && (
-              <div
-                style={{
-                  border: "1px solid var(--color-gray)",
-                  padding: "1rem",
-                  borderRadius: "1rem",
-                  width: "500px",
-                  display: "flex",
-                  flexDirection: "column",
-                  gap: "1rem",
-                }}
-              >
-                <p
-                  style={{
-                    textAlign: "center",
-                    fontWeight: "bold",
-                    fontSize: "1.2rem",
-                  }}
-                >
-                  Calendar Earnings
-                </p>
-                <TableDivider />
-                {calendarEarning.map((item, index) => {
-                  return (
-                    <div
-                      key={index}
-                      style={{
-                        display: "flex",
-                        alignItems: "center",
-                        gap: "1rem",
-                      }}
-                    >
-                      <div
-                        style={{
-                          color: "rgb(25,103,210)",
-                          backgroundColor: "rgb(232,240,254)",
-                          width: "50px",
-                          height: "50px",
-                          display: "flex",
-                          flexDirection: "column",
-                          alignItems: "center",
-                          justifyContent: "center",
-                          borderRadius: "0.6rem",
-                        }}
-                      >
-                        <p>{moment(item.report_date).format("MMM")}.</p>
-                        <p>{item.report_date?.split("-")[2]}</p>
-                      </div>
-                      <div>
-                        <p>{item.name}</p>
-                      </div>
-                    </div>
-                  );
-                })}
-              </div>
-            )}
+            <CalendarEarnings calendarEarning={calendarEarning} />
             <div style={{ width: "600px" }}>
               <ChartSectors sectors={sectors} />
             </div>
