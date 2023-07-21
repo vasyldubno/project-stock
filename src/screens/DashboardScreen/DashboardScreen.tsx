@@ -7,6 +7,8 @@ import { StockService } from "@/services/StockService";
 import { ISupaStock } from "@/types/types";
 import { TableDivider } from "@/components/TableDivider/TableDivider";
 import moment from "moment-timezone";
+import { PortfolioService } from "@/services/PortfolioService";
+import { ChartSectors } from "@/components/ChartSectors/ChartSectors";
 
 interface IPortfolio {
   active_cost: number | null;
@@ -24,8 +26,9 @@ interface IPortfolio {
 export const DashboardScreen = () => {
   const [portfolio, setPortfolio] = useState<IPortfolio | null>(null);
   const [calendarEarning, setCalendarEarnings] = useState<ISupaStock[]>([]);
-
-  console.log(calendarEarning);
+  const [sectors, setSectors] = useState<{ sector: string; count: number }[]>(
+    []
+  );
 
   useEffect(() => {
     const fetch = async () => {
@@ -39,6 +42,36 @@ export const DashboardScreen = () => {
     StockService.getCalendarEarnings().then((res) =>
       setCalendarEarnings(res.stocks)
     );
+  }, []);
+
+  useEffect(() => {
+    PortfolioService.getPortfolio().then((res) => {
+      console.log("CALL");
+      const arrayTickers = res.portfolio?.map((item) => item.ticker);
+      if (arrayTickers) {
+        arrayTickers.forEach(async (ticker) => {
+          const stockData = await supabaseClient
+            .from("stock")
+            .select()
+            .eq("ticker", ticker)
+            .single();
+
+          if (stockData.data) {
+            setSectors((prev) => {
+              const sector = stockData.data.sector;
+              const isExist = prev.find((p) => p.sector === sector);
+
+              if (isExist) {
+                const rest = prev.filter((p) => p.sector !== sector);
+                return [...rest, { sector, count: isExist.count + 1 }];
+              } else {
+                return [...prev, { sector, count: 1 }];
+              }
+            });
+          }
+        });
+      }
+    });
   }, []);
 
   return (
@@ -100,62 +133,67 @@ export const DashboardScreen = () => {
             </div>
           </div>
 
-          {calendarEarning.length > 0 && (
-            <div
-              style={{
-                border: "1px solid var(--color-gray)",
-                padding: "1rem",
-                borderRadius: "1rem",
-                width: "500px",
-                display: "flex",
-                flexDirection: "column",
-                gap: "1rem",
-              }}
-            >
-              <p
+          <div style={{ display: "flex" }}>
+            {calendarEarning.length > 0 && (
+              <div
                 style={{
-                  textAlign: "center",
-                  fontWeight: "bold",
-                  fontSize: "1.2rem",
+                  border: "1px solid var(--color-gray)",
+                  padding: "1rem",
+                  borderRadius: "1rem",
+                  width: "500px",
+                  display: "flex",
+                  flexDirection: "column",
+                  gap: "1rem",
                 }}
               >
-                Calendar Earnings
-              </p>
-              <TableDivider />
-              {calendarEarning.map((item, index) => {
-                return (
-                  <div
-                    key={index}
-                    style={{
-                      display: "flex",
-                      alignItems: "center",
-                      gap: "1rem",
-                    }}
-                  >
+                <p
+                  style={{
+                    textAlign: "center",
+                    fontWeight: "bold",
+                    fontSize: "1.2rem",
+                  }}
+                >
+                  Calendar Earnings
+                </p>
+                <TableDivider />
+                {calendarEarning.map((item, index) => {
+                  return (
                     <div
+                      key={index}
                       style={{
-                        color: "rgb(25,103,210)",
-                        backgroundColor: "rgb(232,240,254)",
-                        width: "50px",
-                        height: "50px",
                         display: "flex",
-                        flexDirection: "column",
                         alignItems: "center",
-                        justifyContent: "center",
-                        borderRadius: "0.6rem",
+                        gap: "1rem",
                       }}
                     >
-                      <p>{moment(item.report_date).format("MMM")}.</p>
-                      <p>{item.report_date?.split("-")[2]}</p>
+                      <div
+                        style={{
+                          color: "rgb(25,103,210)",
+                          backgroundColor: "rgb(232,240,254)",
+                          width: "50px",
+                          height: "50px",
+                          display: "flex",
+                          flexDirection: "column",
+                          alignItems: "center",
+                          justifyContent: "center",
+                          borderRadius: "0.6rem",
+                        }}
+                      >
+                        <p>{moment(item.report_date).format("MMM")}.</p>
+                        <p>{item.report_date?.split("-")[2]}</p>
+                      </div>
+                      <div>
+                        <p>{item.name}</p>
+                      </div>
                     </div>
-                    <div>
-                      <p>{item.name}</p>
-                    </div>
-                  </div>
-                );
-              })}
+                  );
+                })}
+              </div>
+            )}
+            <div style={{ width: "600px" }}>
+              <ChartSectors sectors={sectors} />
             </div>
-          )}
+          </div>
         </div>
       </Layout>
     </div>

@@ -16,7 +16,21 @@ export default async function handler(
     "https://markets.sh/api/v1/symbols/NYSE:SQ?api_token=7ea62693bd4ebc0ae34595335732676b"
   );
 
-  await supabaseClient.from("test").insert({ content: last_price });
+  const stock = await supabaseClient
+    .from("stock")
+    .select()
+    .eq("ticker", "A")
+    .single();
+
+  if (stock.data && last_price) {
+    const price = Number(last_price.toFixed(2));
+    await supabaseClient
+      .from("stock")
+      .update({ price_current: price })
+      .eq("ticker", "A");
+  }
+
+  // await supabaseClient.from("test").insert({ content: last_price });
 
   res.json({
     message: "Ok",
