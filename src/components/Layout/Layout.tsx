@@ -48,6 +48,7 @@ export const Layout: FC<PropsWithChildren> = ({ children }) => {
             padding: "0.5rem",
             borderRadius: "0.5rem",
             borderColor: "var(--color-gray)",
+            borderWidth: "1px",
           }}
         >
           <p>Balance: ${balance}</p>
