@@ -55,6 +55,12 @@ export const Layout: FC<PropsWithChildren> = ({ children }) => {
         >
           <p>Balance: ${balance}</p>
         </div>
+        <Button
+          title="SELL"
+          onClick={async () => {
+            await PortfolioService.addTransaction("CMA", 55.66, 1, "sell");
+          }}
+        />
       </div>
       {children}
     </>

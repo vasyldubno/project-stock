@@ -1,6 +1,9 @@
 import { supabaseClient } from "@/config/supabaseClient";
 import { averageCostPerShare } from "@/utils/averageCostPerShare";
 import { getRealizedValue } from "@/utils/getRealizedValue";
+import { getMarketCap } from "@/utils/portfolio/getMarketCap";
+import { getGainValue } from "../../../utils/portfolio/getGainValue";
+import { getGainMargin } from "../../../utils/portfolio/getGainMargin";
 import { getTotalReturnMarginStock } from "@/utils/stockPortfolio/getTotalReturnMarginStock";
 import axios from "axios";
 import moment from "moment";
@@ -66,6 +69,7 @@ export default async function handler(
       .single();
 
     const portfolio = await supabaseClient.from("portfolio").select().single();
+
     const priceTarget = await supabaseClient
       .from("stock")
       .select("price_target")
@@ -123,9 +127,31 @@ export default async function handler(
       .single();
 
     if (user.data) {
-      await supabaseClient.from("user").update({
-        balance: user.data.balance - price * count,
-      });
+      await supabaseClient
+        .from("user")
+        .update({
+          balance: user.data.balance - price * count,
+        })
+        .eq("username", "vasyldubno");
+    }
+
+    if (portfolio.data && portfolio.data.active_cost && existStock.data) {
+      if (existStock.data.average_cost_per_share) {
+        await supabaseClient
+          .from("portfolio")
+          .update({
+            total_return: portfolio.data.total_return
+              ? Number((portfolio.data.total_return + price * count).toFixed(2))
+              : Number((price * count).toFixed(2)),
+            active_cost:
+              portfolio.data.active_cost -
+              existStock.data?.average_cost_per_share * count,
+            market_cap: await getMarketCap(),
+            gain_value: await getGainValue(),
+            gain_margin: await getGainMargin(),
+          })
+          .eq("title", portfolio.data.title);
+      }
     }
   }
 
@@ -219,9 +245,33 @@ export default async function handler(
 
     if (user.data && stock.data) {
       if (stock.data.average_cost_per_share) {
-        await supabaseClient.from("user").update({
-          balance: user.data.balance + price * count,
-        });
+        await supabaseClient
+          .from("user")
+          .update({
+            balance: Number((user.data.balance + price * count).toFixed(2)),
+          })
+          .eq("username", "vasyldubno");
+      }
+    }
+
+    const portfolio = await supabaseClient.from("portfolio").select().single();
+
+    if (portfolio.data && portfolio.data.active_cost && stock.data) {
+      if (stock.data.average_cost_per_share) {
+        await supabaseClient
+          .from("portfolio")
+          .update({
+            total_return: portfolio.data.total_return
+              ? Number((portfolio.data.total_return + price * count).toFixed(2))
+              : Number((price * count).toFixed(2)),
+            active_cost:
+              portfolio.data.active_cost -
+              stock.data?.average_cost_per_share * count,
+            market_cap: await getMarketCap(),
+            gain_value: await getGainValue(),
+            gain_margin: await getGainMargin(),
+          })
+          .eq("title", portfolio.data.title);
       }
     }
   }
