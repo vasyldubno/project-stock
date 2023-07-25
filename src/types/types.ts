@@ -16,6 +16,10 @@ export interface IPortfolioStock {
   total_return_margin: number | null;
   total_return_value: number | null;
   price_target: number | null;
+  price_growth: number | null;
+  perc_of_portfolio: number | null;
+  dividend_upcoming_date: string | null;
+  dividend_upcoming_value: number | null;
 }
 
 interface INasdaqDividends {
@@ -59,4 +63,32 @@ export interface ISupaStock {
   subIndustry: string;
   ticker: string;
   report_date: string | null;
+}
+
+export interface ISupaDividendsInMonth {
+  [key: string]: {
+    January?: number;
+    February?: number;
+    March?: number;
+    April?: number;
+    May?: number;
+    June?: number;
+    July?: number;
+    August?: number;
+    September?: number;
+    October?: number;
+    November?: number;
+    December?: number;
+  };
+}
+
+export interface ISupaTransaction {
+  count: number;
+  created_at: string | null;
+  date: string;
+  id: string;
+  price: number;
+  ticker: string;
+  type: string;
+  change: string;
 }

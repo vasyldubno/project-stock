@@ -10,8 +10,6 @@ interface TabsProps {
 export const Tabs: FC<TabsProps> = ({ tabsPanel, tabs }) => {
   const [activeTab, setActiveTab] = useState(0);
 
-  // const tabs = [{ content: "A", icon: <LostIcon size="1rem" /> }];
-
   return (
     <>
       <div>

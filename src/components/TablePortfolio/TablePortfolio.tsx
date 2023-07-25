@@ -13,13 +13,13 @@ import { useEffect, useState } from "react";
 import { TableCardPrice } from "../TableCardPrice/TableCardPrice";
 import { TableDetails } from "../TableDetails/TableDetails";
 import { TableDivider } from "../TableDivider/TableDivider";
-import s from "./Table.module.scss";
+import s from "./TablePortfolio.module.scss";
 import { supabaseStockUpdate } from "./supabase";
 import { Button } from "../Button/Button";
 import { Modal } from "../Modal/Modal";
 import { FormAddStock } from "../FormAddStock/FormAddStock";
 
-export const Table = () => {
+export const TablePortfolio = () => {
   const [data, setData] = useState<IPortfolioStock[]>([]);
   const [sorting, setSorting] = useState<SortingState>([]);
   const [selectedTicker, setSelectedTicker] = useState<string[]>([]);
@@ -54,21 +54,21 @@ export const Table = () => {
   const columnHelper = createColumnHelper<IPortfolioStock>();
 
   const columns = [
-    columnHelper.accessor("ticker", {
-      header(props) {
-        return <></>;
-      },
-      cell(props) {
-        return (
-          <div
-            style={{ cursor: "pointer" }}
-            onClick={() => showDetail(props.row.original.ticker)}
-          >
-            <ArrowRight />
-          </div>
-        );
-      },
-    }),
+    // columnHelper.accessor("ticker", {
+    //   header(props) {
+    //     return <></>;
+    //   },
+    //   cell(props) {
+    //     return (
+    //       <div
+    //         style={{ cursor: "pointer" }}
+    //         onClick={() => showDetail(props.row.original.ticker)}
+    //       >
+    //         <ArrowRight />
+    //       </div>
+    //     );
+    //   },
+    // }),
     columnHelper.accessor("ticker", {
       header: "Ticker",
       cell: (info) => <p style={{ textAlign: "center" }}>{info.getValue()}</p>,
@@ -125,10 +125,11 @@ export const Table = () => {
         </div>
       ),
     }),
-    columnHelper.accessor("price_target", {
+    columnHelper.accessor("price_growth", {
       header: "Target",
       cell: (info) => (
         <div style={{ textAlign: "center" }}>
+          {/* {info.getValue()} */}
           {info.row.original.price_target ? (
             <p style={{ fontSize: "0.8rem" }}>
               {info.row.original.price_target.toFixed(2)}
@@ -136,7 +137,7 @@ export const Table = () => {
           ) : (
             <p style={{ fontSize: "0.8rem" }}>-- --</p>
           )}
-          {info.row.original.price_target && info.row.original.market_price ? (
+          {/* {info.row.original.price_target && info.row.original.market_price ? (
             <p style={{ fontSize: "0.8rem" }}>
               {`${(
                 ((info.row.original.price_target -
@@ -148,9 +149,21 @@ export const Table = () => {
             </p>
           ) : (
             <p style={{ fontSize: "0.8rem" }}>-- --</p>
+          )} */}
+          {info.row.original.price_growth ? (
+            <p style={{ fontSize: "0.8rem" }}>
+              {`${info.row.original.price_growth.toFixed(2)}`}%
+            </p>
+          ) : (
+            <p style={{ fontSize: "0.8rem" }}>-- --</p>
           )}
         </div>
       ),
+    }),
+
+    columnHelper.accessor("perc_of_portfolio", {
+      header: "% of Portfolio",
+      cell: (info) => <p style={{ textAlign: "center" }}>{info.getValue()}%</p>,
     }),
   ];
 
@@ -165,21 +178,29 @@ export const Table = () => {
 
   const toggleSortingHandler = (columnId: string) => () => {
     const sortConfig = sorting.find((sort) => sort.id === columnId);
-    console.log(sortConfig);
+    // console.log(sortConfig);
     if (sortConfig) {
       if (sortConfig.desc) {
-        setSorting(sorting.filter((sort) => sort.id !== columnId));
-      } else {
         setSorting(
           sorting.map((sort) =>
-            sort.id === columnId ? { ...sort, desc: true } : sort
+            sort.id === columnId ? { ...sort, desc: false } : sort
           )
         );
+        // setSorting(sorting.filter((sort) => sort.id !== columnId));
+      } else {
+        setSorting(sorting.filter((sort) => sort.id !== columnId));
+        // setSorting(
+        //   sorting.map((sort) =>
+        //     sort.id === columnId ? { ...sort, desc: true } : sort
+        //   )
+        // );
       }
     } else {
       setSorting([{ id: columnId, desc: true }]);
     }
   };
+
+  console.log(sorting);
 
   return (
     <>
@@ -187,6 +208,7 @@ export const Table = () => {
         <thead>
           {table.getHeaderGroups().map((headerGroup, headerGroupIndex) => (
             <tr key={`${headerGroup.id}-${headerGroupIndex}`}>
+              <th></th>
               {headerGroup.headers.map((header, headerIndex) => (
                 <th
                   key={`${header.id}-${headerIndex}`}
@@ -222,24 +244,30 @@ export const Table = () => {
         </thead>
 
         {table.getRowModel().rows.map((row, rowIndex) => (
-          <>
-            <tbody key={`divider-${row.id}-${rowIndex}`}>
-              <tr>
-                <td colSpan={columns.length}>
-                  <TableDivider />
+          <tbody key={`data-${row.id}-${rowIndex}`}>
+            <tr>
+              <td colSpan={columns.length + 2}>
+                <TableDivider />
+              </td>
+            </tr>
+            <tr>
+              <td>
+                <div
+                  style={{ cursor: "pointer" }}
+                  onClick={() => showDetail(row.original.ticker)}
+                >
+                  <ArrowRight />
+                </div>
+              </td>
+              {row.getVisibleCells().map((cell, cellIndex) => (
+                <td
+                  key={`${cell.id}-${cellIndex}`}
+                  style={{ padding: "5px 0" }}
+                >
+                  {flexRender(cell.column.columnDef.cell, cell.getContext())}
                 </td>
-              </tr>
-            </tbody>
-            <tbody key={`data-${row.id}-${rowIndex}`}>
-              <tr>
-                {row.getVisibleCells().map((cell, cellIndex) => (
-                  <td
-                    key={`${cell.id}-${cellIndex}`}
-                    style={{ padding: "5px 0" }}
-                  >
-                    {flexRender(cell.column.columnDef.cell, cell.getContext())}
-                  </td>
-                ))}
+              ))}
+              <td>
                 <div
                   style={{
                     padding: "5px 0",
@@ -257,22 +285,22 @@ export const Table = () => {
                     />
                   )}
                 </div>
-              </tr>
-              {selectedTicker.includes(row.original.ticker) && (
-                <>
-                  <tr>
-                    <td colSpan={columns.length}>
-                      <TableDetails
-                        ticker={selectedTicker.find((item) =>
-                          item.includes(row.original.ticker)
-                        )}
-                      />
-                    </td>
-                  </tr>
-                </>
-              )}
-            </tbody>
-          </>
+              </td>
+            </tr>
+            {selectedTicker.includes(row.original.ticker) && (
+              <>
+                <tr>
+                  <td colSpan={columns.length + 2}>
+                    <TableDetails
+                      ticker={selectedTicker.find((item) =>
+                        item.includes(row.original.ticker)
+                      )}
+                    />
+                  </td>
+                </tr>
+              </>
+            )}
+          </tbody>
         ))}
       </table>
       <Modal open={isOpenModal} onClose={() => setIsOpenModal(false)}>
@@ -285,3 +313,13 @@ export const Table = () => {
     </>
   );
 };
+
+{
+  /* <tbody key={`divider-${row.id}-${rowIndex}`}>
+  <tr>
+    <td colSpan={columns.length + 2}>
+      <TableDivider />
+    </td>
+  </tr>
+</tbody>; */
+}

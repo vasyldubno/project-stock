@@ -58,10 +58,6 @@ export default async function handler(
       `https://www.alphavantage.co/query?function=OVERVIEW&symbol=${ticker}&apikey=U0366SZHJEG1GO6E`
     );
 
-    await supabaseClient
-      .from("transaction")
-      .insert({ count: count, date: updatedDate, price, ticker, type });
-
     const existStock = await supabaseClient
       .from("stock_portfolio")
       .select()
@@ -75,6 +71,41 @@ export default async function handler(
       .select("price_target")
       .eq("ticker", ticker)
       .single();
+
+    const lastChangePortfolio = () => {
+      if (!existStock) {
+        return "new";
+      }
+
+      if (
+        existStock.data &&
+        existStock.data.average_cost_per_share &&
+        existStock.data.amount_active_shares
+      ) {
+        const oldValue =
+          existStock.data.average_cost_per_share *
+          existStock.data.amount_active_shares;
+
+        const newValue = price * count;
+
+        const change = (newValue / oldValue) * 100;
+
+        return `increase ${change}%`;
+      }
+
+      return "";
+    };
+
+    await supabaseClient
+      .from("transaction")
+      .insert({
+        count: count,
+        date: updatedDate,
+        price,
+        ticker,
+        type,
+        change: lastChangePortfolio(),
+      });
 
     if (existStock.data && responseExchange) {
       if (portfolio.data && priceTarget.data) {
@@ -94,6 +125,7 @@ export default async function handler(
               : count,
             portfolio_id: portfolio.data.id,
             price_target: priceTarget.data.price_target,
+            last_change_portfolio: lastChangePortfolio(),
           })
           .eq("ticker", ticker);
 
@@ -116,6 +148,7 @@ export default async function handler(
           amount_active_shares: count,
           portfolio_id: portfolio.data.id,
           price_target: priceTarget.data.price_target,
+          last_change_portfolio: lastChangePortfolio(),
         });
       }
     }
@@ -155,13 +188,39 @@ export default async function handler(
     }
   }
 
+  // --- --- --- SELL --- --- ---
+
   if (type === "sell") {
+    const lastChangePortfolio = () => {
+      if (stock.data) {
+        if (
+          stock.data.average_cost_per_share &&
+          stock.data.amount_active_shares
+        ) {
+          const oldValue =
+            stock.data?.average_cost_per_share *
+            stock.data?.amount_active_shares;
+
+          const newValue = price * count;
+
+          const change = (newValue / oldValue) * 100;
+
+          if (change === 100) {
+            return "sold";
+          } else {
+            return `reduce ${change}%`;
+          }
+        }
+      }
+    };
+
     await supabaseClient.from("transaction").insert({
       ticker,
       count,
       price,
       type: "sell",
       date: updatedDate,
+      change: lastChangePortfolio(),
     });
 
     const stock = await supabaseClient
@@ -203,6 +262,7 @@ export default async function handler(
             ),
             gain_unrealized_value: null,
             gain_unrealized_percentage: null,
+            last_change_portfolio: lastChangePortfolio(),
           })
           .eq("ticker", ticker);
       }
@@ -233,6 +293,7 @@ export default async function handler(
             price
           ),
           amount_active_shares: stock.data.amount_active_shares - count,
+          last_change_portfolio: lastChangePortfolio(),
         });
       }
     }

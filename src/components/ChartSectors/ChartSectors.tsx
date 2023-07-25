@@ -1,12 +1,9 @@
+import { PortfolioService } from "@/services/PortfolioService";
 import { ArcElement, Chart as ChartJS, Legend, Tooltip } from "chart.js";
 import { FC, useEffect, useState } from "react";
 import { Doughnut, Pie, PolarArea } from "react-chartjs-2";
 
 ChartJS.register(ArcElement, Legend, Tooltip);
-
-interface ChartSectorsProps {
-  sectors: { sector: string; count: number }[];
-}
 
 function getRandomColor() {
   var letters = "0123456789ABCDEF";
@@ -17,11 +14,18 @@ function getRandomColor() {
   return color;
 }
 
-export const ChartSectors: FC<ChartSectorsProps> = ({ sectors }) => {
+export const ChartSectors: FC = () => {
   const [colors, setColors] = useState<string[]>([]);
+  const [sectors, setSectors] = useState<{ sector: string; count: number }[]>(
+    []
+  );
 
   useEffect(() => {
-    const a = sectors.map((sector) => getRandomColor());
+    PortfolioService.getPortfolioSectors().then((res) => setSectors(res));
+  }, []);
+
+  useEffect(() => {
+    const a = sectors.map(() => getRandomColor());
     setColors(a);
   }, [sectors]);
   return (
@@ -36,7 +40,21 @@ export const ChartSectors: FC<ChartSectorsProps> = ({ sectors }) => {
         ],
         labels: sectors.map((sector) => sector.sector),
       }}
-      options={{}}
+      options={{
+        plugins: {
+          tooltip: {
+            callbacks: {
+              label(tooltipItem) {
+                return `${(
+                  (Number(tooltipItem.formattedValue) /
+                    sectors.reduce((acc, item) => acc + item.count, 0)) *
+                  100
+                ).toFixed(2)}%`;
+              },
+            },
+          },
+        },
+      }}
     />
   );
 };

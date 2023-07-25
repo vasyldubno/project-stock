@@ -15,35 +15,18 @@ import { FormAddStock } from "../FormAddStock/FormAddStock";
 import { Layout } from "../Layout/Layout";
 import { supabaseClient } from "@/config/supabaseClient";
 import { PortfolioService } from "@/services/PortfolioService";
+import { StockService } from "@/services/StockService";
+import { SupaStockUpdate } from "./supabase";
 
 export const TableScreener = ({ data }: { data: ISupaStock[] }) => {
   const [stocks, setStocks] = useState<ISupaStock[]>(data);
   const [sorting, setSorting] = useState<SortingState>([]);
   const [isOpenModal, setIsOpenModal] = useState(false);
   const [selectedStock, setSelectedStock] = useState<ISupaStock | null>(null);
+  const [selectedScreener, setSelectedScreener] = useState("Growth");
 
   useEffect(() => {
-    supabaseClient
-      .channel("stock-update")
-      .on(
-        "postgres_changes",
-        {
-          event: "UPDATE",
-          schema: "public",
-          table: "stock_portfolio",
-        },
-        async (payload) => {
-          const response = await PortfolioService.getStocks();
-
-          if (response) {
-            setStocks(response);
-          }
-
-          console.log(response);
-          console.log("PAYLOAD");
-        }
-      )
-      .subscribe();
+    SupaStockUpdate(setStocks);
   }, []);
 
   const columnHelper = createColumnHelper<ISupaStock>();
@@ -101,6 +84,10 @@ export const TableScreener = ({ data }: { data: ISupaStock[] }) => {
       header: "Industry",
       cell: ({ getValue }) => getValue(),
     }),
+    columnHelper.accessor("dividendYield", {
+      header: "Dividend Yield",
+      cell: (info) => info.getValue(),
+    }),
   ];
 
   const table = useReactTable({
@@ -108,22 +95,21 @@ export const TableScreener = ({ data }: { data: ISupaStock[] }) => {
     data: stocks,
     getCoreRowModel: getCoreRowModel(),
     getSortedRowModel: getSortedRowModel(),
-    state: { sorting: sorting },
+    state: { sorting: sorting, columnVisibility: {} },
     onSortingChange: setSorting,
   });
 
   const toggleSortingHandler = (columnId: string) => () => {
     const sortConfig = sorting.find((sort) => sort.id === columnId);
-    console.log(sortConfig);
     if (sortConfig) {
       if (sortConfig.desc) {
-        setSorting(sorting.filter((sort) => sort.id !== columnId));
-      } else {
         setSorting(
           sorting.map((sort) =>
-            sort.id === columnId ? { ...sort, desc: true } : sort
+            sort.id === columnId ? { ...sort, desc: false } : sort
           )
         );
+      } else {
+        setSorting(sorting.filter((sort) => sort.id !== columnId));
       }
     } else {
       setSorting([{ id: columnId, desc: true }]);
@@ -132,6 +118,18 @@ export const TableScreener = ({ data }: { data: ISupaStock[] }) => {
 
   return (
     <Layout>
+      <div style={{ display: "flex", gap: "1rem" }}>
+        <Button title="Growth Screener" onClick={() => setStocks(data)} />
+        <Button
+          title="Dividend Screener"
+          onClick={async () => {
+            const response = await StockService.getStocksDividends();
+            if (response) {
+              setStocks(response);
+            }
+          }}
+        />
+      </div>
       <table
         style={{
           borderCollapse: "collapse",

@@ -24,6 +24,38 @@ interface INasdaqDividends {
   };
 }
 
+const determineMonth = (monthNumber: string) => {
+  switch (monthNumber) {
+    case "01":
+      return "January";
+    case "02":
+      return "February";
+    case "03":
+      return "March";
+    case "04":
+      return "April";
+    case "04":
+      return "May";
+    case "06":
+      return "June";
+    case "07":
+      return "July";
+    case "08":
+      return "August";
+    case "09":
+      return "September";
+    case "10":
+      return "October";
+    case "11":
+      return "November";
+    case "12":
+      return "December";
+
+    default:
+      return "January";
+  }
+};
+
 interface IResponse {
   results: {
     cash_amount: number;
@@ -46,10 +78,14 @@ export default async function handler(
     stocks.data.forEach((stock, index) => {
       setTimeout(async () => {
         try {
-          console.log(index + 1, stock.ticker);
           const response = await axios.get<IResponse>(
             `https://api.polygon.io/v3/reference/dividends?ticker=${stock.ticker}&apiKey=OZ_9x0ccKRsnzoE6OqsoW0oGeQCmAohs`
           );
+
+          const monthNumber = moment(response.data.results[0].pay_date).format(
+            "MM"
+          );
+          const monthName = determineMonth(monthNumber);
 
           if (stock.startTradeDate) {
             const today = moment().format("YYYY-MM-DD");
@@ -119,141 +155,41 @@ export default async function handler(
                     (last.cash_amount * stock.amount_active_shares).toFixed(2)
                   ),
                 });
+
+                const supaDividendInMonth = await supabaseClient
+                  .from("dividend_in_month")
+                  .select()
+                  .eq("year", "2023")
+                  .single();
+
+                if (supaDividendInMonth.data) {
+                  await supabaseClient
+                    .from("dividend_in_month")
+                    .update({
+                      [monthName]: supaDividendInMonth.data[monthName]
+                        ? supaDividendInMonth.data[monthName]! +
+                          Number(
+                            (
+                              last.cash_amount * stock.amount_active_shares
+                            ).toFixed(2)
+                          )
+                        : Number(
+                            (
+                              last.cash_amount * stock.amount_active_shares
+                            ).toFixed(2)
+                          ),
+                    })
+                    .eq("year", "2023");
+                }
               }
             }
           }
         } catch {
-          console.log("ERROR", index + 1, stock.ticker);
+          console.log("ERROR", stock.ticker);
         }
       }, index * 15000);
     });
   }
-
-  // const portfolio = await xataClient.db.portfolioStock
-  //   .filter("isTrading", true)
-  //   .getAll();
-
-  // portfolio.forEach(async (stock, index) => {
-  //   console.log(index + 1, stock.ticker);
-
-  //   const response = await axios.get<INasdaqDividends>(
-  //     `https://api.nasdaq.com/api/quote/${stock.ticker}/dividends?assetclass=stocks`
-  //   );
-
-  //   if (stock.startTradeDate) {
-  //     const today = moment().format("YYYY-MM-DD");
-  //     const std = new Date(stock.startTradeDate);
-
-  //     if (response.data.data.dividends.rows) {
-  //       const last = response.data.data.dividends.rows.find(
-  //         (res) =>
-  //           moment(new Date(res.paymentDate)).isBefore(new Date(today)) &&
-  //           moment(new Date(res.exOrEffDate)).isAfter(moment(std))
-  //       );
-  //       if (last) {
-  //         const isExistDividends = moment(stock.lastDividendPayDate).isSame(
-  //           new Date(moment(last.paymentDate).format("YYYY-MM-DD"))
-  //         );
-  //         if (!isExistDividends && stock.ticker && stock.averageCostPerShare) {
-  //           const xataStock = await xataClient.db.portfolioStock
-  //             .filter("ticker", stock.ticker)
-  //             .getFirst();
-  //           if (xataStock) {
-  //             await xataClient.db.portfolioStock.update(xataStock.id, {
-  //               lastDividendPayDate: moment(last.paymentDate)
-  //                 .tz("UTC")
-  //                 .startOf("day")
-  //                 .toDate(),
-  //               gainRealizedValue: stock.gainRealizedValue
-  //                 ? Number(
-  //                     (
-  //                       stock.gainRealizedValue +
-  //                       (await getAmountActiveShares(stock.ticker)) *
-  //                         Number(Number(last.amount.split("$")[1]).toFixed(2))
-  //                     ).toFixed(2)
-  //                   )
-  //                 : Number(
-  //                     (
-  //                       (await getAmountActiveShares(stock.ticker)) *
-  //                       Number(Number(last.amount.split("$")[1]).toFixed(2))
-  //                     ).toFixed(2)
-  //                   ),
-  //               gainRealizedPercentage: stock.gainRealizedPercentage
-  //                 ? stock.gainRealizedPercentage +
-  //                   Number(
-  //                     (
-  //                       (Number(Number(last.amount.split("$")[1]).toFixed(2)) /
-  //                         stock.averageCostPerShare) *
-  //                       100
-  //                     ).toFixed(2)
-  //                   )
-  //                 : Number(
-  //                     (
-  //                       (Number(Number(last.amount.split("$")[1]).toFixed(2)) /
-  //                         stock.averageCostPerShare) *
-  //                       100
-  //                     ).toFixed(2)
-  //                   ),
-  //               dividendValue: stock.dividendValue
-  //                 ? {
-  //                     $increment: Number(
-  //                       (
-  //                         (await getAmountActiveShares(stock.ticker)) *
-  //                         Number(Number(last.amount.split("$")[1]).toFixed(2))
-  //                       ).toFixed(2)
-  //                     ),
-  //                   }
-  //                 : Number(
-  //                     (
-  //                       (await getAmountActiveShares(stock.ticker)) *
-  //                       Number(Number(last.amount.split("$")[1]).toFixed(2))
-  //                     ).toFixed(2)
-  //                   ),
-  //               dividendPercentage: stock.dividendPercentage
-  //                 ? {
-  //                     $increment: Number(
-  //                       (
-  //                         (Number(
-  //                           Number(last.amount.split("$")[1]).toFixed(2)
-  //                         ) /
-  //                           stock.averageCostPerShare) *
-  //                         100
-  //                       ).toFixed(2)
-  //                     ),
-  //                   }
-  //                 : Number(
-  //                     (
-  //                       (Number(Number(last.amount.split("$")[1]).toFixed(2)) /
-  //                         stock.averageCostPerShare) *
-  //                       100
-  //                     ).toFixed(2)
-  //                   ),
-  //             });
-  //             await xataClient.db.dividend.create({
-  //               dividendValue: Number(
-  //                 Number(last.amount.split("$")[1]).toFixed(2)
-  //               ),
-  //               dividendYield: Number(
-  //                 (
-  //                   (Number(Number(last.amount.split("$")[1]).toFixed(2)) /
-  //                     stock.averageCostPerShare) *
-  //                   100
-  //                 ).toFixed(2)
-  //               ),
-  //               ticker: stock.ticker,
-  //               payDate: new Date(
-  //                 moment(last.paymentDate).format("YYYY-MM-DD")
-  //               ),
-  //               totalAmount:
-  //                 (await getAmountActiveShares(stock.ticker)) *
-  //                 Number(Number(last.amount.split("$")[1]).toFixed(2)),
-  //             });
-  //           }
-  //         }
-  //       }
-  //     }
-  //   }
-  // });
 
   res.json({ message: "Ok" });
 }

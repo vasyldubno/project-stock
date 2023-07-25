@@ -3,8 +3,11 @@ import { PortfolioService } from "@/services/PortfolioService";
 import dynamic from "next/dynamic";
 import { useEffect } from "react";
 
-const TableDynamic = dynamic(
-  () => import("@/components/Table/Table").then((res) => res.Table),
+const TablePortfolioDynamic = dynamic(
+  () =>
+    import("@/components/TablePortfolio/TablePortfolio").then(
+      (res) => res.TablePortfolio
+    ),
   { ssr: false }
 );
 
@@ -15,7 +18,7 @@ export const PortfolioScreen = () => {
   return (
     <div style={{ margin: "1rem" }}>
       <Layout>
-        <TableDynamic />
+        <TablePortfolioDynamic />
       </Layout>
     </div>
   );

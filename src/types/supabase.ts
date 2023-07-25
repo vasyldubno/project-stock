@@ -42,6 +42,60 @@ export interface Database {
         }
         Relationships: []
       }
+      dividend_in_month: {
+        Row: {
+          April: number | null
+          August: number | null
+          created_at: string | null
+          December: number | null
+          February: number | null
+          id: string
+          January: number | null
+          July: number | null
+          June: number | null
+          March: number | null
+          May: number | null
+          November: number | null
+          October: number | null
+          September: number | null
+          year: number
+        }
+        Insert: {
+          April?: number | null
+          August?: number | null
+          created_at?: string | null
+          December?: number | null
+          February?: number | null
+          id?: string
+          January?: number | null
+          July?: number | null
+          June?: number | null
+          March?: number | null
+          May?: number | null
+          November?: number | null
+          October?: number | null
+          September?: number | null
+          year: number
+        }
+        Update: {
+          April?: number | null
+          August?: number | null
+          created_at?: string | null
+          December?: number | null
+          February?: number | null
+          id?: string
+          January?: number | null
+          July?: number | null
+          June?: number | null
+          March?: number | null
+          May?: number | null
+          November?: number | null
+          October?: number | null
+          September?: number | null
+          year?: number
+        }
+        Relationships: []
+      }
       index: {
         Row: {
           created_at: string | null
@@ -64,6 +118,7 @@ export interface Database {
         Row: {
           active_cost: number | null
           created_at: string | null
+          dividends_in_months: Json | null
           free_cash: number | null
           gain_margin: number | null
           gain_value: number | null
@@ -76,6 +131,7 @@ export interface Database {
         Insert: {
           active_cost?: number | null
           created_at?: string | null
+          dividends_in_months?: Json | null
           free_cash?: number | null
           gain_margin?: number | null
           gain_value?: number | null
@@ -88,6 +144,7 @@ export interface Database {
         Update: {
           active_cost?: number | null
           created_at?: string | null
+          dividends_in_months?: Json | null
           free_cash?: number | null
           gain_margin?: number | null
           gain_value?: number | null
@@ -195,14 +252,19 @@ export interface Database {
           amount_active_shares: number | null
           average_cost_per_share: number | null
           created_at: string | null
+          dividend_upcoming_date: string | null
+          dividend_upcoming_value: number | null
           exchange: string
           gain_unrealized_percentage: number | null
           gain_unrealized_value: number | null
           id: string
           is_trading: boolean | null
+          last_change_portfolio: string | null
           lastDividendPayDate: string | null
           market_price: number | null
+          perc_of_portfolio: number | null
           portfolio_id: string | null
+          price_growth: number | null
           price_target: number | null
           startTradeDate: string | null
           ticker: string
@@ -214,14 +276,19 @@ export interface Database {
           amount_active_shares?: number | null
           average_cost_per_share?: number | null
           created_at?: string | null
+          dividend_upcoming_date?: string | null
+          dividend_upcoming_value?: number | null
           exchange: string
           gain_unrealized_percentage?: number | null
           gain_unrealized_value?: number | null
           id?: string
           is_trading?: boolean | null
+          last_change_portfolio?: string | null
           lastDividendPayDate?: string | null
           market_price?: number | null
+          perc_of_portfolio?: number | null
           portfolio_id?: string | null
+          price_growth?: number | null
           price_target?: number | null
           startTradeDate?: string | null
           ticker: string
@@ -233,14 +300,19 @@ export interface Database {
           amount_active_shares?: number | null
           average_cost_per_share?: number | null
           created_at?: string | null
+          dividend_upcoming_date?: string | null
+          dividend_upcoming_value?: number | null
           exchange?: string
           gain_unrealized_percentage?: number | null
           gain_unrealized_value?: number | null
           id?: string
           is_trading?: boolean | null
+          last_change_portfolio?: string | null
           lastDividendPayDate?: string | null
           market_price?: number | null
+          perc_of_portfolio?: number | null
           portfolio_id?: string | null
+          price_growth?: number | null
           price_target?: number | null
           startTradeDate?: string | null
           ticker?: string
@@ -277,6 +349,7 @@ export interface Database {
       }
       transaction: {
         Row: {
+          change: string
           count: number
           created_at: string | null
           date: string
@@ -286,6 +359,7 @@ export interface Database {
           type: string
         }
         Insert: {
+          change: string
           count: number
           created_at?: string | null
           date: string
@@ -295,6 +369,7 @@ export interface Database {
           type: string
         }
         Update: {
+          change?: string
           count?: number
           created_at?: string | null
           date?: string

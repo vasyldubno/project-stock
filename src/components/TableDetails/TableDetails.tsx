@@ -23,8 +23,10 @@ export const TableDetails: FC<TableDetailsProps> = ({ ticker }) => {
     getData({ ticker, setDividends, setShareLots, setTransactions });
   }, [ticker]);
 
+  const width = "966px";
+
   return (
-    <>
+    <div>
       <Tabs
         tabs={[
           { content: "Share Lots", icon: <LostIcon size="1rem" /> },
@@ -36,7 +38,7 @@ export const TableDetails: FC<TableDetailsProps> = ({ ticker }) => {
             content: (
               <>
                 {shareLots.length > 0 ? (
-                  <table style={{ width: "1000px" }}>
+                  <table style={{ width }}>
                     <TableHead
                       columns={[
                         "Trade Date",
@@ -62,7 +64,7 @@ export const TableDetails: FC<TableDetailsProps> = ({ ticker }) => {
                     </tbody>
                   </table>
                 ) : (
-                  <p>No lots</p>
+                  <p style={{ width }}>No lots</p>
                 )}
               </>
             ),
@@ -71,7 +73,7 @@ export const TableDetails: FC<TableDetailsProps> = ({ ticker }) => {
             content: (
               <>
                 {transactions && (
-                  <table style={{ width: "1000px" }}>
+                  <table style={{ width }}>
                     <TableHead columns={["Type", "Date", "Price", "Count"]} />
                     <tbody>
                       {transactions.map((item, index) => (
@@ -93,7 +95,7 @@ export const TableDetails: FC<TableDetailsProps> = ({ ticker }) => {
             content: (
               <>
                 {dividends.length > 0 ? (
-                  <table style={{ width: "1000px" }}>
+                  <table style={{ width }}>
                     <TableHead
                       columns={[
                         "Payment Date",
@@ -115,13 +117,13 @@ export const TableDetails: FC<TableDetailsProps> = ({ ticker }) => {
                     </tbody>
                   </table>
                 ) : (
-                  <p>No dividends</p>
+                  <p style={{ width }}>No dividends</p>
                 )}
               </>
             ),
           },
         ]}
       />
-    </>
+    </div>
   );
 };

@@ -11,7 +11,7 @@ export default async function handler(
   const stocks = await supabaseClient
     .from("stock")
     .select()
-    // .eq("ticker", "FMC")
+    // .eq("ticker", "MTCH")
     .order("ticker", { ascending: true });
 
   if (stocks.data) {

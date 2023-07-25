@@ -13,6 +13,7 @@ export const Layout: FC<PropsWithChildren> = ({ children }) => {
     { href: "/dashboard", title: "Dashboard" },
     { href: "/portfolio", title: "Portfolio" },
     { href: "/screener", title: "Screener" },
+    { href: "/activity", title: "Activity" },
   ];
 
   useEffect(() => {
@@ -39,12 +40,12 @@ export const Layout: FC<PropsWithChildren> = ({ children }) => {
             <Button title={link.title} />
           </Link>
         ))}
-        <Button
+        {/* <Button
           title="Update Dividends"
           onClick={async () => {
             await PortfolioService.updateDividends();
           }}
-        />
+        /> */}
         <div
           style={{
             padding: "0.5rem",
@@ -55,12 +56,12 @@ export const Layout: FC<PropsWithChildren> = ({ children }) => {
         >
           <p>Balance: ${balance}</p>
         </div>
-        <Button
+        {/* <Button
           title="SELL"
           onClick={async () => {
             await PortfolioService.addTransaction("CMA", 55.66, 1, "sell");
           }}
-        />
+        /> */}
       </div>
       {children}
     </>

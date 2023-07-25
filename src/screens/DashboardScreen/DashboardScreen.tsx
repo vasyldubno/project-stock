@@ -10,6 +10,8 @@ import moment from "moment-timezone";
 import { PortfolioService } from "@/services/PortfolioService";
 import { ChartSectors } from "@/components/ChartSectors/ChartSectors";
 import { CalendarEarnings } from "@/components/CalendarEarnings/CalendarEarnings";
+import { ChartDividends } from "@/components/ChartDividends/ChartDividends";
+import { ChartUpcomingDividends } from "@/components/ChartUpcomingDividends/ChartUpcomingDividends";
 
 interface IPortfolio {
   active_cost: number | null;
@@ -27,9 +29,6 @@ interface IPortfolio {
 export const DashboardScreen = () => {
   const [portfolio, setPortfolio] = useState<IPortfolio | null>(null);
   const [calendarEarning, setCalendarEarnings] = useState<ISupaStock[]>([]);
-  const [sectors, setSectors] = useState<{ sector: string; count: number }[]>(
-    []
-  );
 
   useEffect(() => {
     const fetch = async () => {
@@ -43,36 +42,6 @@ export const DashboardScreen = () => {
     StockService.getCalendarEarnings().then((res) =>
       setCalendarEarnings(res.stocks)
     );
-  }, []);
-
-  useEffect(() => {
-    PortfolioService.getPortfolio().then((res) => {
-      console.log("CALL");
-      const arrayTickers = res.portfolio?.map((item) => item.ticker);
-      if (arrayTickers) {
-        arrayTickers.forEach(async (ticker) => {
-          const stockData = await supabaseClient
-            .from("stock")
-            .select()
-            .eq("ticker", ticker)
-            .single();
-
-          if (stockData.data) {
-            setSectors((prev) => {
-              const sector = stockData.data.sector;
-              const isExist = prev.find((p) => p.sector === sector);
-
-              if (isExist) {
-                const rest = prev.filter((p) => p.sector !== sector);
-                return [...rest, { sector, count: isExist.count + 1 }];
-              } else {
-                return [...prev, { sector, count: 1 }];
-              }
-            });
-          }
-        });
-      }
-    });
   }, []);
 
   return (
@@ -136,8 +105,51 @@ export const DashboardScreen = () => {
 
           <div style={{ display: "flex" }}>
             <CalendarEarnings calendarEarning={calendarEarning} />
-            <div style={{ width: "600px" }}>
-              <ChartSectors sectors={sectors} />
+            <div
+              style={{
+                width: "600px",
+                display: "flex",
+                flexDirection: "column",
+                gap: "2rem",
+                padding: "0 0 0 1rem",
+              }}
+            >
+              <div>
+                <p
+                  style={{
+                    textAlign: "center",
+                    fontWeight: "bold",
+                    fontSize: "1.2rem",
+                  }}
+                >
+                  Sectors
+                </p>
+                <ChartSectors />
+              </div>
+              <div>
+                <p
+                  style={{
+                    textAlign: "center",
+                    fontWeight: "bold",
+                    fontSize: "1.2rem",
+                  }}
+                >
+                  Dividends
+                </p>
+                <ChartDividends />
+              </div>
+              <div>
+                <p
+                  style={{
+                    textAlign: "center",
+                    fontWeight: "bold",
+                    fontSize: "1.2rem",
+                  }}
+                >
+                  Upcoming Dividends
+                </p>
+                <ChartUpcomingDividends />
+              </div>
             </div>
           </div>
         </div>
