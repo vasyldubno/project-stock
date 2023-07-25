@@ -96,16 +96,14 @@ export default async function handler(
       return "";
     };
 
-    await supabaseClient
-      .from("transaction")
-      .insert({
-        count: count,
-        date: updatedDate,
-        price,
-        ticker,
-        type,
-        change: lastChangePortfolio(),
-      });
+    await supabaseClient.from("transaction").insert({
+      count: count,
+      date: updatedDate,
+      price,
+      ticker,
+      type,
+      change: lastChangePortfolio(),
+    });
 
     if (existStock.data && responseExchange) {
       if (portfolio.data && priceTarget.data) {
@@ -212,6 +210,7 @@ export default async function handler(
           }
         }
       }
+      return "";
     };
 
     await supabaseClient.from("transaction").insert({
