@@ -6,8 +6,6 @@ import { PortfolioService } from "@/services/PortfolioService";
 import { supabaseClient } from "@/config/supabaseClient";
 
 export const Layout: FC<PropsWithChildren> = ({ children }) => {
-  const [balance, setBalance] = useState(0);
-
   const links = [
     { href: "/", title: "Home" },
     { href: "/dashboard", title: "Dashboard" },
@@ -15,22 +13,6 @@ export const Layout: FC<PropsWithChildren> = ({ children }) => {
     { href: "/screener", title: "Screener" },
     { href: "/activity", title: "Activity" },
   ];
-
-  useEffect(() => {
-    const fetch = async () => {
-      const result = await supabaseClient
-        .from("user")
-        .select()
-        .eq("username", "vasyldubno")
-        .single();
-
-      if (result.data) {
-        setBalance(result.data.balance);
-      }
-    };
-
-    fetch();
-  }, []);
 
   return (
     <>
@@ -46,16 +28,6 @@ export const Layout: FC<PropsWithChildren> = ({ children }) => {
             await PortfolioService.updateDividends();
           }}
         /> */}
-        <div
-          style={{
-            padding: "0.5rem",
-            borderRadius: "0.5rem",
-            borderColor: "var(--color-gray)",
-            borderWidth: "1px",
-          }}
-        >
-          <p>Balance: ${balance}</p>
-        </div>
         {/* <Button
           title="SELL"
           onClick={async () => {

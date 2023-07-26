@@ -95,10 +95,10 @@ export default async function handler(
             moment(item.pay_date).isAfter(today)
           );
 
-          console.log(index);
+          // console.log(index);
 
           if (last) {
-            console.log(index, stock.ticker);
+            // console.log(index, stock.ticker);
             await supabaseClient
               .from("stock_portfolio")
               .update({
@@ -116,7 +116,7 @@ export default async function handler(
               .eq("ticker", stock.ticker);
           }
         } catch (error) {
-          console.log(`ERROR => ${stock.ticker}`);
+          // console.log(`ERROR => ${stock.ticker}`);
         }
       }, index * 15000);
     });

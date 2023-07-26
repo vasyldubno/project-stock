@@ -171,12 +171,12 @@ export default async function handler(
         await supabaseClient
           .from("portfolio")
           .update({
-            total_return: portfolio.data.total_return
-              ? Number((portfolio.data.total_return + price * count).toFixed(2))
-              : Number((price * count).toFixed(2)),
-            active_cost:
-              portfolio.data.active_cost -
-              existStock.data?.average_cost_per_share * count,
+            active_cost: portfolio.data.active_cost
+              ? portfolio.data.active_cost + price * count
+              : price * count,
+            total_cost: portfolio.data.total_cost
+              ? portfolio.data.total_cost + price * count
+              : price * count,
             market_cap: await getMarketCap(),
             gain_value: await getGainValue(),
             gain_margin: await getGainMargin(),
@@ -321,15 +321,24 @@ export default async function handler(
         await supabaseClient
           .from("portfolio")
           .update({
-            total_return: portfolio.data.total_return
-              ? Number((portfolio.data.total_return + price * count).toFixed(2))
-              : Number((price * count).toFixed(2)),
-            active_cost:
-              portfolio.data.active_cost -
-              stock.data?.average_cost_per_share * count,
             market_cap: await getMarketCap(),
             gain_value: await getGainValue(),
             gain_margin: await getGainMargin(),
+            profit: portfolio.data.profit
+              ? portfolio.data.profit +
+                getRealizedValue(
+                  price,
+                  count,
+                  stock.data.average_cost_per_share
+                )
+              : getRealizedValue(
+                  price,
+                  count,
+                  stock.data.average_cost_per_share
+                ),
+            total_return: portfolio.data.total_return
+              ? portfolio.data.total_return + price * count
+              : price * count,
           })
           .eq("title", portfolio.data.title);
       }

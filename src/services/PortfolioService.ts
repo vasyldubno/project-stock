@@ -64,7 +64,20 @@ export class PortfolioService {
         ascending: true,
         nullsFirst: false,
       });
+    return {
+      portfolio: portfolio.data,
+    };
+  }
 
+  static async getPortfolioMap() {
+    const portfolio = await supabaseClient
+      .from("stock_portfolio")
+      .select()
+      .eq("is_trading", true)
+      .order("perc_of_portfolio", {
+        ascending: false,
+        nullsFirst: false,
+      });
     return {
       portfolio: portfolio.data,
     };

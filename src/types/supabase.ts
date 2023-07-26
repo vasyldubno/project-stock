@@ -124,6 +124,8 @@ export interface Database {
           gain_value: number | null
           id: string
           market_cap: number | null
+          portfolio_yield: number | null
+          profit: number | null
           title: string | null
           total_cost: number | null
           total_return: number | null
@@ -137,6 +139,8 @@ export interface Database {
           gain_value?: number | null
           id?: string
           market_cap?: number | null
+          portfolio_yield?: number | null
+          profit?: number | null
           title?: string | null
           total_cost?: number | null
           total_return?: number | null
@@ -150,6 +154,8 @@ export interface Database {
           gain_value?: number | null
           id?: string
           market_cap?: number | null
+          portfolio_yield?: number | null
+          profit?: number | null
           title?: string | null
           total_cost?: number | null
           total_return?: number | null

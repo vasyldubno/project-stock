@@ -1,0 +1,19 @@
+.nav {
+  background-color: #192b58;
+}
+
+.li {
+  color: #96a2c1;
+  padding: 1rem 0;
+  transition: all 0.5s ease;
+  &:hover {
+    color: #fff;
+    transition: all 0.5s ease;
+  }
+}
+
+.ul {
+  display: flex;
+  justify-content: center;
+  gap: 3rem;
+}

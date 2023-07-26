@@ -8,7 +8,7 @@ export default async function handler(
   const stocks = await xataClient.db.stock.getAll();
 
   stocks.forEach(async (stock, index) => {
-    console.log(index, stock.ticker);
+    // console.log(index, stock.ticker);
 
     if (stock.priceCurrent && stock.priceTarget && stock.ticker) {
       const priceGrowth = Number(

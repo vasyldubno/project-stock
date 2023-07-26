@@ -1,12 +1,14 @@
 import { supabaseClient } from "@/config/supabaseClient";
 import { PortfolioService } from "@/services/PortfolioService";
+import { StockService } from "@/services/StockService";
 import { ISupaStock } from "@/types/types";
 import { Dispatch, SetStateAction } from "react";
 
 export const SupaStockUpdate = (
-  setState: Dispatch<SetStateAction<ISupaStock[]>>
+  setState: Dispatch<SetStateAction<ISupaStock[]>>,
+  selectedScreener: "Dividend" | "Growth"
 ) => {
-  return supabaseClient
+  const channel = supabaseClient
     .channel("stock-update")
     .on(
       "postgres_changes",
@@ -16,15 +18,25 @@ export const SupaStockUpdate = (
         table: "stock_portfolio",
       },
       async (payload) => {
-        const response = await PortfolioService.getStocks();
+        console.log("PAYLOAD SUPABASE", selectedScreener);
+        console.log(payload);
+        if (selectedScreener === "Growth") {
+          const response = await PortfolioService.getStocks();
 
-        if (response) {
-          setState(response);
+          if (response) {
+            setState(response);
+          }
         }
 
-        console.log(response);
-        console.log("PAYLOAD");
+        if (selectedScreener === "Dividend") {
+          const response = await StockService.getStocksDividends();
+
+          if (response) {
+            setState(response);
+          }
+        }
       }
     )
     .subscribe();
+  return () => channel.unsubscribe();
 };

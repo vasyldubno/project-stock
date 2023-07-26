@@ -72,7 +72,7 @@ export default async function handler(
           // }
         }
       } catch (error) {
-        console.log(`ERROR => ${stock.ticker}`);
+        // console.log(`ERROR => ${stock.ticker}`);
       }
     });
   }

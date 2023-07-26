@@ -9,7 +9,8 @@ export default async function handler(
   const stocks = await supabaseClient
     .from("stock")
     .select()
-    .order("report_date", { ascending: true });
+    .order("report_date", { ascending: true })
+    .order("ticker", { ascending: true });
 
   const portfolio = await supabaseClient.from("stock_portfolio").select();
 

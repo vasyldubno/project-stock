@@ -7,7 +7,7 @@ export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse
 ) {
-  console.log("API/STOCK/PRICE-CURRENT");
+  // console.log("API/STOCK/PRICE-CURRENT");
   const stocks = await supabaseClient
     .from("stock")
     .select()

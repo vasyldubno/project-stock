@@ -5,6 +5,6 @@ export const getHTML = async (url: string) => {
     const { data } = await axios.get(url);
     return data;
   } catch (error) {
-    console.log("Site dont allow parsing");
+    // console.log("Site dont allow parsing");
   }
 };

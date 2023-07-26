@@ -1,3 +1,4 @@
+import { Header } from "@/components/Header/Header";
 import { ISupaStock } from "@/types/types";
 import dynamic from "next/dynamic";
 
@@ -12,7 +13,10 @@ const TableScreenerDynamic = dynamic(
 export const ScreenerScreen = ({ data }: { data: ISupaStock[] }) => {
   return (
     <>
-      <TableScreenerDynamic data={data} />
+      <Header />
+      <div style={{ margin: "1rem" }}>
+        <TableScreenerDynamic data={data} />
+      </div>
     </>
   );
 };

@@ -1,3 +1,4 @@
+import { Header } from "@/components/Header/Header";
 import { Layout } from "@/components/Layout/Layout";
 import { PortfolioService } from "@/services/PortfolioService";
 import dynamic from "next/dynamic";
@@ -16,10 +17,11 @@ export const PortfolioScreen = () => {
     // PortfolioService.updatePortfolio();
   }, []);
   return (
-    <div style={{ margin: "1rem" }}>
-      <Layout>
+    <>
+      <Header />
+      <div style={{ margin: "1rem" }}>
         <TablePortfolioDynamic />
-      </Layout>
-    </div>
+      </div>
+    </>
   );
 };

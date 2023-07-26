@@ -43,11 +43,11 @@ export default async function handler(
           }
 
           if (index === stocks.length - 1) {
-            console.log("FINISH");
+            // console.log("FINISH");
           }
         }
       } catch (error) {
-        console.log(`${stock.ticker} ${error}`);
+        // console.log(`${stock.ticker} ${error}`);
       }
     }, 100 * index);
   });

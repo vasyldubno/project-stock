@@ -1,3 +1,4 @@
+import { StockService } from "@/services/StockService";
 import { ISupaStock } from "@/types/types";
 import {
   SortingState,
@@ -10,12 +11,9 @@ import {
 import millify from "millify";
 import { useEffect, useState } from "react";
 import { Button } from "../Button/Button";
-import { Modal } from "../Modal/Modal";
 import { FormAddStock } from "../FormAddStock/FormAddStock";
 import { Layout } from "../Layout/Layout";
-import { supabaseClient } from "@/config/supabaseClient";
-import { PortfolioService } from "@/services/PortfolioService";
-import { StockService } from "@/services/StockService";
+import { Modal } from "../Modal/Modal";
 import { SupaStockUpdate } from "./supabase";
 
 export const TableScreener = ({ data }: { data: ISupaStock[] }) => {
@@ -23,10 +21,14 @@ export const TableScreener = ({ data }: { data: ISupaStock[] }) => {
   const [sorting, setSorting] = useState<SortingState>([]);
   const [isOpenModal, setIsOpenModal] = useState(false);
   const [selectedStock, setSelectedStock] = useState<ISupaStock | null>(null);
-  const [selectedScreener, setSelectedScreener] = useState("Growth");
+  const [selectedScreener, setSelectedScreener] = useState<
+    "Dividend" | "Growth"
+  >("Growth");
+
+  // console.log(selectedScreener);
 
   useEffect(() => {
-    SupaStockUpdate(setStocks);
+    // SupaStoc kUpdate(setStocks, selectedScreener);
   }, []);
 
   const columnHelper = createColumnHelper<ISupaStock>();
@@ -86,7 +88,9 @@ export const TableScreener = ({ data }: { data: ISupaStock[] }) => {
     }),
     columnHelper.accessor("dividendYield", {
       header: "Dividend Yield",
-      cell: (info) => info.getValue(),
+      cell: (info) => (
+        <>{info.getValue() ? <p>{info.getValue()}%</p> : <p>-- --</p>}</>
+      ),
     }),
   ];
 
@@ -117,15 +121,22 @@ export const TableScreener = ({ data }: { data: ISupaStock[] }) => {
   };
 
   return (
-    <Layout>
+    <>
       <div style={{ display: "flex", gap: "1rem" }}>
-        <Button title="Growth Screener" onClick={() => setStocks(data)} />
+        <Button
+          title="Growth Screener"
+          onClick={() => {
+            setStocks(data);
+            setSelectedScreener("Growth");
+          }}
+        />
         <Button
           title="Dividend Screener"
           onClick={async () => {
             const response = await StockService.getStocksDividends();
             if (response) {
               setStocks(response);
+              setSelectedScreener("Dividend");
             }
           }}
         />
@@ -174,27 +185,25 @@ export const TableScreener = ({ data }: { data: ISupaStock[] }) => {
         </thead>
 
         {table.getRowModel().rows.map((row, rowIndex) => (
-          <>
-            <tbody key={`data-${row.id}-${rowIndex}`}>
-              <tr>
-                {row.getVisibleCells().map((cell, cellIndex) => (
-                  <td
-                    key={`${cell.id}-${cellIndex}`}
-                    style={{ padding: "5px 0" }}
-                  >
-                    {flexRender(cell.column.columnDef.cell, cell.getContext())}
-                  </td>
-                ))}
-                <Button
-                  title="BUY"
-                  onClick={() => {
-                    setIsOpenModal(true);
-                    setSelectedStock(row.original);
-                  }}
-                />
-              </tr>
-            </tbody>
-          </>
+          <tbody key={`data-${row.id}-${rowIndex}`}>
+            <tr>
+              {row.getVisibleCells().map((cell, cellIndex) => (
+                <td
+                  key={`${cell.id}-${cellIndex}`}
+                  style={{ padding: "5px 0" }}
+                >
+                  {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                </td>
+              ))}
+              <Button
+                title="BUY"
+                onClick={() => {
+                  setIsOpenModal(true);
+                  setSelectedStock(row.original);
+                }}
+              />
+            </tr>
+          </tbody>
         ))}
       </table>
       <Modal open={isOpenModal} onClose={() => setIsOpenModal(false)}>
@@ -204,6 +213,6 @@ export const TableScreener = ({ data }: { data: ISupaStock[] }) => {
           type="buy"
         />
       </Modal>
-    </Layout>
+    </>
   );
 };

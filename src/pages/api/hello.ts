@@ -12,18 +12,18 @@ export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse
 ) {
-  const stocks = await supabaseClient
-    .from("transaction")
-    .select()
-    .eq("type", "buy")
-    .order("ticker", { ascending: true });
+  const portfolio = await supabaseClient.from("portfolio").select().single();
 
-  const html = await getHTML(
-    "https://www.nasdaq.com/market-activity/stocks/ko/dividend-history"
-  );
-  const $ = cheerio.load(html);
-  const a = $("table.dividend-history__table").html();
-  console.log(a);
+  if (portfolio.data) {
+    const r = await supabaseClient
+      .from("portfolio")
+      .update({
+        total_return: 610.6,
+      })
+      .eq("id", portfolio.data.id);
+
+    console.log(r);
+  }
 
   res.json({
     message: "Ok",

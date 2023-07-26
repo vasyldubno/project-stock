@@ -18,6 +18,6 @@ export const getGFValue = async (ticker: string) => {
       return Number(result.replace(/[^0-9.]/g, ""));
     }
   } catch {
-    console.log("ERROR => GET_GF_VALUE", ticker);
+    // console.log("ERROR => GET_GF_VALUE", ticker);
   }
 };

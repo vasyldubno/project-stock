@@ -1,3 +1,4 @@
+import { Header } from "@/components/Header/Header";
 import { Layout } from "@/components/Layout/Layout";
 import dynamic from "next/dynamic";
 
@@ -11,10 +12,11 @@ const DynamicTableActivity = dynamic(
 
 export const ActivityScreener = () => {
   return (
-    <Layout>
+    <>
+      <Header />
       <div style={{ margin: "0 auto", width: "1280px", padding: "1rem 0" }}>
         <DynamicTableActivity />
       </div>
-    </Layout>
+    </>
   );
 };

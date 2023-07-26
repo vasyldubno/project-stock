@@ -25,7 +25,7 @@ export const updateReportDate = async (ticker: string) => {
         .update({ report_date: date })
         .eq("ticker", ticker);
     } catch {
-      console.log("ERROR CHEERIO updateReportdate =>", ticker);
+      // console.log("ERROR CHEERIO updateReportdate =>", ticker);
     }
   }
 };

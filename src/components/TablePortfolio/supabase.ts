@@ -15,7 +15,6 @@ export const supabaseStockUpdate = (
         table: "stock_portfolio",
       },
       async (payload) => {
-        console.log("PAYLOAD");
         const updatedStock = await supabaseClient
           .from("stock_portfolio")
           .select()
@@ -29,25 +28,22 @@ export const supabaseStockUpdate = (
                 item.ticker === payload.new.ticker ? updatedStock.data : item
               )
               .sort((a, b) => {
-                if (
-                  a.gain_unrealized_percentage === null &&
-                  b.gain_unrealized_percentage === null
-                ) {
+                if (a.price_growth === null && b.price_growth === null) {
                   return 0;
                 }
 
-                if (a.gain_unrealized_percentage === null) {
+                if (a.price_growth === null) {
                   return 1;
                 }
 
-                if (b.gain_unrealized_percentage === null) {
+                if (b.price_growth === null) {
                   return -1;
                 }
 
-                return (
-                  b.gain_unrealized_percentage - a.gain_unrealized_percentage
-                );
+                return a.price_growth - b.price_growth;
               });
+
+            console.log(result);
 
             return result;
           });

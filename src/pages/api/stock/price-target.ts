@@ -54,9 +54,9 @@ export default async function handler(
           // }
           // }
 
-          console.log(index, stock.ticker);
+          // console.log(index, stock.ticker);
         } catch (err) {
-          console.log("ERROR =>", stock.ticker, err);
+          // console.log("ERROR =>", stock.ticker, err);
         }
       }, 200 * index);
     });

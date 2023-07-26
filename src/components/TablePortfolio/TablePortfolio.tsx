@@ -313,13 +313,3 @@ export const TablePortfolio = () => {
     </>
   );
 };
-
-{
-  /* <tbody key={`divider-${row.id}-${rowIndex}`}>
-  <tr>
-    <td colSpan={columns.length + 2}>
-      <TableDivider />
-    </td>
-  </tr>
-</tbody>; */
-}

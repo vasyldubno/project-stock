@@ -92,3 +92,16 @@ export interface ISupaTransaction {
   type: string;
   change: string;
 }
+
+export interface ISupaPortfolio {
+  active_cost: number | null;
+  created_at: string | null;
+  free_cash: number | null;
+  gain_margin: number | null;
+  gain_value: number | null;
+  id: string;
+  market_cap: number | null;
+  title: string | null;
+  total_cost: number | null;
+  total_return: number | null;
+}

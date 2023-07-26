@@ -181,11 +181,49 @@ export default async function handler(
                     })
                     .eq("year", "2023");
                 }
+
+                const portfolio = await supabaseClient
+                  .from("portfolio")
+                  .select()
+                  .eq("id", stock.portfolio_id)
+                  .single();
+
+                if (portfolio.data) {
+                  await supabaseClient
+                    .from("portfolio")
+                    .update({
+                      total_return: portfolio.data.total_return
+                        ? portfolio.data.total_return +
+                          Number(
+                            (
+                              last.cash_amount * stock.amount_active_shares
+                            ).toFixed(2)
+                          )
+                        : Number(
+                            (
+                              last.cash_amount * stock.amount_active_shares
+                            ).toFixed(2)
+                          ),
+                      profit: portfolio.data.profit
+                        ? portfolio.data.profit +
+                          Number(
+                            (
+                              last.cash_amount * stock.amount_active_shares
+                            ).toFixed(2)
+                          )
+                        : Number(
+                            (
+                              last.cash_amount * stock.amount_active_shares
+                            ).toFixed(2)
+                          ),
+                    })
+                    .eq("id", portfolio.data.id);
+                }
               }
             }
           }
         } catch {
-          console.log("ERROR", stock.ticker);
+          // console.log("ERROR", stock.ticker);
         }
       }, index * 15000);
     });

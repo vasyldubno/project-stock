@@ -21,6 +21,7 @@
     "autoprefixer": "10.4.14",
     "axios": "^1.4.0",
     "chart.js": "^4.3.0",
+    "chartjs-chart-treemap": "^2.3.0",
     "cheerio": "^1.0.0-rc.12",
     "cron": "^2.3.1",
     "eslint": "8.44.0",

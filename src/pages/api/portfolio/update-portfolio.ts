@@ -36,9 +36,9 @@ export default async function handler(
             })
             .eq("ticker", stock.ticker);
 
-          console.log(index, stock.ticker, marketPrice);
+          // console.log(index, stock.ticker, marketPrice);
         } catch {
-          console.log("ERROR", index, stock.ticker);
+          // console.log("ERROR", index, stock.ticker);
         }
       }, index * 600);
     });

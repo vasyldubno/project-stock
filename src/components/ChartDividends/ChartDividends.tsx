@@ -49,6 +49,17 @@ export const ChartDividends: FC = () => {
             padding: 10,
             yAlign: "bottom",
             displayColors: false,
+            callbacks: {
+              // @ts-ignore
+              title: () => null,
+              label: (context) => {
+                let label = context.parsed.y || "";
+                if (label !== "") {
+                  label = "$" + label;
+                }
+                return label;
+              },
+            },
           },
         },
 
