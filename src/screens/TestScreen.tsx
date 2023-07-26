@@ -18,9 +18,5 @@ export const TestScreen: FC = () => {
     fetch();
   }, []);
 
-  return (
-    <>
-      <ChartMapStocks />
-    </>
-  );
+  return <></>;
 };

@@ -19,6 +19,9 @@ export default async function handler(
       .from("portfolio")
       .update({
         total_return: 610.6,
+        profit: 120.8,
+        total_cost: 9363.67,
+        active_cost: 8873.49,
       })
       .eq("id", portfolio.data.id);
 
