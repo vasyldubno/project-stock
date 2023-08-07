@@ -85,6 +85,6 @@ export default async function handler(
 
   res.json({
     message: "Ok",
-    // stocks,
+    stocks,
   });
 }
