@@ -66,7 +66,7 @@ export const FormAddStock: FC<Props> = ({
 
   useEffect(() => {
     if (user) {
-      PortfolioService.getPortfolios(user.id).then((res) => {
+      PortfolioService.getPortfolios(user).then((res) => {
         if (res) {
           setPortfolios(res.data);
         }
@@ -84,7 +84,7 @@ export const FormAddStock: FC<Props> = ({
   }, [searchValue]);
 
   const onSubmit: SubmitHandler<FormSchema> = async (data) => {
-    if (user) {
+    if (user && user.id) {
       const response = await PortfolioService.addTransaction(
         data.ticker,
         data.price,
