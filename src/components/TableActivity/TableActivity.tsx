@@ -1,6 +1,5 @@
-import { ArrowRight } from "@/icons/ArrowRight";
 import { PortfolioService } from "@/services/PortfolioService";
-import { IPortfolioStock, ISupaStock, ISupaTransaction } from "@/types/types";
+import { ISupaTransaction } from "@/types/types";
 import {
   SortingState,
   createColumnHelper,
@@ -10,22 +9,12 @@ import {
   useReactTable,
 } from "@tanstack/react-table";
 import { useEffect, useState } from "react";
-import { TableCardPrice } from "../TableCardPrice/TableCardPrice";
-import { TableDetails } from "../TableDetails/TableDetails";
-import { TableDivider } from "../TableDivider/TableDivider";
-
-import { Button } from "../Button/Button";
-import { Modal } from "../Modal/Modal";
-import { FormAddStock } from "../FormAddStock/FormAddStock";
+import { SortIcon } from "@/icons/SortIcon";
+import moment from "moment";
 
 export const TableActivity = () => {
   const [data, setData] = useState<ISupaTransaction[]>([]);
   const [sorting, setSorting] = useState<SortingState>([]);
-  const [selectedTicker, setSelectedTicker] = useState<string[]>([]);
-  const [selectedStock, setSelectedStock] = useState<IPortfolioStock | null>(
-    null
-  );
-  const [isOpenModal, setIsOpenModal] = useState(false);
 
   useEffect(() => {
     PortfolioService.getTransactions().then((res) => setData(res));
@@ -44,7 +33,11 @@ export const TableActivity = () => {
     }),
     columnHelper.accessor("date", {
       header: "Date",
-      cell: (info) => <p style={{ textAlign: "center" }}>{info.getValue()}</p>,
+      cell: (info) => (
+        <p style={{ textAlign: "center" }}>
+          {moment(info.getValue()).format("DD.MM.YYYY")}
+        </p>
+      ),
     }),
     columnHelper.accessor("type", {
       header: "Type",
@@ -67,7 +60,6 @@ export const TableActivity = () => {
 
   const toggleSortingHandler = (columnId: string) => () => {
     const sortConfig = sorting.find((sort) => sort.id === columnId);
-    // console.log(sortConfig);
     if (sortConfig) {
       if (sortConfig.desc) {
         setSorting(
@@ -75,14 +67,8 @@ export const TableActivity = () => {
             sort.id === columnId ? { ...sort, desc: false } : sort
           )
         );
-        // setSorting(sorting.filter((sort) => sort.id !== columnId));
       } else {
         setSorting(sorting.filter((sort) => sort.id !== columnId));
-        // setSorting(
-        //   sorting.map((sort) =>
-        //     sort.id === columnId ? { ...sort, desc: true } : sort
-        //   )
-        // );
       }
     } else {
       setSorting([{ id: columnId, desc: true }]);
@@ -95,6 +81,7 @@ export const TableActivity = () => {
         style={{
           width: "100%",
           border: "1px solid var(--color-gray)",
+          borderCollapse: "collapse",
         }}
       >
         <thead>
@@ -104,12 +91,17 @@ export const TableActivity = () => {
                 <th
                   key={`${header.id}-${headerIndex}`}
                   onClick={toggleSortingHandler(header.column.id)}
+                  style={{
+                    border: "1px solid var(--color-gray)",
+                    padding: "5px 0",
+                  }}
                 >
                   {header.isPlaceholder ? null : (
                     <div
                       style={{
                         display: "flex",
                         justifyContent: "center",
+                        gap: "0.3rem",
                       }}
                     >
                       <div style={{ cursor: "pointer" }}>
@@ -118,13 +110,23 @@ export const TableActivity = () => {
                           header.getContext()
                         )}
                       </div>
-                      {sorting.some((sort) => sort.id === header.column.id) && (
-                        <span>
+                      {sorting.some((sort) => sort.id === header.column.id) ? (
+                        <span style={{ display: "flex", alignItems: "center" }}>
                           {sorting.find((sort) => sort.id === header.column.id)
-                            ?.desc
-                            ? "🔽"
-                            : "🔼"}
+                            ?.desc ? (
+                            <SortIcon size="1rem" type="desc" />
+                          ) : (
+                            <SortIcon size="1rem" type="asc" />
+                          )}
                         </span>
+                      ) : (
+                        <div
+                          style={{
+                            backgroundColor: "white",
+                            width: "1rem",
+                            height: "1rem",
+                          }}
+                        ></div>
                       )}
                     </div>
                   )}
@@ -137,80 +139,21 @@ export const TableActivity = () => {
         {table.getRowModel().rows.map((row, rowIndex) => (
           <tbody key={`data-${row.id}-${rowIndex}`}>
             <tr>
-              <td colSpan={columns.length + 2}>
-                <TableDivider />
-              </td>
-            </tr>
-            <tr>
-              {/* <td>
-                <div
-                  style={{ cursor: "pointer" }}
-                  // onClick={() => showDetail(row.original.ticker)}
-                >
-                  <ArrowRight />
-                </div>
-              </td> */}
               {row.getVisibleCells().map((cell, cellIndex) => (
                 <td
                   key={`${cell.id}-${cellIndex}`}
-                  style={{ padding: "5px 0" }}
+                  style={{
+                    padding: "5px 0",
+                    border: "1px solid var(--color-gray)",
+                  }}
                 >
                   {flexRender(cell.column.columnDef.cell, cell.getContext())}
                 </td>
               ))}
-              {/* <td>
-                <div
-                  style={{
-                    padding: "5px 0",
-                    display: "flex",
-                    justifyContent: "center",
-                  }}
-                >
-                  {row.original.is_trading && (
-                    <Button
-                      title="SELL"
-                      onClick={() => {
-                        setIsOpenModal(true);
-                        setSelectedStock(row.original);
-                      }}
-                    />
-                  )}
-                </div>
-              </td> */}
             </tr>
-            {selectedTicker.includes(row.original.ticker) && (
-              <>
-                <tr>
-                  <td colSpan={columns.length + 2}>
-                    <TableDetails
-                      ticker={selectedTicker.find((item) =>
-                        item.includes(row.original.ticker)
-                      )}
-                    />
-                  </td>
-                </tr>
-              </>
-            )}
           </tbody>
         ))}
       </table>
-      <Modal open={isOpenModal} onClose={() => setIsOpenModal(false)}>
-        <FormAddStock
-          onClose={() => setIsOpenModal(false)}
-          stock={selectedStock}
-          type="sell"
-        />
-      </Modal>
     </>
   );
 };
-
-{
-  /* <tbody key={`divider-${row.id}-${rowIndex}`}>
-  <tr>
-    <td colSpan={columns.length + 2}>
-      <TableDivider />
-    </td>
-  </tr>
-</tbody>; */
-}

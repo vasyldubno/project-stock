@@ -1,13 +1,14 @@
 import { supabaseClient } from "@/config/supabaseClient";
 import { getMarketCap } from "./getMarketCap";
 
-export const getGainMargin = async () => {
+export const getGainMargin = async (portfolioId: string) => {
   const supaStocks = await supabaseClient
     .from("stock_portfolio")
     .select()
-    .eq("is_trading", true);
+    .eq("is_trading", true)
+    .eq("portfolio_id", portfolioId);
 
-  const marketCap = await getMarketCap();
+  const marketCap = await getMarketCap(portfolioId);
 
   const cost = supaStocks.data?.reduce((acc, item) => {
     if (item.average_cost_per_share && item.amount_active_shares) {

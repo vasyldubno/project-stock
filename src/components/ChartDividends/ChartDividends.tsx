@@ -12,27 +12,18 @@ import { Bar } from "react-chartjs-2";
 
 ChartJS.register(Legend, Tooltip, BarElement, CategoryScale, LinearScale);
 
-export const ChartDividends: FC = () => {
-  const [colors, setColors] = useState<string[]>([]);
-  const [data, setData] = useState<number[]>([]);
-  const [months, setMonths] = useState<string[]>([]);
+type Props = {
+  data: { amount: number; monthName: string }[];
+};
 
-  useEffect(() => {
-    PortfolioService.getDividendIncomeInMonth(new Date().getUTCFullYear()).then(
-      (res) => {
-        setMonths(Object.keys(res));
-        setData(Object.values(res));
-      }
-    );
-  }, []);
-
+export const ChartDividends: FC<Props> = ({ data }) => {
   return (
     <Bar
       data={{
-        labels: months,
+        labels: data.map((item) => item.monthName),
         datasets: [
           {
-            data,
+            data: data.map((item) => item.amount),
             backgroundColor: "rgb(91, 155, 213)",
           },
         ],

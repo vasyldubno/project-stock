@@ -1,6 +1,3 @@
-import { StockRecord } from "@/types/xata";
-import { SelectedPick } from "@xata.io/client";
-
 export const getPriceGrowth = (
   priceTarget: number | null,
   priceCurrent: number | null

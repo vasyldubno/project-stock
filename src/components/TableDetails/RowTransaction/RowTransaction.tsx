@@ -1,3 +1,5 @@
+import moment from "moment";
+
 export const RowTransaction = ({
   count,
   date,
@@ -12,7 +14,7 @@ export const RowTransaction = ({
   return (
     <tr>
       <td style={{ fontWeight: "bold" }}>{type.toUpperCase()}</td>
-      <td>{date}</td>
+      <td>{moment(date).format("DD.MM.YYYY")}</td>
       <td>{count}</td>
       <td>{price}</td>
     </tr>

@@ -12,40 +12,18 @@ import { Bar } from "react-chartjs-2";
 
 ChartJS.register(Legend, Tooltip, BarElement, CategoryScale, LinearScale);
 
-export const ChartUpcomingDividends: FC = () => {
-  const [colors, setColors] = useState<string[]>([]);
-  const [data, setData] = useState<(string | null)[]>();
-  const [labels, setLabels] = useState<(string | null)[]>();
+type Props = {
+  data: { amount: number; monthName: string }[];
+};
 
-  useEffect(() => {
-    // PortfolioService.getDividendIncomeInMonth(new Date().getUTCFullYear()).then(
-    //   (res) => {
-    //     setMonths(Object.keys(res));
-    //     setData(Object.values(res));
-    //   }
-    // );
-
-    PortfolioService.getUpcomingDividends().then((res) => {
-      console.log(res);
-      // console.log(res);
-      if (res) {
-        const data = res.map((item) => item.value.toFixed(2));
-        setData(data);
-        const labels = res.map((item) => item.month);
-        setLabels(labels);
-      }
-    });
-  }, []);
-
-  // console.log(data);
-
+export const ChartUpcomingDividends: FC<Props> = ({ data }) => {
   return (
     <Bar
       data={{
-        labels,
+        labels: data.map((item) => item.monthName),
         datasets: [
           {
-            data,
+            data: data.map((item) => item.amount),
             backgroundColor: "rgb(91, 155, 213)",
           },
         ],
@@ -64,7 +42,9 @@ export const ChartUpcomingDividends: FC = () => {
             displayColors: false,
             callbacks: {
               // @ts-ignore
-              title: () => null,
+              title: (props) => {
+                return props.map((item) => item.label);
+              },
               label: (context) => {
                 let label = context.parsed.y || "";
                 if (label !== "") {

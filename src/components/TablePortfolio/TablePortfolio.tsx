@@ -1,6 +1,6 @@
 import { ArrowRight } from "@/icons/ArrowRight";
-import { PortfolioService } from "@/services/PortfolioService";
-import { IPortfolioStock, ISupaStock } from "@/types/types";
+import { SortIcon } from "@/icons/SortIcon";
+import { ISupaStockPortfolio } from "@/types/types";
 import {
   SortingState,
   createColumnHelper,
@@ -9,34 +9,30 @@ import {
   getSortedRowModel,
   useReactTable,
 } from "@tanstack/react-table";
-import { useEffect, useState } from "react";
+import { FC, useState } from "react";
+import { Button } from "../Button/Button";
+import { FormAddStock } from "../FormAddStock/FormAddStock";
+import { Modal } from "../Modal/Modal";
 import { TableCardPrice } from "../TableCardPrice/TableCardPrice";
 import { TableDetails } from "../TableDetails/TableDetails";
 import { TableDivider } from "../TableDivider/TableDivider";
 import s from "./TablePortfolio.module.scss";
-import { supabaseStockUpdate } from "./supabase";
-import { Button } from "../Button/Button";
-import { Modal } from "../Modal/Modal";
-import { FormAddStock } from "../FormAddStock/FormAddStock";
+import { useRouter } from "next/router";
+import Link from "next/link";
 
-export const TablePortfolio = () => {
-  const [data, setData] = useState<IPortfolioStock[]>([]);
+type Props = {
+  portfolioId: string;
+  data: ISupaStockPortfolio[];
+};
+
+export const TablePortfolio: FC<Props> = ({ portfolioId, data }) => {
   const [sorting, setSorting] = useState<SortingState>([]);
   const [selectedTicker, setSelectedTicker] = useState<string[]>([]);
-  const [selectedStock, setSelectedStock] = useState<IPortfolioStock | null>(
-    null
-  );
+  const [selectedStock, setSelectedStock] =
+    useState<ISupaStockPortfolio | null>(null);
   const [isOpenModal, setIsOpenModal] = useState(false);
 
-  useEffect(() => {
-    PortfolioService.getPortfolio().then((res) => {
-      if (res.portfolio) {
-        setData(res.portfolio);
-      }
-    });
-
-    supabaseStockUpdate(setData);
-  }, []);
+  const router = useRouter();
 
   const showDetail = async (ticker: string) => {
     setSelectedTicker((prev) => {
@@ -51,30 +47,21 @@ export const TablePortfolio = () => {
     });
   };
 
-  const columnHelper = createColumnHelper<IPortfolioStock>();
+  const columnHelper = createColumnHelper<ISupaStockPortfolio>();
 
   const columns = [
-    // columnHelper.accessor("ticker", {
-    //   header(props) {
-    //     return <></>;
-    //   },
-    //   cell(props) {
-    //     return (
-    //       <div
-    //         style={{ cursor: "pointer" }}
-    //         onClick={() => showDetail(props.row.original.ticker)}
-    //       >
-    //         <ArrowRight />
-    //       </div>
-    //     );
-    //   },
-    // }),
     columnHelper.accessor("ticker", {
       header: "Ticker",
-      cell: (info) => <p style={{ textAlign: "center" }}>{info.getValue()}</p>,
+      cell: (info) => (
+        <div style={{ textAlign: "center" }}>
+          <Link className={s.cell__ticker} href={`/stock/${info.getValue()}`}>
+            {info.getValue()}
+          </Link>
+        </div>
+      ),
     }),
-    columnHelper.accessor("gain_unrealized_percentage", {
-      header: "Total Gain (Unrealized)",
+    columnHelper.accessor("gain_margin", {
+      header: "Gain",
       cell: (info) => (
         <>
           {info.row.original.is_trading ? (
@@ -85,10 +72,16 @@ export const TablePortfolio = () => {
         </>
       ),
     }),
-    columnHelper.accessor("market_price", {
+    columnHelper.accessor("price_current", {
       header: "Market Price",
       cell: (info) => (
         <p style={{ textAlign: "center" }}>{info.getValue()?.toFixed(2)}</p>
+      ),
+    }),
+    columnHelper.accessor("average_cost_per_share", {
+      header: "Cost / Share",
+      cell: ({ getValue }) => (
+        <p style={{ textAlign: "center" }}>{getValue()}</p>
       ),
     }),
     columnHelper.accessor("total_dividend_income", {
@@ -115,9 +108,9 @@ export const TablePortfolio = () => {
             <p style={{ fontSize: "0.8rem" }}>-- --</p>
           )}
 
-          {info.row.original.total_return_value ? (
+          {info.row.original.total_return_margin ? (
             <p style={{ fontSize: "0.8rem" }}>
-              {info.row.original.total_return_value.toFixed(2)}
+              {info.row.original.total_return_margin.toFixed(2)}
             </p>
           ) : (
             <p style={{ fontSize: "0.8rem" }}>-- --</p>
@@ -137,19 +130,6 @@ export const TablePortfolio = () => {
           ) : (
             <p style={{ fontSize: "0.8rem" }}>-- --</p>
           )}
-          {/* {info.row.original.price_target && info.row.original.market_price ? (
-            <p style={{ fontSize: "0.8rem" }}>
-              {`${(
-                ((info.row.original.price_target -
-                  info.row.original.market_price) /
-                  info.row.original.market_price) *
-                100
-              ).toFixed(2)}`}
-              %
-            </p>
-          ) : (
-            <p style={{ fontSize: "0.8rem" }}>-- --</p>
-          )} */}
           {info.row.original.price_growth ? (
             <p style={{ fontSize: "0.8rem" }}>
               {`${info.row.original.price_growth.toFixed(2)}`}%
@@ -163,7 +143,11 @@ export const TablePortfolio = () => {
 
     columnHelper.accessor("perc_of_portfolio", {
       header: "% of Portfolio",
-      cell: (info) => <p style={{ textAlign: "center" }}>{info.getValue()}%</p>,
+      cell: (info) => (
+        <>
+          <p style={{ textAlign: "center" }}>{info.getValue()?.toFixed(2)}%</p>
+        </>
+      ),
     }),
   ];
 
@@ -178,7 +162,6 @@ export const TablePortfolio = () => {
 
   const toggleSortingHandler = (columnId: string) => () => {
     const sortConfig = sorting.find((sort) => sort.id === columnId);
-    // console.log(sortConfig);
     if (sortConfig) {
       if (sortConfig.desc) {
         setSorting(
@@ -186,21 +169,13 @@ export const TablePortfolio = () => {
             sort.id === columnId ? { ...sort, desc: false } : sort
           )
         );
-        // setSorting(sorting.filter((sort) => sort.id !== columnId));
       } else {
         setSorting(sorting.filter((sort) => sort.id !== columnId));
-        // setSorting(
-        //   sorting.map((sort) =>
-        //     sort.id === columnId ? { ...sort, desc: true } : sort
-        //   )
-        // );
       }
     } else {
       setSorting([{ id: columnId, desc: true }]);
     }
   };
-
-  console.log(sorting);
 
   return (
     <>
@@ -219,6 +194,7 @@ export const TablePortfolio = () => {
                       style={{
                         display: "flex",
                         justifyContent: "center",
+                        gap: "1rem",
                       }}
                     >
                       <div style={{ cursor: "pointer" }}>
@@ -227,13 +203,23 @@ export const TablePortfolio = () => {
                           header.getContext()
                         )}
                       </div>
-                      {sorting.some((sort) => sort.id === header.column.id) && (
-                        <span>
+                      {sorting.some((sort) => sort.id === header.column.id) ? (
+                        <span style={{ display: "flex", alignItems: "center" }}>
                           {sorting.find((sort) => sort.id === header.column.id)
-                            ?.desc
-                            ? "🔽"
-                            : "🔼"}
+                            ?.desc ? (
+                            <SortIcon size="1rem" type="desc" />
+                          ) : (
+                            <SortIcon size="1rem" type="asc" />
+                          )}
                         </span>
+                      ) : (
+                        <div
+                          style={{
+                            backgroundColor: "white",
+                            width: "1rem",
+                            height: "1rem",
+                          }}
+                        ></div>
                       )}
                     </div>
                   )}
@@ -306,8 +292,10 @@ export const TablePortfolio = () => {
       <Modal open={isOpenModal} onClose={() => setIsOpenModal(false)}>
         <FormAddStock
           onClose={() => setIsOpenModal(false)}
-          stock={selectedStock}
+          ticker={selectedStock?.ticker}
           type="sell"
+          portfolioId={portfolioId}
+          price={selectedStock?.price_current}
         />
       </Modal>
     </>

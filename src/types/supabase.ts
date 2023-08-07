@@ -17,8 +17,10 @@ export interface Database {
           dividendYield: number
           id: string
           payDate: string
+          portfolio_id: string
           ticker: string
           totalAmount: number
+          year: number
         }
         Insert: {
           amount_shares: number
@@ -27,8 +29,10 @@ export interface Database {
           dividendYield: number
           id?: string
           payDate: string
+          portfolio_id: string
           ticker: string
           totalAmount: number
+          year: number
         }
         Update: {
           amount_shares?: number
@@ -37,10 +41,19 @@ export interface Database {
           dividendYield?: number
           id?: string
           payDate?: string
+          portfolio_id?: string
           ticker?: string
           totalAmount?: number
+          year?: number
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "dividend_portfolio_id_fkey"
+            columns: ["portfolio_id"]
+            referencedRelation: "portfolio"
+            referencedColumns: ["id"]
+          }
+        ]
       }
       dividend_in_month: {
         Row: {
@@ -96,6 +109,48 @@ export interface Database {
         }
         Relationships: []
       }
+      exit: {
+        Row: {
+          average_price_per_share: number
+          cost: number
+          created_at: string
+          finish_date: string
+          id: string
+          portfolio_id: string
+          profit_margin: number
+          profit_value: number
+          return: number
+          start_date: string
+          ticker: string
+        }
+        Insert: {
+          average_price_per_share: number
+          cost: number
+          created_at?: string
+          finish_date: string
+          id?: string
+          portfolio_id: string
+          profit_margin: number
+          profit_value: number
+          return: number
+          start_date: string
+          ticker: string
+        }
+        Update: {
+          average_price_per_share?: number
+          cost?: number
+          created_at?: string
+          finish_date?: string
+          id?: string
+          portfolio_id?: string
+          profit_margin?: number
+          profit_value?: number
+          return?: number
+          start_date?: string
+          ticker?: string
+        }
+        Relationships: []
+      }
       index: {
         Row: {
           created_at: string | null
@@ -116,74 +171,131 @@ export interface Database {
       }
       portfolio: {
         Row: {
-          active_cost: number | null
-          created_at: string | null
-          dividends_in_months: Json | null
-          free_cash: number | null
-          gain_margin: number | null
-          gain_value: number | null
+          cost: number
+          created_at: string
+          gain_margin: number
+          gain_value: number
           id: string
-          market_cap: number | null
-          portfolio_yield: number | null
-          profit: number | null
-          title: string | null
-          total_cost: number | null
-          total_return: number | null
+          title: string
+          user_id: string
+          value: number
         }
         Insert: {
-          active_cost?: number | null
-          created_at?: string | null
-          dividends_in_months?: Json | null
-          free_cash?: number | null
-          gain_margin?: number | null
-          gain_value?: number | null
+          cost?: number
+          created_at?: string
+          gain_margin?: number
+          gain_value?: number
           id?: string
-          market_cap?: number | null
-          portfolio_yield?: number | null
-          profit?: number | null
-          title?: string | null
-          total_cost?: number | null
-          total_return?: number | null
+          title: string
+          user_id: string
+          value?: number
         }
         Update: {
-          active_cost?: number | null
-          created_at?: string | null
-          dividends_in_months?: Json | null
-          free_cash?: number | null
-          gain_margin?: number | null
-          gain_value?: number | null
+          cost?: number
+          created_at?: string
+          gain_margin?: number
+          gain_value?: number
           id?: string
-          market_cap?: number | null
-          portfolio_yield?: number | null
-          profit?: number | null
-          title?: string | null
-          total_cost?: number | null
-          total_return?: number | null
+          title?: string
+          user_id?: string
+          value?: number
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "portfolio_user_id_fkey"
+            columns: ["user_id"]
+            referencedRelation: "user"
+            referencedColumns: ["id"]
+          }
+        ]
+      }
+      screener: {
+        Row: {
+          analyst: string | null
+          created_at: string
+          de: string | null
+          dividend_yield: string | null
+          id: string
+          industry: string | null
+          margin_safety: string | null
+          payout_ratio: string | null
+          pe: string | null
+          priceGrowth: string | null
+          roe: string | null
+          sector: string | null
+          title: string
+          user_id: string
+        }
+        Insert: {
+          analyst?: string | null
+          created_at?: string
+          de?: string | null
+          dividend_yield?: string | null
+          id?: string
+          industry?: string | null
+          margin_safety?: string | null
+          payout_ratio?: string | null
+          pe?: string | null
+          priceGrowth?: string | null
+          roe?: string | null
+          sector?: string | null
+          title: string
+          user_id: string
+        }
+        Update: {
+          analyst?: string | null
+          created_at?: string
+          de?: string | null
+          dividend_yield?: string | null
+          id?: string
+          industry?: string | null
+          margin_safety?: string | null
+          payout_ratio?: string | null
+          pe?: string | null
+          priceGrowth?: string | null
+          roe?: string | null
+          sector?: string | null
+          title?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "screener_user_id_fkey"
+            columns: ["user_id"]
+            referencedRelation: "user"
+            referencedColumns: ["id"]
+          }
+        ]
       }
       stock: {
         Row: {
           analystRatingBuy: number | null
           annualDividend: number | null
+          beta: number | null
           created_at: string | null
           de: number | null
+          dividend_upcoming_date: string | null
+          dividend_upcoming_value: number | null
           dividendYield: number | null
-          eps: number | null
-          exchange: string | null
+          eps_growth_past_5y: number | null
+          exchange: string
           gfValue: number | null
           gfValueMargin: number | null
+          gross_margin: number | null
           id: string
           index: string | null
+          is_dividend: boolean
           isDividendAristocrat: boolean
           isDividendKing: boolean
           marketCap: number | null
           name: string | null
+          net_margin: number | null
           payoutRation: number | null
           pe: number | null
           price_current: number | null
           price_growth: number | null
           price_target: number | null
+          price_year_high: number | null
           report_date: string | null
           roe: number | null
           sector: string
@@ -193,24 +305,31 @@ export interface Database {
         Insert: {
           analystRatingBuy?: number | null
           annualDividend?: number | null
+          beta?: number | null
           created_at?: string | null
           de?: number | null
+          dividend_upcoming_date?: string | null
+          dividend_upcoming_value?: number | null
           dividendYield?: number | null
-          eps?: number | null
-          exchange?: string | null
+          eps_growth_past_5y?: number | null
+          exchange: string
           gfValue?: number | null
           gfValueMargin?: number | null
+          gross_margin?: number | null
           id?: string
           index?: string | null
+          is_dividend?: boolean
           isDividendAristocrat?: boolean
           isDividendKing?: boolean
           marketCap?: number | null
           name?: string | null
+          net_margin?: number | null
           payoutRation?: number | null
           pe?: number | null
           price_current?: number | null
           price_growth?: number | null
           price_target?: number | null
+          price_year_high?: number | null
           report_date?: string | null
           roe?: number | null
           sector: string
@@ -220,24 +339,31 @@ export interface Database {
         Update: {
           analystRatingBuy?: number | null
           annualDividend?: number | null
+          beta?: number | null
           created_at?: string | null
           de?: number | null
+          dividend_upcoming_date?: string | null
+          dividend_upcoming_value?: number | null
           dividendYield?: number | null
-          eps?: number | null
-          exchange?: string | null
+          eps_growth_past_5y?: number | null
+          exchange?: string
           gfValue?: number | null
           gfValueMargin?: number | null
+          gross_margin?: number | null
           id?: string
           index?: string | null
+          is_dividend?: boolean
           isDividendAristocrat?: boolean
           isDividendKing?: boolean
           marketCap?: number | null
           name?: string | null
+          net_margin?: number | null
           payoutRation?: number | null
           pe?: number | null
           price_current?: number | null
           price_growth?: number | null
           price_target?: number | null
+          price_year_high?: number | null
           report_date?: string | null
           roe?: number | null
           sector?: string
@@ -261,15 +387,16 @@ export interface Database {
           dividend_upcoming_date: string | null
           dividend_upcoming_value: number | null
           exchange: string
-          gain_unrealized_percentage: number | null
-          gain_unrealized_value: number | null
+          gain_margin: number | null
+          gain_value: number | null
           id: string
+          is_dividend: boolean
           is_trading: boolean | null
           last_change_portfolio: string | null
           lastDividendPayDate: string | null
-          market_price: number | null
-          perc_of_portfolio: number | null
-          portfolio_id: string | null
+          perc_of_portfolio: number
+          portfolio_id: string
+          price_current: number
           price_growth: number | null
           price_target: number | null
           startTradeDate: string | null
@@ -285,15 +412,16 @@ export interface Database {
           dividend_upcoming_date?: string | null
           dividend_upcoming_value?: number | null
           exchange: string
-          gain_unrealized_percentage?: number | null
-          gain_unrealized_value?: number | null
+          gain_margin?: number | null
+          gain_value?: number | null
           id?: string
+          is_dividend?: boolean
           is_trading?: boolean | null
           last_change_portfolio?: string | null
           lastDividendPayDate?: string | null
-          market_price?: number | null
-          perc_of_portfolio?: number | null
-          portfolio_id?: string | null
+          perc_of_portfolio?: number
+          portfolio_id: string
+          price_current: number
           price_growth?: number | null
           price_target?: number | null
           startTradeDate?: string | null
@@ -309,15 +437,16 @@ export interface Database {
           dividend_upcoming_date?: string | null
           dividend_upcoming_value?: number | null
           exchange?: string
-          gain_unrealized_percentage?: number | null
-          gain_unrealized_value?: number | null
+          gain_margin?: number | null
+          gain_value?: number | null
           id?: string
+          is_dividend?: boolean
           is_trading?: boolean | null
           last_change_portfolio?: string | null
           lastDividendPayDate?: string | null
-          market_price?: number | null
-          perc_of_portfolio?: number | null
-          portfolio_id?: string | null
+          perc_of_portfolio?: number
+          portfolio_id?: string
+          price_current?: number
           price_growth?: number | null
           price_target?: number | null
           startTradeDate?: string | null
@@ -325,31 +454,6 @@ export interface Database {
           total_dividend_income?: number | null
           total_return_margin?: number | null
           total_return_value?: number | null
-        }
-        Relationships: [
-          {
-            foreignKeyName: "stock_portfolio_portfolio_id_fkey"
-            columns: ["portfolio_id"]
-            referencedRelation: "portfolio"
-            referencedColumns: ["id"]
-          }
-        ]
-      }
-      test: {
-        Row: {
-          content: string | null
-          created_at: string | null
-          id: string
-        }
-        Insert: {
-          content?: string | null
-          created_at?: string | null
-          id?: string
-        }
-        Update: {
-          content?: string | null
-          created_at?: string | null
-          id?: string
         }
         Relationships: []
       }
@@ -360,6 +464,7 @@ export interface Database {
           created_at: string | null
           date: string
           id: string
+          portfolio_id: string
           price: number
           ticker: string
           type: string
@@ -370,6 +475,7 @@ export interface Database {
           created_at?: string | null
           date: string
           id?: string
+          portfolio_id: string
           price: number
           ticker: string
           type: string
@@ -380,6 +486,7 @@ export interface Database {
           created_at?: string | null
           date?: string
           id?: string
+          portfolio_id?: string
           price?: number
           ticker?: string
           type?: string
@@ -390,20 +497,20 @@ export interface Database {
         Row: {
           balance: number
           created_at: string | null
+          email: string
           id: string
-          username: string
         }
         Insert: {
           balance?: number
           created_at?: string | null
+          email: string
           id?: string
-          username: string
         }
         Update: {
           balance?: number
           created_at?: string | null
+          email?: string
           id?: string
-          username?: string
         }
         Relationships: []
       }

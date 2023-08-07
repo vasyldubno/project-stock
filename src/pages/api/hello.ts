@@ -1,34 +1,63 @@
 // Next.js API route support: https://nextjs.org/docs/api-routes/introduction
-import moment from "moment";
-import type { NextApiRequest, NextApiResponse } from "next";
-import { load } from "cheerio";
-import axios from "axios";
+import { db } from "@/config/firebaseConfig";
 import { supabaseClient } from "@/config/supabaseClient";
 import { getHTML } from "@/utils/getHTML";
-import { getGFValue } from "@/utils/stock/getGFValue";
-import cheerio from "cheerio";
+import axios from "axios";
+import { load } from "cheerio";
+import { collection, doc, getDocs, setDoc } from "firebase/firestore";
+import moment from "moment";
+import type { NextApiRequest, NextApiResponse } from "next";
 
 export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse
 ) {
-  const portfolio = await supabaseClient.from("portfolio").select().single();
+  const stocks = await supabaseClient
+    .from("stock")
+    .select()
+    // .eq("ticker", "AAPL")
+    .limit(100)
+    .eq("is_dividend", true)
+    .order("ticker", { ascending: true });
 
-  if (portfolio.data) {
-    const r = await supabaseClient
-      .from("portfolio")
-      .update({
-        total_return: 610.6,
-        profit: 120.8,
-        total_cost: 9363.67,
-        active_cost: 8873.49,
-      })
-      .eq("id", portfolio.data.id);
-
-    console.log(r);
+  if (stocks.data) {
+    stocks.data.forEach((stock, index) => {
+      const t = setTimeout(async () => {
+        console.log(stock.ticker);
+        clearTimeout(t);
+      }, index * 15000);
+    });
   }
+
+  // if (stocks.data) {
+  //   stocks.data.forEach((stock, index) => {
+  //     setTimeout(async () => {
+  //       try {
+  //         const html = await getHTML(
+  //           `https://finviz.com/quote.ashx?t=${stock.ticker}`
+  //         );
+  //         console.log(stock.ticker);
+  //         const $ = load(html);
+
+  //         const a = $(
+  //           ".snapshot-table-wrapper > table > tbody > tr:nth-child(7) td:nth-child(2)"
+  //         ).text();
+
+  //         const b = Number(a) > 0;
+
+  //         await supabaseClient
+  //           .from("stock")
+  //           .update({ is_dividend: Number(a) > 0 })
+  //           .eq("ticker", stock.ticker);
+  //       } catch {
+  //         // console.log("ERROR => /API/STOCK/FUNDAMENTALS", stock.ticker);
+  //       }
+  //     }, 300 * index);
+  //   });
+  // }
 
   res.json({
     message: "Ok",
+    // stocks,
   });
 }

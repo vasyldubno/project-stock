@@ -1,6 +1,27 @@
 import { supabaseClient } from "@/config/supabaseClient";
-import { IPortfolioStock, ISupaDividendsInMonth } from "@/types/types";
+import {
+  ISupaStockPortfolio,
+  ISupaDividendsInMonth,
+  IPortfolio,
+  IStockPortfolio,
+  ISupaPortfolio,
+  IUser,
+} from "@/types/types";
 import axios from "axios";
+import { UserService } from "./UserService";
+import { auth, db } from "@/config/firebaseConfig";
+import {
+  addDoc,
+  collection,
+  doc,
+  getDocs,
+  query,
+  setDoc,
+  where,
+} from "firebase/firestore";
+import { User, onAuthStateChanged } from "firebase/auth";
+import moment from "moment";
+import { ROUND } from "@/utils/round";
 
 interface IResponseGetStocks {
   stocks: [];
@@ -9,53 +30,75 @@ interface IResponseGetStocks {
 interface IResponseGetPortfolio {
   gainRealizedPercentage: number;
   gainUnrealizedPercentage: number;
-  portfolio: IPortfolioStock[];
+  portfolio: ISupaStockPortfolio[];
 }
 
 export class PortfolioService {
   static async addTransaction(
     ticker: string,
-    price: number,
-    count: number,
-    type: "buy" | "sell"
+    price: string,
+    count: string,
+    type: "buy" | "sell",
+    date: string,
+    portfolioId: string | undefined,
+    userId: string
   ) {
-    return axios.post("/api/portfolio/add-transaction", {
+    // const user = await UserService.getUser();
+    // console.log(user);
+    // if (user.data.user) {
+    //   return axios.post("/api/portfolio/add-transaction", {
+    //     ticker,
+    //     price: Number(price),
+    //     count: Number(count),
+    //     type,
+    //     date,
+    //     portfolioId,
+    //     userId: user.data.user.id,
+    //   });
+    // }
+
+    const response = await axios.post("/api/portfolio/add-transaction", {
       ticker,
-      price,
-      count,
+      price: Number(price),
+      count: Number(count),
       type,
+      date,
+      portfolioId,
+      userId: userId,
     });
+    return response;
   }
 
-  static async getStocks() {
-    const stocks = await supabaseClient
-      .from("stock")
-      .select()
-      .gte("roe", 20)
-      .gte("price_growth", 15)
-      .gte("analystRatingBuy", 10)
-      .lte("pe", 30)
-      .gt("pe", 0)
-      .gte("gfValue", 10)
-      .lte("de", 3)
-      .order("price_growth", { ascending: false });
+  // static async getStocks() {
+  //   const stocks = await supabaseClient
+  //     .from("stock")
+  //     .select()
+  //     .gte("roe", 20)
+  //     .gte("price_growth", 15)
+  //     .gte("analystRatingBuy", 10)
+  //     .lte("pe", 30)
+  //     .gt("pe", 0)
+  //     .gte("gfValue", 10)
+  //     .lte("de", 3)
+  //     .order("price_growth", { ascending: false });
 
-    const stockPortfolio = await supabaseClient
-      .from("stock_portfolio")
-      .select()
-      .eq("is_trading", true);
+  //   const stockPortfolio = await supabaseClient
+  //     .from("stock_portfolio")
+  //     .select()
+  //     .eq("is_trading", true);
 
-    if (stocks.data && stockPortfolio.data) {
-      return stocks.data.filter(
-        (stock) =>
-          !stockPortfolio.data.some(
-            (stockPortfolio) => stockPortfolio.ticker === stock.ticker
-          )
-      );
-    }
-  }
+  //   if (stocks.data && stockPortfolio.data) {
+  //     return stocks.data.filter(
+  //       (stock) =>
+  //         !stockPortfolio.data.some(
+  //           (stockPortfolio) => stockPortfolio.ticker === stock.ticker
+  //         )
+  //     );
+  //   }
+  // }
 
-  static async getPortfolio() {
+  static async getPortfolioStocks() {
+    const user = await UserService.getUser();
     const portfolio = await supabaseClient
       .from("stock_portfolio")
       .select()
@@ -90,7 +133,7 @@ export class PortfolioService {
       .from("stock_portfolio")
       .select()
       .eq("is_trading", true)
-      .order("gain_unrealized_percentage", {
+      .order("gain_margin", {
         ascending: false,
         nullsFirst: false,
       });
@@ -133,134 +176,268 @@ export class PortfolioService {
     return [];
   }
 
-  static async updatePortfolio() {
-    return axios.get(
-      `${process.env.NEXT_PUBLIC_CLIENT_URL}/api/portfolio/update-portfolio`
+  // static async updatePortfolio() {
+  //   return axios.get(
+  //     `${process.env.NEXT_PUBLIC_CLIENT_URL}/api/portfolio/update-portfolio`
+  //   );
+  // }
+
+  static async updateDividends(userId: string) {
+    return axios.post(
+      `${process.env.NEXT_PUBLIC_CLIENT_URL}/api/portfolio/update-dividends`,
+      { userId }
     );
   }
 
-  static async updateDividends() {
-    return axios.get(
-      `${process.env.NEXT_PUBLIC_CLIENT_URL}/api/portfolio/update-dividends`
-    );
-  }
-
-  static async getDividendIncomeInMonth(year: number) {
+  static async getDividendIncomeInMonth(
+    year: number,
+    portfolio: ISupaPortfolio | null
+  ) {
     const resposne = await supabaseClient
-      .from("dividend_in_month")
+      .from("dividend")
       .select()
-      .eq("year", year)
-      .single();
+      .eq("portfolio_id", portfolio?.id)
+      .eq("year", year);
 
-    const filtered = {};
+    const result = [
+      {
+        monthNumber: "01",
+        monthName: "January",
+        amount: 0,
+      },
+      {
+        monthNumber: "02",
+        monthName: "February",
+        amount: 0,
+      },
+      {
+        monthNumber: "03",
+        monthName: "March",
+        amount: 0,
+      },
+      {
+        monthNumber: "03",
+        monthName: "April",
+        amount: 0,
+      },
+      {
+        monthNumber: "05",
+        monthName: "May",
+        amount: 0,
+      },
+      {
+        monthNumber: "06",
+        monthName: "June",
+        amount: 0,
+      },
+      {
+        monthNumber: "07",
+        monthName: "July",
+        amount: 0,
+      },
+      {
+        monthNumber: "08",
+        monthName: "August",
+        amount: 0,
+      },
+      {
+        monthNumber: "09",
+        monthName: "September",
+        amount: 0,
+      },
+      {
+        monthNumber: "10",
+        monthName: "October",
+        amount: 0,
+      },
+      {
+        monthNumber: "11",
+        monthName: "November",
+        amount: 0,
+      },
+      {
+        monthNumber: "12",
+        monthName: "December",
+        amount: 0,
+      },
+    ];
 
     if (resposne.data) {
-      for (const key in resposne.data) {
-        // @ts-ignore
-        if (
-          // @ts-ignore
-          key !== "id" &&
-          key !== "year" &&
-          key !== "created_at"
-        ) {
-          // @ts-ignore
-          filtered[key] = resposne.data[key];
+      resposne.data.forEach((item) => {
+        const month = moment(item.payDate).format("MM");
+        const current = result.find((item) => item.monthNumber === month);
+        if (current) {
+          current.amount += item.totalAmount;
         }
-      }
+      });
     }
 
-    return filtered;
+    return result;
   }
 
-  static async getUpcomingDividends() {
-    const convertMonth = (month: string) => {
-      if (month === "01") {
-        return "January";
-      }
-      if (month === "02") {
-        return "February";
-      }
-      if (month === "03") {
-        return "March";
-      }
-      if (month === "04") {
-        return "April";
-      }
-      if (month === "05") {
-        return "May";
-      }
-      if (month === "06") {
-        return "June";
-      }
-      if (month === "07") {
-        return "July";
-      }
-      if (month === "08") {
-        return "August";
-      }
-      if (month === "09") {
-        return "September";
-      }
-      if (month === "10") {
-        return "October";
-      }
-      if (month === "11") {
-        return "November";
-      }
-      if (month === "12") {
-        return "December";
-      }
-      return "January";
-    };
-
-    function sumValuesByMonth(arr: IPortfolioStock[]) {
-      const monthlySums = {
-        January: 0,
-        February: 0,
-        March: 0,
-        April: 0,
-        May: 0,
-        June: 0,
-        July: 0,
-        August: 0,
-        September: 0,
-        October: 0,
-        November: 0,
-        December: 0,
-      };
-
-      arr.forEach((item) => {
-        if (item.dividend_upcoming_date && item.dividend_upcoming_value) {
-          const month = item.dividend_upcoming_date.slice(5, 7);
-          const nameMonth = convertMonth(month);
-          // if (!monthlySums[month]) {
-          //   monthlySums[month] = 0;
-          // }
-          monthlySums[nameMonth] += item.dividend_upcoming_value;
-        }
-      });
-
-      return Object.keys(monthlySums).map((month) => {
-        return {
-          month: month.padStart(2, "0"),
-          //@ts-ignore
-          value: monthlySums[month],
-        };
-      });
-    }
+  static async getUpcomingDividends(portfolio: ISupaPortfolio | null) {
+    const result = [
+      {
+        monthNumber: "01",
+        monthName: "January",
+        amount: 0,
+      },
+      {
+        monthNumber: "02",
+        monthName: "February",
+        amount: 0,
+      },
+      {
+        monthNumber: "03",
+        monthName: "March",
+        amount: 0,
+      },
+      {
+        monthNumber: "03",
+        monthName: "April",
+        amount: 0,
+      },
+      {
+        monthNumber: "05",
+        monthName: "May",
+        amount: 0,
+      },
+      {
+        monthNumber: "06",
+        monthName: "June",
+        amount: 0,
+      },
+      {
+        monthNumber: "07",
+        monthName: "July",
+        amount: 0,
+      },
+      {
+        monthNumber: "08",
+        monthName: "August",
+        amount: 0,
+      },
+      {
+        monthNumber: "09",
+        monthName: "September",
+        amount: 0,
+      },
+      {
+        monthNumber: "10",
+        monthName: "October",
+        amount: 0,
+      },
+      {
+        monthNumber: "11",
+        monthName: "November",
+        amount: 0,
+      },
+      {
+        monthNumber: "12",
+        monthName: "December",
+        amount: 0,
+      },
+    ];
 
     const response = await supabaseClient
       .from("stock_portfolio")
       .select()
+      .eq("portfolio_id", portfolio?.id)
       .not("dividend_upcoming_value", "is", null)
       .order("dividend_upcoming_date", { ascending: true });
 
     if (response.data) {
-      const result = sumValuesByMonth(response.data);
-      const sortedResult = result.sort(
-        (a, b) => parseInt(a.month) - parseInt(b.month)
+      response.data.forEach((item) => {
+        const month = moment(item.dividend_upcoming_date).format("MM");
+        const current = result.find((item) => item.monthNumber === month);
+        if (current) {
+          const newValue = ROUND(
+            (current.amount += item.dividend_upcoming_value ?? 0)
+          );
+          current.amount = newValue;
+        }
+      });
+    }
+
+    return result;
+  }
+
+  static async addPortfolio(title: string, user: IUser | null) {
+    if (user && user.id) {
+      const exist = await supabaseClient
+        .from("portfolio")
+        .select()
+        .eq("title", title)
+        .eq("user_id", user.id)
+        .single();
+      if (exist.data) {
+        return {
+          status: "Error",
+          errorMessage: "Portfolio with this name exist. Select another name",
+        };
+      } else {
+        const response = await supabaseClient
+          .from("portfolio")
+          .insert({
+            title,
+            user_id: user.id,
+          })
+          .select();
+        if (response.data) {
+          return { status: "Ok" };
+        }
+      }
+    }
+  }
+
+  static async getPortfolios(user: IUser | null) {
+    if (user) {
+      const portfolios = await supabaseClient
+        .from("portfolio")
+        .select()
+        .eq("user_id", user.id);
+
+      return portfolios;
+    }
+
+    // if (user && user.uid) {
+    //   const portfolioRef = query(
+    //     collection(db, "portfolio"),
+    //     where("userId", "==", user.uid)
+    //   );
+    //   const portfolios = (await getDocs(portfolioRef)).docs.map((item) => {
+    //     return { ...item.data(), id: item.id };
+    //   });
+    //   return portfolios as IPortfolio[];
+    // }
+  }
+
+  static async getMarketValue(portfolioId: string) {
+    // const stockPortfolioRef = query(
+    //   collection(db, "stock_portfolio"),
+    //   where("portfolioId", "==", portfolioId)
+    // );
+    // const stockPortfolio = (await getDocs(stockPortfolioRef)).docs.map((item) =>
+    //   item.data()
+    // ) as IStockPortfolio[];
+    // const result = stockPortfolio.reduce(
+    //   (acc, item) => (acc += item.amountActiveShares * item.priceCurrent),
+    //   0
+    // );
+    // return result;
+
+    const supaStockPortfolio = await supabaseClient
+      .from("stock_portfolio")
+      .select()
+      .eq("portfolio_id", portfolioId);
+    if (supaStockPortfolio.data) {
+      const result = supaStockPortfolio.data.reduce(
+        (acc, item) =>
+          (acc +=
+            Number(item.amount_active_shares) * Number(item.price_current)),
+        0
       );
-      return sortedResult;
+      return result;
     }
   }
 }

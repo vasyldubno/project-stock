@@ -1,3 +1,5 @@
+import { ROUND } from "./round";
+
 export const getRealizedValue = (
   price: number,
   count: number,
@@ -6,7 +8,7 @@ export const getRealizedValue = (
   const sellSumm = price * count;
   const buySumm = averageCostPerShare * count;
 
-  const result = Number((sellSumm - buySumm).toFixed(2));
+  const result = ROUND(sellSumm - buySumm);
 
   return result;
 };

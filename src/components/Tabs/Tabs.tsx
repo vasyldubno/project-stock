@@ -3,7 +3,7 @@ import s from "./Tabs.module.scss";
 import { LostIcon } from "@/icons/LotsIcon";
 
 interface TabsProps {
-  tabs: { content: string; icon?: ReactNode }[];
+  tabs: { content: string | ReactNode; icon?: ReactNode }[];
   tabsPanel: { content: ReactNode }[];
 }
 

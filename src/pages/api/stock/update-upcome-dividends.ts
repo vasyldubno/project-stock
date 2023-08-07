@@ -43,83 +43,64 @@ export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse
 ) {
-  const stocks = await supabaseClient
-    .from("stock_portfolio")
+  const { userId } = req.body;
+
+  const supaPortfolio = await supabaseClient
+    .from("portfolio")
     .select()
-    .order("ticker", { ascending: true })
-    // .limit(10)
-    .eq("is_trading", true);
-  // .eq("ticker", "CSCO");
+    .eq("user_id", userId);
 
-  if (stocks.data) {
-    stocks.data.forEach(async (stock, index) => {
-      setTimeout(async () => {
-        try {
-          // const html = await getHTML(
-          //   `https://www.marketbeat.com/stocks/${stock.exchange}/${stock.ticker}/dividend/`
-          // );
-          // const $ = cheerio.load(html);
-          // const result = $(
-          //   ".col-12.col-md-6 > dl > div:nth-child(6) > dt"
-          // ).text();
-          // if (result === "Next Dividend Payment") {
-          //   const response = $(
-          //     ".col-12.col-md-6 > dl > div:nth-child(6) > dd"
-          //   ).text();
-          //   const responseArray = response.trim().split(" ");
-          //   const day = responseArray[1];
-          //   const month = convertMonth(responseArray[0].replace(".", ""));
-          //   const year = new Date().getUTCFullYear();
-          //   const date = `${year}-${month}-${day}`;
-          //   await supabaseClient
-          //     .from("stock_portfolio")
-          //     .update({ dividend_upcoming_date: date })
-          //     .eq("ticker", stock.ticker);
-          //   console.log(stock.ticker);
-          // } else {
-          //   await supabaseClient
-          //     .from("stock_portfolio")
-          //     .update({ dividend_upcoming_date: null })
-          //     .eq("ticker", stock.ticker);
-          // }
+  if (supaPortfolio.data) {
+    const portfolioIds = supaPortfolio.data.map((item) => item.id);
 
-          const response = await axios.get<{
-            results: { pay_date: string; cash_amount: number }[];
-          }>(
-            `https://api.polygon.io/v3/reference/dividends?ticker=${stock.ticker}&apiKey=OZ_9x0ccKRsnzoE6OqsoW0oGeQCmAohs `
-          );
+    const stockPortfolio = await supabaseClient
+      .from("stock_portfolio")
+      .select()
+      .order("ticker", { ascending: true })
+      .eq("is_trading", true)
+      .in("portfolio_id", portfolioIds);
 
-          const today = moment(new Date()).format("YYYY-MM-DD");
+    if (stockPortfolio.data) {
+      stockPortfolio.data.forEach(async (stock, index) => {
+        setTimeout(async () => {
+          try {
+            const response = await axios.get<{
+              results: { pay_date: string; cash_amount: number }[];
+            }>(
+              `https://api.polygon.io/v3/reference/dividends?ticker=${stock.ticker}&apiKey=OZ_9x0ccKRsnzoE6OqsoW0oGeQCmAohs `
+            );
 
-          const last = response.data.results.find((item) =>
-            moment(item.pay_date).isAfter(today)
-          );
+            const today = moment(new Date()).format("YYYY-MM-DD");
 
-          // console.log(index);
+            const lastUpcomeDividend = response.data.results.find((item) =>
+              moment(item.pay_date).isAfter(today)
+            );
 
-          if (last) {
-            // console.log(index, stock.ticker);
-            await supabaseClient
-              .from("stock_portfolio")
-              .update({
-                dividend_upcoming_date: last.pay_date,
-                dividend_upcoming_value: last.cash_amount,
-              })
-              .eq("ticker", stock.ticker);
-          } else {
-            await supabaseClient
-              .from("stock_portfolio")
-              .update({
-                dividend_upcoming_date: null,
-                dividend_upcoming_value: null,
-              })
-              .eq("ticker", stock.ticker);
+            if (lastUpcomeDividend) {
+              await supabaseClient
+                .from("stock_portfolio")
+                .update({
+                  dividend_upcoming_date: lastUpcomeDividend.pay_date,
+                  dividend_upcoming_value: lastUpcomeDividend.cash_amount,
+                })
+                .eq("ticker", stock.ticker)
+                .eq("portfolio_id", stock.portfolio_id);
+            } else {
+              await supabaseClient
+                .from("stock_portfolio")
+                .update({
+                  dividend_upcoming_date: null,
+                  dividend_upcoming_value: null,
+                })
+                .eq("ticker", stock.ticker)
+                .eq("portfolio_id", stock.portfolio_id);
+            }
+          } catch (error) {
+            // console.log(`ERROR => ${stock.ticker}`);
           }
-        } catch (error) {
-          // console.log(`ERROR => ${stock.ticker}`);
-        }
-      }, index * 15000);
-    });
+        }, index * 15000);
+      });
+    }
   }
 
   res.json({

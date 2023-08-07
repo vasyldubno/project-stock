@@ -7,20 +7,12 @@ import { GetStaticProps } from "next";
 import Head from "next/head";
 import { useEffect } from "react";
 
-const ScreenerPage = ({ data }: { data: ISupaStock[] }) => {
+const ScreenerPage = () => {
   return (
     <>
-      {/* <Head>
-        <title>Screener | {TITLE}</title>
-      </Head> */}
-      <ScreenerScreen data={data} />
+      <ScreenerScreen />
     </>
   );
 };
 
 export default ScreenerPage;
-
-export const getStaticProps: GetStaticProps = async () => {
-  const data = await PortfolioService.getStocks();
-  return { props: { data } };
-};

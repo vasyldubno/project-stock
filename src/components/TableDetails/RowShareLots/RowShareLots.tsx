@@ -20,7 +20,7 @@ export const RowShareLots = ({
       <td>{averagePrice}</td>
       <td>{totalCost}</td>
       <td>{marketPrice}</td>
-      <td>{gain}</td>
+      <td>{gain}%</td>
     </tr>
   );
 };

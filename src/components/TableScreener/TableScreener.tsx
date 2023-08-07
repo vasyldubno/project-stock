@@ -1,102 +1,25 @@
-import { StockService } from "@/services/StockService";
 import { ISupaStock } from "@/types/types";
 import {
   SortingState,
-  createColumnHelper,
   flexRender,
   getCoreRowModel,
   getSortedRowModel,
   useReactTable,
 } from "@tanstack/react-table";
-import millify from "millify";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { Button } from "../Button/Button";
 import { FormAddStock } from "../FormAddStock/FormAddStock";
-import { Layout } from "../Layout/Layout";
 import { Modal } from "../Modal/Modal";
-import { SupaStockUpdate } from "./supabase";
+import { columns } from "./table";
 
 export const TableScreener = ({ data }: { data: ISupaStock[] }) => {
-  const [stocks, setStocks] = useState<ISupaStock[]>(data);
   const [sorting, setSorting] = useState<SortingState>([]);
   const [isOpenModal, setIsOpenModal] = useState(false);
   const [selectedStock, setSelectedStock] = useState<ISupaStock | null>(null);
-  const [selectedScreener, setSelectedScreener] = useState<
-    "Dividend" | "Growth"
-  >("Growth");
-
-  // console.log(selectedScreener);
-
-  useEffect(() => {
-    // SupaStoc kUpdate(setStocks, selectedScreener);
-  }, []);
-
-  const columnHelper = createColumnHelper<ISupaStock>();
-
-  const columns = [
-    columnHelper.accessor("ticker", {
-      header: "Ticker",
-      cell: (info) => info.getValue(),
-    }),
-    columnHelper.accessor("name", {
-      header: "Name",
-      cell: (info) => info.getValue(),
-    }),
-    columnHelper.accessor("marketCap", {
-      header: "Market Cap",
-      cell: ({ getValue, row: { original } }) => (
-        <>
-          {original.marketCap && (
-            <p>
-              {millify(Number(original.marketCap), {
-                precision: 2,
-                locales: "en",
-              })}
-            </p>
-          )}
-        </>
-      ),
-    }),
-    columnHelper.accessor("price_current", {
-      header: "Price Current",
-      cell: ({ getValue }) => getValue(),
-    }),
-    columnHelper.accessor("price_growth", {
-      header: "Target",
-      cell: ({ row: { original } }) => (
-        <>
-          <p>{original.price_target}</p>
-          <p>{original.price_growth}%</p>
-        </>
-      ),
-    }),
-    columnHelper.accessor("pe", {
-      header: "PE",
-      cell: ({ getValue }) => getValue(),
-    }),
-    columnHelper.accessor("roe", {
-      header: "ROE",
-      cell: ({ getValue }) => getValue(),
-    }),
-    columnHelper.accessor("sector", {
-      header: "Sector",
-      cell: ({ getValue }) => getValue(),
-    }),
-    columnHelper.accessor("subIndustry", {
-      header: "Industry",
-      cell: ({ getValue }) => getValue(),
-    }),
-    columnHelper.accessor("dividendYield", {
-      header: "Dividend Yield",
-      cell: (info) => (
-        <>{info.getValue() ? <p>{info.getValue()}%</p> : <p>-- --</p>}</>
-      ),
-    }),
-  ];
 
   const table = useReactTable({
-    columns,
-    data: stocks,
+    columns: columns,
+    data,
     getCoreRowModel: getCoreRowModel(),
     getSortedRowModel: getSortedRowModel(),
     state: { sorting: sorting, columnVisibility: {} },
@@ -122,33 +45,15 @@ export const TableScreener = ({ data }: { data: ISupaStock[] }) => {
 
   return (
     <>
-      <div style={{ display: "flex", gap: "1rem" }}>
-        <Button
-          title="Growth Screener"
-          onClick={() => {
-            setStocks(data);
-            setSelectedScreener("Growth");
-          }}
-        />
-        <Button
-          title="Dividend Screener"
-          onClick={async () => {
-            const response = await StockService.getStocksDividends();
-            if (response) {
-              setStocks(response);
-              setSelectedScreener("Dividend");
-            }
-          }}
-        />
-      </div>
       <table
         style={{
           borderCollapse: "collapse",
           borderSpacing: "0",
-          width: "1200px",
+          overflowX: "scroll",
+          width: "100%",
         }}
       >
-        <thead>
+        <thead style={{ fontSize: "0.8rem" }}>
           {table.getHeaderGroups().map((headerGroup, headerGroupIndex) => (
             <tr key={`${headerGroup.id}-${headerGroupIndex}`}>
               {headerGroup.headers.map((header, headerIndex) => (
@@ -160,6 +65,7 @@ export const TableScreener = ({ data }: { data: ISupaStock[] }) => {
                     <div
                       style={{
                         display: "flex",
+                        justifyContent: "center",
                       }}
                     >
                       <div style={{ cursor: "pointer" }}>
@@ -168,14 +74,6 @@ export const TableScreener = ({ data }: { data: ISupaStock[] }) => {
                           header.getContext()
                         )}
                       </div>
-                      {sorting.some((sort) => sort.id === header.column.id) && (
-                        <span>
-                          {sorting.find((sort) => sort.id === header.column.id)
-                            ?.desc
-                            ? "🔽"
-                            : "🔼"}
-                        </span>
-                      )}
                     </div>
                   )}
                 </th>
@@ -185,30 +83,37 @@ export const TableScreener = ({ data }: { data: ISupaStock[] }) => {
         </thead>
 
         {table.getRowModel().rows.map((row, rowIndex) => (
-          <tbody key={`data-${row.id}-${rowIndex}`}>
+          <tbody
+            key={`data-${row.id}-${rowIndex}`}
+            style={{ fontSize: "0.8rem" }}
+          >
             <tr>
               {row.getVisibleCells().map((cell, cellIndex) => (
                 <td
                   key={`${cell.id}-${cellIndex}`}
-                  style={{ padding: "5px 0" }}
+                  style={{
+                    padding: "10px 5px",
+                  }}
                 >
                   {flexRender(cell.column.columnDef.cell, cell.getContext())}
                 </td>
               ))}
-              <Button
-                title="BUY"
-                onClick={() => {
-                  setIsOpenModal(true);
-                  setSelectedStock(row.original);
-                }}
-              />
+              <td>
+                <Button
+                  title="BUY"
+                  onClick={() => {
+                    setIsOpenModal(true);
+                    setSelectedStock(row.original);
+                  }}
+                />
+              </td>
             </tr>
           </tbody>
         ))}
       </table>
       <Modal open={isOpenModal} onClose={() => setIsOpenModal(false)}>
         <FormAddStock
-          stock={selectedStock}
+          ticker={selectedStock?.ticker}
           onClose={() => setIsOpenModal(false)}
           type="buy"
         />

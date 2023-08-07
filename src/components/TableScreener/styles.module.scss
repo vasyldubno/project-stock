@@ -1,0 +1,8 @@
+.cell__ticker {
+  cursor: pointer;
+  width: fit-content;
+  &:hover {
+    color: var(--color-hover-link);
+    font-weight: 700;
+  }
+}

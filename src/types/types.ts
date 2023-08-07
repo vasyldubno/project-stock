@@ -1,25 +1,26 @@
-export interface IPortfolioStock {
+export interface ISupaStockPortfolio {
   amount_active_shares: number | null;
   average_cost_per_share: number | null;
   created_at: string | null;
   exchange: string;
-  gain_unrealized_percentage: number | null;
-  gain_unrealized_value: number | null;
+  gain_margin: number | null;
+  gain_value: number | null;
   id: string;
   is_trading: boolean | null;
   lastDividendPayDate: string | null;
-  market_price: number | null;
   portfolio_id: string | null;
   startTradeDate: string | null;
   ticker: string;
   total_dividend_income: number | null;
   total_return_margin: number | null;
   total_return_value: number | null;
+  price_current: number | null;
   price_target: number | null;
   price_growth: number | null;
-  perc_of_portfolio: number | null;
   dividend_upcoming_date: string | null;
   dividend_upcoming_value: number | null;
+  perc_of_portfolio: number;
+  last_change_portfolio: string | null;
 }
 
 interface INasdaqDividends {
@@ -43,7 +44,8 @@ export interface ISupaStock {
   annualDividend: number | null;
   created_at: string | null;
   dividendYield: number | null;
-  eps: number | null;
+  de: number | null;
+  eps_growth_past_5y: number | null;
   exchange: string | null;
   gfValue: number | null;
   gfValueMargin: number | null;
@@ -63,6 +65,11 @@ export interface ISupaStock {
   subIndustry: string;
   ticker: string;
   report_date: string | null;
+  beta: number | null;
+  gross_margin: number | null;
+  net_margin: number | null;
+  price_year_high: number | null;
+  yearRange?: number;
 }
 
 export interface ISupaDividendsInMonth {
@@ -94,14 +101,110 @@ export interface ISupaTransaction {
 }
 
 export interface ISupaPortfolio {
-  active_cost: number | null;
-  created_at: string | null;
-  free_cash: number | null;
-  gain_margin: number | null;
-  gain_value: number | null;
+  cost: number;
+  created_at: string;
+  gain_margin: number;
+  gain_value: number;
   id: string;
-  market_cap: number | null;
-  title: string | null;
-  total_cost: number | null;
-  total_return: number | null;
+  title: string;
+  user_id: string;
+  value: number;
+}
+
+export interface IPortfolio {
+  cost: number;
+  value: number;
+  gainValue: number;
+  gainMargin: number;
+  title: string;
+  userId: string;
+  id: string;
+}
+
+export interface IStockPortfolio {
+  amountActiveShares: number;
+  averageCostPerShare: number;
+  exchange: string;
+  gainMargin: number;
+  gainValue: number;
+  isTrading: boolean;
+  lastChangePortfolio: string;
+  portfolioId: string;
+  priceCurrent: number;
+  priceGrowth: number;
+  priceTarget: number;
+  startTradeDate: string;
+  ticker: string;
+  percOfPortfolio?: number;
+  totalReturnMargin?: number | null;
+  totalReturnValue?: number | null;
+  lastDividendPayDate?: string | null;
+  totalDividendIncome?: number | null;
+  dividendUpcomingDate?: string | null;
+  dividendUpcomingValue?: number | null;
+}
+
+export interface IStock {
+  analystRatingBuy: number | null;
+  annualDividend: number | null;
+  created_at: string | null;
+  dividendYield: number | null;
+  eps: number | null;
+  exchange: string | null;
+  gfValue: number | null;
+  gfValueMargin: number | null;
+  id: string;
+  index: string | null;
+  isDividendAristocrat: boolean;
+  isDividendKing: boolean;
+  marketCap: number | null;
+  name: string;
+  payoutRation: number | null;
+  pe: number | null;
+  priceCurrent: number | null;
+  priceGrowth: number | null;
+  priceTarget: number | null;
+  roe: number | null;
+  sector: string;
+  subIndustry: string;
+  ticker: string;
+  reportDate: string | null;
+  intrinsicMargin: number | null;
+  intrinsicValue: number | null;
+}
+
+export interface ISupaScreener {
+  id: string;
+  created_at: string;
+  user_id: string;
+  pe: string | null;
+  title: string;
+  roe: string | null;
+  de: string | null;
+  priceGrowth: string | null;
+  margin_safety: string | null;
+  analyst: string | null;
+  industry: string | null;
+  sector: string | null;
+  payout_ratio: string | null;
+  dividend_yield: string | null;
+}
+
+export interface ISupaExit {
+  id: string;
+  created_at: string;
+  portfolio_id: string;
+  ticker: string;
+  profit_value: number;
+  profit_margin: number;
+  start_date: string;
+  finish_date: string;
+  average_price_per_share: number;
+  cost: number;
+  return: number;
+}
+
+export interface IUser {
+  email?: string;
+  id?: string;
 }

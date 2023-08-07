@@ -4,7 +4,7 @@ import { FC } from "react";
 import s from "./TableCardPrice.module.scss";
 
 interface CardPriceProps {
-  content: string | null | undefined;
+  content: string | number | null | undefined;
 }
 
 export const TableCardPrice: FC<CardPriceProps> = ({ content }) => {

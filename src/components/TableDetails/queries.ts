@@ -58,8 +58,8 @@ export const getData = async ({
       if (item.amount_active_shares && item.average_cost_per_share) {
         return {
           averagePrice: item.average_cost_per_share,
-          gain: item.gain_unrealized_percentage,
-          marketPrice: item.market_price,
+          gain: item.gain_margin,
+          marketPrice: item.price_current,
           shares: item.amount_active_shares,
           totalCost: item.amount_active_shares * item.average_cost_per_share,
           tradeDate: item.startTradeDate,
@@ -67,8 +67,8 @@ export const getData = async ({
       } else {
         return {
           averagePrice: item.average_cost_per_share,
-          gain: item.gain_unrealized_percentage,
-          marketPrice: item.market_price,
+          gain: item.gain_margin,
+          marketPrice: item.price_growth,
           shares: item.amount_active_shares,
           totalCost: 0,
           tradeDate: item.startTradeDate,

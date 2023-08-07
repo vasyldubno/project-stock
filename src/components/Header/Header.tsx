@@ -1,34 +1,67 @@
+import { useUser } from "@/hooks/useUser";
+import { UserService } from "@/services/UserService";
 import Link from "next/link";
-import { FC } from "react";
+import { useRouter } from "next/router";
+import { FC, useEffect, useState } from "react";
+import { Button } from "../Button/Button";
 import s from "./Header.module.scss";
+import { UserIcon } from "@/icons/UserIcon";
+import { Popover } from "../Popover/Popover";
+
+type Link = {
+  link: string;
+  name: string;
+};
+
+const links: Link[] = [
+  { link: "/dashboard", name: "Dashboard" },
+  { link: "/portfolio", name: "Portfolio" },
+  { link: "/screener", name: "Screener" },
+  { link: "/activity", name: "Activity" },
+  { link: "/sold-out", name: "Sold Out" },
+  { link: "/compare", name: "Compare" },
+];
 
 export const Header: FC = () => {
+  const router = useRouter();
+
   return (
-    <>
-      <nav className={s.nav}>
-        <ul className={s.ul}>
-          <li>
-            <Link href={"/dashboard"}>
-              <p className={s.li}>Dashboard</p>
-            </Link>
-          </li>
-          <li>
-            <Link href={"/portfolio"}>
-              <p className={s.li}>Portfolio</p>
-            </Link>
-          </li>
-          <li>
-            <Link href={"/screener"}>
-              <p className={s.li}>Screener</p>
-            </Link>
-          </li>
-          <li>
-            <Link href={"/activity"}>
-              <p className={s.li}>Activity</p>
-            </Link>
-          </li>
-        </ul>
-      </nav>
-    </>
+    <div className={s.wrapper}>
+      <div className={s.content}>
+        <nav>
+          <ul className={s.ul}>
+            {links.map((link, index) => (
+              <li key={index}>
+                <Link href={link.link}>
+                  <p
+                    className={`${s.li} ${
+                      router.pathname === link.link ? s.li__active : ""
+                    }`}
+                  >
+                    {link.name}
+                  </p>
+                </Link>
+              </li>
+            ))}
+          </ul>
+        </nav>
+        <div className={s.user}>
+          <Popover
+            trigger={<UserIcon size="2rem" />}
+            content={
+              <p
+                style={{ cursor: "pointer" }}
+                onClick={() => {
+                  UserService.signOut();
+                  router.push("/login");
+                }}
+              >
+                Sign Out
+              </p>
+            }
+          />
+        </div>
+      </div>
+    </div>
   );
 };

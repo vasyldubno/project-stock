@@ -4,6 +4,10 @@ import { Database } from "@/types/supabase";
 
 export const supabaseClient = createClient<Database>(
   SUPABSE_URL,
-  SUPABASE_KEY,
-  { auth: { persistSession: false } }
+  SUPABASE_KEY
+  // {
+  //   auth: {
+  //     persistSession: false,
+  //   },
+  // }
 );

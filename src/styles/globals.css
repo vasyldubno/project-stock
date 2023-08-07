@@ -6,6 +6,7 @@
 
 :root {
   --color-gray: #dadce0;
+  --color-hover-link: blue;
 }
 
 body {

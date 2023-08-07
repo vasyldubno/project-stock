@@ -1,3 +1,5 @@
+// TIMEOUT 300ms
+
 import { supabaseClient } from "@/config/supabaseClient";
 import { getHTML } from "../getHTML";
 import { load } from "cheerio";
