@@ -21,7 +21,7 @@ export const stockPortfolioInsert = (
           const newValue = await StockPortfolioService.getStocks(
             selectedPortfolio
           );
-          setState(newValue.data);
+          setState(newValue ?? null);
         }
       }
     )
@@ -46,7 +46,7 @@ export const stockPortfolioUpdate = (
           const newValue = await StockPortfolioService.getStocks(
             selectedPortfolio
           );
-          setState(newValue.data);
+          setState(newValue ?? null);
         }
       }
     )

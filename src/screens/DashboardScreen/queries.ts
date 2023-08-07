@@ -64,5 +64,5 @@ export const useStockPortfolio = (selectedPortfolio: ISupaPortfolio | null) => {
     queryFn: () => StockPortfolioService.getStocks(selectedPortfolio),
     enabled: !!selectedPortfolio,
   });
-  return data?.data ?? null;
+  return data ?? null;
 };
