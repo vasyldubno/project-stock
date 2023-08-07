@@ -49,7 +49,7 @@ export default async function handler(
             })
             .eq("ticker", stock.ticker);
         } catch {}
-        clearTimeout(t);
+        // clearTimeout(t);
       }, index * 15000);
     });
   }
