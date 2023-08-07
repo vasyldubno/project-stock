@@ -16,7 +16,7 @@ export default async function handler(
     .from("stock")
     .select()
     // .eq("ticker", "AAPL")
-    .limit(3)
+    .limit(20)
     .eq("is_dividend", true)
     .order("ticker", { ascending: true });
 
