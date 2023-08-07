@@ -16,7 +16,7 @@ export default async function handler(
     .from("stock")
     .select()
     // .eq("ticker", "AAPL")
-    .limit(100)
+    .limit(3)
     .eq("is_dividend", true)
     .order("ticker", { ascending: true });
 
@@ -35,6 +35,8 @@ export default async function handler(
             moment(item.pay_date).isAfter(today)
           );
 
+          console.log(stock.ticker, !!lastUpcomeDividend);
+
           await supabaseClient
             .from("stock")
             .update({
@@ -52,15 +54,7 @@ export default async function handler(
     });
   }
 
-  // if (stocks.data) {
-  //   stocks.data.forEach((stock, index) => {
-  //     const t = setTimeout(async () => {
-  //       console.log(stock.ticker);
-  //       clearTimeout(t);
-  //     }, index * 15000);
-  //   });
-  // }
-
+  /* --- UPDATE:IS_DIVIDEND --- */
   // if (stocks.data) {
   //   stocks.data.forEach((stock, index) => {
   //     setTimeout(async () => {
