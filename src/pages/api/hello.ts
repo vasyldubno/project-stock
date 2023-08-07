@@ -23,11 +23,43 @@ export default async function handler(
   if (stocks.data) {
     stocks.data.forEach((stock, index) => {
       const t = setTimeout(async () => {
-        console.log(stock.ticker);
+        try {
+          const response = await axios.get(
+            `https://api.polygon.io/v3/reference/dividends?ticker=${stock.ticker}&apiKey=OZ_9x0ccKRsnzoE6OqsoW0oGeQCmAohs`
+          );
+
+          /* --- UPDATE UPCOMING DIVIDEND ---  */
+          const today = moment().format("YYYY-MM-DD");
+
+          const lastUpcomeDividend = response.data.results.find((item: any) =>
+            moment(item.pay_date).isAfter(today)
+          );
+
+          await supabaseClient
+            .from("stock")
+            .update({
+              dividend_upcoming_date: lastUpcomeDividend?.pay_date
+                ? lastUpcomeDividend?.pay_date
+                : null,
+              dividend_upcoming_value: lastUpcomeDividend?.cash_amount
+                ? lastUpcomeDividend?.cash_amount
+                : null,
+            })
+            .eq("ticker", stock.ticker);
+        } catch {}
         clearTimeout(t);
       }, index * 15000);
     });
   }
+
+  // if (stocks.data) {
+  //   stocks.data.forEach((stock, index) => {
+  //     const t = setTimeout(async () => {
+  //       console.log(stock.ticker);
+  //       clearTimeout(t);
+  //     }, index * 15000);
+  //   });
+  // }
 
   // if (stocks.data) {
   //   stocks.data.forEach((stock, index) => {
