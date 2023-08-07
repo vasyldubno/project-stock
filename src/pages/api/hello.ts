@@ -40,13 +40,12 @@ export default async function handler(
           await supabaseClient
             .from("stock")
             .update({
-              // dividend_upcoming_date: lastUpcomeDividend?.pay_date
-              //   ? lastUpcomeDividend?.pay_date
-              //   : null,
-              // dividend_upcoming_value: lastUpcomeDividend?.cash_amount
-              //   ? lastUpcomeDividend?.cash_amount
-              //   : null,
-              dividend_upcoming_value: 1,
+              dividend_upcoming_date: lastUpcomeDividend?.pay_date
+                ? lastUpcomeDividend?.pay_date
+                : null,
+              dividend_upcoming_value: lastUpcomeDividend?.cash_amount
+                ? lastUpcomeDividend?.cash_amount
+                : null,
             })
             .eq("ticker", stock.ticker);
         } catch {}
