@@ -40,10 +40,10 @@ export default async function handler(
           await supabaseClient
             .from("stock")
             .update({
-              dividend_upcoming_date: lastUpcomeDividend?.pay_date
+              dividend_upcoming_date: lastUpcomeDividend
                 ? lastUpcomeDividend?.pay_date
                 : null,
-              dividend_upcoming_value: lastUpcomeDividend?.cash_amount
+              dividend_upcoming_value: lastUpcomeDividend
                 ? lastUpcomeDividend?.cash_amount
                 : null,
             })
