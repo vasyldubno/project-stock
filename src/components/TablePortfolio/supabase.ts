@@ -1,9 +1,9 @@
 import { supabaseClient } from "@/config/supabaseClient";
-import { IPortfolioStock } from "@/types/types";
+import { ISupaStockPortfolio } from "@/types/types";
 import { Dispatch, SetStateAction } from "react";
 
 export const supabaseStockUpdate = (
-  setState: Dispatch<SetStateAction<IPortfolioStock[]>>
+  setState: Dispatch<SetStateAction<ISupaStockPortfolio[]>>
 ) => {
   return supabaseClient
     .channel("stock-update")
