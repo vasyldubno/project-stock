@@ -34,11 +34,10 @@ export default TickerPage;
 export const getServerSideProps: GetServerSideProps = async (
   context: GetServerSidePropsContext
 ) => {
-  const { ticker } = context.params;
   const data = await supabaseClient
     .from("stock")
     .select()
-    .eq("ticker", ticker)
+    .eq("ticker", context.params?.ticker)
     .single();
 
   return { props: { data: data.data } };
