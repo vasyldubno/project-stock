@@ -2,6 +2,7 @@
 import { db } from "@/config/firebaseConfig";
 import { supabaseClient } from "@/config/supabaseClient";
 import { getHTML } from "@/utils/getHTML";
+import { ROUND } from "@/utils/round";
 import axios from "axios";
 import { load } from "cheerio";
 import { collection, doc, getDocs, setDoc } from "firebase/firestore";
@@ -16,41 +17,75 @@ export default async function handler(
     .from("stock")
     .select()
     // .eq("ticker", "AAPL")
-    .limit(20)
+    .limit(100)
     .eq("is_dividend", true)
     .order("ticker", { ascending: true });
 
   if (stocks.data) {
     stocks.data.forEach((stock, index) => {
-      const t = setTimeout(async () => {
+      setTimeout(async () => {
         try {
-          const response = await axios.get(
-            `https://api.polygon.io/v3/reference/dividends?ticker=${stock.ticker}&apiKey=OZ_9x0ccKRsnzoE6OqsoW0oGeQCmAohs`
+          // const response = await axios.get(
+          //   `https://api.polygon.io/v3/reference/dividends?ticker=${stock.ticker}&apiKey=OZ_9x0ccKRsnzoE6OqsoW0oGeQCmAohs`
+          // );
+          // /* --- UPDATE UPCOMING DIVIDEND ---  */
+          // const today = moment().format("YYYY-MM-DD");
+          // const lastUpcomeDividend = response.data.results.find((item: any) =>
+          //   moment(item.pay_date).isAfter(today)
+          // );
+          // console.log(stock.ticker, !!lastUpcomeDividend);
+          // await supabaseClient
+          //   .from("stock")
+          //   .update({
+          //     dividend_upcoming_date: lastUpcomeDividend
+          //       ? lastUpcomeDividend?.pay_date
+          //       : null,
+          //     dividend_upcoming_value: lastUpcomeDividend
+          //       ? lastUpcomeDividend?.cash_amount
+          //       : null,
+          //   })
+          //   .eq("ticker", stock.ticker);
+
+          const html = await axios.get(
+            `https://stockanalysis.com/stocks/${stock.ticker.replace(
+              "-",
+              "."
+            )}/dividend/`
           );
 
-          /* --- UPDATE UPCOMING DIVIDEND ---  */
-          const today = moment().format("YYYY-MM-DD");
+          if (html) {
+            const $ = load(html.data);
 
-          const lastUpcomeDividend = response.data.results.find((item: any) =>
-            moment(item.pay_date).isAfter(today)
-          );
+            const today = moment().format("YYYY-MM-DD");
+            let lastPayDate = "";
+            let lastCashAmount;
 
-          console.log(stock.ticker, !!lastUpcomeDividend);
+            $("table > tbody > tr").each((i, el) => {
+              const payDate = $(el).find("td:nth-child(4)").text();
+              const cashAmount = $(el).find("td:nth-child(2)").text();
 
-          await supabaseClient
-            .from("stock")
-            .update({
-              dividend_upcoming_date: lastUpcomeDividend
-                ? lastUpcomeDividend?.pay_date
-                : null,
-              dividend_upcoming_value: lastUpcomeDividend
-                ? lastUpcomeDividend?.cash_amount
-                : null,
-            })
-            .eq("ticker", stock.ticker);
-        } catch {}
-        // clearTimeout(t);
-      }, index * 15000);
+              if (moment(payDate).isAfter(today)) {
+                lastPayDate = moment(payDate).format("YYYY-MM-DD");
+                lastCashAmount = ROUND(Number(cashAmount.split("$")[1]));
+              }
+            });
+
+            console.log(lastPayDate);
+            console.log(lastCashAmount);
+
+            /* --- UPDATE UPCOMING DIVIDEND ---  */
+            await supabaseClient
+              .from("stock")
+              .update({
+                dividend_upcoming_date: lastPayDate ? lastPayDate : null,
+                dividend_upcoming_value: lastCashAmount ? lastCashAmount : null,
+              })
+              .eq("ticker", stock.ticker);
+          }
+        } catch {
+          console.log("ERROR");
+        }
+      }, index * 2000);
     });
   }
 
@@ -79,6 +114,19 @@ export default async function handler(
   //         // console.log("ERROR => /API/STOCK/FUNDAMENTALS", stock.ticker);
   //       }
   //     }, 300 * index);
+  //   });
+  // }
+
+  /* --- RESET UPCOMING_DIVIDEND --- */
+  // if (stocks.data) {
+  //   stocks.data.forEach(async (stock) => {
+  //     await supabaseClient
+  //       .from("stock")
+  //       .update({
+  //         dividend_upcoming_date: null,
+  //         dividend_upcoming_value: null,
+  //       })
+  //       .eq("ticker", stock.ticker);
   //   });
   // }
 
