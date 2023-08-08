@@ -11,6 +11,8 @@ import {
   useBalance,
   useCalendarEarning,
   useDividendIncomeInMonth,
+  usePortfolioGainMargin,
+  usePortfolioGainValue,
   usePortfolios,
   useStockPortfolio,
   useUpcomingDividends,
@@ -28,6 +30,11 @@ export const DashboardScreen: FC = () => {
   const dividendIncomeInMonth = useDividendIncomeInMonth(selectedPortfolio);
   const upcomingDividends = useUpcomingDividends(selectedPortfolio);
   const stockPortfolio = useStockPortfolio(selectedPortfolio);
+  const gainValue = usePortfolioGainValue(selectedPortfolio);
+  const gainMargin = usePortfolioGainMargin(selectedPortfolio);
+
+  console.log("gainValue", !!gainValue);
+  console.log("gainMargin", !!gainMargin);
 
   useEffect(() => {
     if (portfolios) {
@@ -63,7 +70,7 @@ export const DashboardScreen: FC = () => {
                 }}
               >
                 <div style={{ display: "flex", gap: "1rem" }}>
-                  {selectedPortfolio && (
+                  {gainValue && gainMargin && (
                     <div
                       style={{
                         border: "1px solid var(--color-gray)",
@@ -73,8 +80,8 @@ export const DashboardScreen: FC = () => {
                       }}
                     >
                       <p>
-                        <span>Gain: {selectedPortfolio?.gain_value}$ /</span>
-                        <span>{selectedPortfolio?.gain_margin}%</span>
+                        <span>Gain: {gainValue}$ /</span>
+                        <span>{gainMargin}%</span>
                       </p>
                     </div>
                   )}

@@ -7,7 +7,6 @@ export const updateMargins = async () => {
     .from("stock")
     .select()
     .order("ticker", { ascending: true });
-  // .eq("ticker", "AAPL");
 
   if (stocks.data) {
     stocks.data.forEach((stock, index) => {

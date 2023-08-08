@@ -1,10 +1,11 @@
 import { getHTML } from "@/utils/getHTML";
 import { NextApiRequest, NextApiResponse } from "next";
-import cheerio from "cheerio";
+import { load } from "cheerio";
 import { supabaseClient } from "@/config/supabaseClient";
 import { updateReportDate } from "@/utils/stock/updateReportDate";
 import { getGFValue } from "@/utils/stock/getGFValue";
 import { updateMargins } from "@/utils/stock/update-margins";
+import axios from "axios";
 
 const convertMarketCap = (numberString: string) => {
   if (typeof numberString !== "string") {
@@ -38,12 +39,10 @@ export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse
 ) {
-  await updateMargins();
-
+  /* FUNDAMENTALS */
   const stocks = await supabaseClient
     .from("stock")
     .select()
-    // .eq("ticker", "AAPL")
     .order("ticker", { ascending: true });
 
   if (stocks.data) {
@@ -55,7 +54,7 @@ export default async function handler(
           );
 
           // console.log(stock.ticker);
-          const $ = cheerio.load(html);
+          const $ = load(html);
 
           const pe = $(
             ".snapshot-table-wrapper > table > tbody > tr:nth-child(1) td:nth-child(4)"
@@ -78,16 +77,6 @@ export default async function handler(
           const de = $(
             ".snapshot-table-wrapper > table > tbody > tr:nth-child(10) td:nth-child(4)"
           ).text();
-          // const grossMargin = $(
-          //   ".snapshot-table-wrapper > table > tbody > tr:nth-child(8) td:nth-child(8)"
-          // )
-          //   .text()
-          //   .split("%")[0];
-          // const netMargin = $(
-          //   ".snapshot-table-wrapper > table > tbody > tr:nth-child(10) td:nth-child(8)"
-          // )
-          //   .text()
-          //   .split("%")[0];
           const beta = $(
             ".snapshot-table-wrapper > table > tbody > tr:nth-child(7) td:nth-child(12)"
           ).text();
@@ -132,15 +121,13 @@ export default async function handler(
               de: Number(de),
               eps_growth_past_5y: Number(epsGrowth5Y),
               beta: Number(beta),
-              // gross_margin: Number(grossMargin),
-              // net_margin: Number(netMargin),
               price_year_high: Number(yearHigh),
             })
             .eq("ticker", stock.ticker);
 
           updateReportDate(stock.ticker);
         } catch {
-          // console.log("ERROR => /API/STOCK/FUNDAMENTALS", stock.ticker);
+          console.log("ERROR");
         }
       }, 300 * index);
     });

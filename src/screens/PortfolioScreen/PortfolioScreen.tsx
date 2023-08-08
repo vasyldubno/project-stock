@@ -12,8 +12,6 @@ import {
   stockPortfolioInsert,
   stockPortfolioUpdate,
 } from "./supabase";
-import { StockPortfolioService } from "@/services/StockPortfolioService";
-import { supabaseClient } from "@/config/supabaseClient";
 
 const TablePortfolioDynamic = dynamic(
   () =>
@@ -34,27 +32,6 @@ export const PortfolioScreen = () => {
   stockPortfolioInsert(selectedPortfolio, setStocks);
   stockPortfolioUpdate(selectedPortfolio, setStocks);
   portfolioInsert(setPortfolios, setSelectedPortfolio);
-
-  // supabaseClient
-  //   .channel("stockPortfolio-update")
-  //   .on(
-  //     "postgres_changes",
-  //     {
-  //       event: "UPDATE",
-  //       schema: "public",
-  //       table: "stock_portfolio",
-  //     },
-  //     async (payload) => {
-  //       console.log(payload);
-  //       if (selectedPortfolio) {
-  //         const newValue = await StockPortfolioService.getStocks(
-  //           selectedPortfolio
-  //         );
-  //         setStocks(newValue.data);
-  //       }
-  //     }
-  //   )
-  //   .subscribe();
 
   const queryPortfolios = usePortfolios(user);
   const queryStocks = useStocks(selectedPortfolio);

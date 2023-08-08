@@ -11,15 +11,6 @@ export class StockPortfolioService {
       .order("price_growth", { ascending: true });
 
     if (supaStockPortfolio.data) {
-      // const tickers = supaStockPortfolio.data.map((item) => item.ticker);
-      // const arr = tickers.map(async (ticker) => {
-      //   const supaStock = await supabaseClient
-      //     .from("stock")
-      //     .select()
-      //     .eq("ticker", ticker);
-      //     return {ticker: ticker }
-      // });
-
       const portfolioValue = supaStockPortfolio.data.reduce(
         (acc, item) =>
           (acc += Number(item.amount_active_shares) * item.price_current),
@@ -33,7 +24,6 @@ export class StockPortfolioService {
           .eq("ticker", stockPortfolio.ticker)
           .single();
 
-        // if (supaStock.data) {
         const cost =
           Number(stockPortfolio.amount_active_shares) *
           Number(stockPortfolio.average_cost_per_share);
@@ -62,13 +52,14 @@ export class StockPortfolioService {
           price_current: Number(supaStock.data?.price_current),
           price_growth: Number(supaStock.data?.price_growth),
           price_target: Number(supaStock.data?.price_target),
-          dividend_upcoming_date: "",
-          dividend_upcoming_value: 0,
+          dividend_upcoming_date:
+            supaStock.data?.dividend_upcoming_date ?? null,
+          dividend_upcoming_value:
+            supaStock.data?.dividend_upcoming_value ?? null,
           perc_of_portfolio: percOfPortfolio,
         };
 
         return result;
-        // }
       });
 
       const b = await Promise.all(aPromises);
@@ -76,7 +67,5 @@ export class StockPortfolioService {
       console.log(b);
       return b.sort((a, b) => Number(a.price_growth) - Number(b.price_growth));
     }
-
-    // return supaStockPortfolio;
   }
 }

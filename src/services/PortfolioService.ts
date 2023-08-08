@@ -22,6 +22,7 @@ import {
 import { User, onAuthStateChanged } from "firebase/auth";
 import moment from "moment";
 import { ROUND } from "@/utils/round";
+import { StockPortfolioService } from "./StockPortfolioService";
 
 interface IResponseGetStocks {
   stocks: [];
@@ -438,6 +439,52 @@ export class PortfolioService {
         0
       );
       return result;
+    }
+  }
+
+  static async getGainValue(portfolio: ISupaPortfolio | null) {
+    const stocks = await StockPortfolioService.getStocks(portfolio);
+    if (stocks) {
+      const cost = stocks.reduce(
+        (acc, item) =>
+          (acc +=
+            Number(item.amount_active_shares) *
+            Number(item.average_cost_per_share)),
+        0
+      );
+
+      const value = stocks.reduce(
+        (acc, item) =>
+          (acc +=
+            Number(item.amount_active_shares) * Number(item.price_current)),
+        0
+      );
+
+      const result = value - cost;
+      return ROUND(result);
+    }
+  }
+
+  static async getGainMargin(portfolio: ISupaPortfolio | null) {
+    const stocks = await StockPortfolioService.getStocks(portfolio);
+    if (stocks) {
+      const cost = stocks.reduce(
+        (acc, item) =>
+          (acc +=
+            Number(item.amount_active_shares) *
+            Number(item.average_cost_per_share)),
+        0
+      );
+
+      const value = stocks.reduce(
+        (acc, item) =>
+          (acc +=
+            Number(item.amount_active_shares) * Number(item.price_current)),
+        0
+      );
+
+      const result = ((value - cost) / cost) * 100;
+      return ROUND(result);
     }
   }
 }

@@ -66,3 +66,25 @@ export const useStockPortfolio = (selectedPortfolio: ISupaPortfolio | null) => {
   });
   return data ?? null;
 };
+
+export const usePortfolioGainValue = (
+  selectedPortfolio: ISupaPortfolio | null
+) => {
+  const { data } = useQuery({
+    queryKey: ["gainValue", { selectedPortfolio }],
+    queryFn: () => PortfolioService.getGainValue(selectedPortfolio),
+    enabled: !!selectedPortfolio,
+  });
+  return data ?? null;
+};
+
+export const usePortfolioGainMargin = (
+  selectedPortfolio: ISupaPortfolio | null
+) => {
+  const { data } = useQuery({
+    queryKey: ["gainMargin", { selectedPortfolio }],
+    queryFn: () => PortfolioService.getGainMargin(selectedPortfolio),
+    enabled: !!selectedPortfolio,
+  });
+  return data ?? null;
+};
