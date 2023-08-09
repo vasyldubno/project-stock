@@ -1,6 +1,7 @@
 import { ISupaStock } from "@/types/types";
 import React, { FC, useEffect, useRef } from "react";
 
+// @ts-ignore
 let tvScriptLoadingPromise;
 
 type Props = {
@@ -10,9 +11,12 @@ type Props = {
 export const Chart: FC<Props> = ({ data }) => {
   const onLoadScriptRef = useRef();
 
+  // @ts-ignore
   useEffect(() => {
+    // @ts-ignore
     onLoadScriptRef.current = createWidget;
 
+    // @ts-ignore
     if (!tvScriptLoadingPromise) {
       tvScriptLoadingPromise = new Promise((resolve) => {
         const script = document.createElement("script");
@@ -26,9 +30,11 @@ export const Chart: FC<Props> = ({ data }) => {
     }
 
     tvScriptLoadingPromise.then(
+      // @ts-ignore
       () => onLoadScriptRef.current && onLoadScriptRef.current()
     );
 
+    // @ts-ignore
     return () => (onLoadScriptRef.current = null);
 
     function createWidget() {
@@ -36,6 +42,7 @@ export const Chart: FC<Props> = ({ data }) => {
         document.getElementById("tradingview_4c89e") &&
         "TradingView" in window
       ) {
+        // @ts-ignore
         new window.TradingView.widget({
           autosize: true,
           symbol: `${data.exchange}:${data.ticker}`,
