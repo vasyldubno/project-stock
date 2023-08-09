@@ -4,7 +4,7 @@ import { useUser } from "@/hooks/useUser";
 import { ISupaStock } from "@/types/types";
 import { GetServerSideProps, GetServerSidePropsContext } from "next";
 import { FC } from "react";
-import { Chart } from "./Chart/Chart";
+import { ChartTradingView } from "../../components/ChartTradingView/ChartTradingView";
 import millify from "millify";
 import { Header } from "@/components/Header/Header";
 
@@ -189,7 +189,7 @@ const TickerPage: FC<Props> = ({ data }) => {
                 </p>
               </div>
             </div>
-            <Chart data={data} />
+            <ChartTradingView data={data} />
           </div>
         )}
       </Container>

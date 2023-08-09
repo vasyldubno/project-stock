@@ -8,7 +8,7 @@ type Props = {
   data: ISupaStock;
 };
 
-export const Chart: FC<Props> = ({ data }) => {
+export const ChartTradingView: FC<Props> = ({ data }) => {
   const onLoadScriptRef = useRef();
 
   // @ts-ignore
