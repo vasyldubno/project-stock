@@ -1,6 +1,7 @@
 import { supabaseClient } from "@/config/supabaseClient";
+import { PortfolioService } from "@/services/PortfolioService";
 import { StockPortfolioService } from "@/services/StockPortfolioService";
-import { ISupaPortfolio, ISupaStockPortfolio } from "@/types/types";
+import { ISupaPortfolio, ISupaStockPortfolio, IUser } from "@/types/types";
 import { Dispatch, SetStateAction } from "react";
 
 export const stockPortfolioInsert = (
@@ -55,7 +56,7 @@ export const stockPortfolioUpdate = (
 
 export const portfolioInsert = (
   setPortfolios: Dispatch<SetStateAction<ISupaPortfolio[] | null>>,
-  setSelectedPortfolio: Dispatch<SetStateAction<ISupaPortfolio | null>>
+  user: IUser | null
 ) => {
   return supabaseClient
     .channel("portfolio-insert")
@@ -66,15 +67,38 @@ export const portfolioInsert = (
         schema: "public",
         table: "portfolio",
       },
+      async (payload) => {
+        const portfolios = await PortfolioService.getPortfolios(user);
+        if (portfolios?.data) {
+          setPortfolios(portfolios.data);
+        }
+      }
+    )
+    .subscribe();
+};
+
+export const portfolioDelete = (
+  setPortfolios: Dispatch<SetStateAction<ISupaPortfolio[] | null>>,
+  setSelectedPortfolio: Dispatch<SetStateAction<ISupaPortfolio | null>>
+) => {
+  return supabaseClient
+    .channel("portfolio-delete")
+    .on(
+      "postgres_changes",
+      {
+        event: "DELETE",
+        schema: "public",
+        table: "portfolio",
+      },
       (payload) => {
-        const newValue = payload.new as ISupaPortfolio;
         setPortfolios((prev) => {
           if (prev) {
-            [...prev, newValue];
+            const result = prev.filter((item) => item.id !== payload.old.id);
+            setSelectedPortfolio(result[0]);
+            return [...result];
           }
           return null;
         });
-        setSelectedPortfolio(newValue);
       }
     )
     .subscribe();

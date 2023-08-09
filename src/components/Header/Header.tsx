@@ -7,6 +7,7 @@ import { Button } from "../Button/Button";
 import s from "./Header.module.scss";
 import { UserIcon } from "@/icons/UserIcon";
 import { Popover } from "../Popover/Popover";
+import { useBalance } from "./queries";
 
 type Link = {
   link: string;
@@ -24,6 +25,8 @@ const links: Link[] = [
 
 export const Header: FC = () => {
   const router = useRouter();
+  const user = useUser();
+  const balance = useBalance(user);
 
   return (
     <div className={s.wrapper}>
@@ -48,17 +51,22 @@ export const Header: FC = () => {
         <div className={s.user}>
           <Popover
             trigger={<UserIcon size="2rem" />}
-            content={
-              <p
-                style={{ cursor: "pointer" }}
-                onClick={() => {
-                  UserService.signOut();
-                  router.push("/login");
-                }}
-              >
-                Sign Out
-              </p>
-            }
+            content={[
+              <>
+                <p style={{ cursor: "pointer" }}>Balance: ${balance}</p>
+              </>,
+              <>
+                <p
+                  style={{ cursor: "pointer" }}
+                  onClick={() => {
+                    UserService.signOut();
+                    router.push("/login");
+                  }}
+                >
+                  Sign Out
+                </p>
+              </>,
+            ]}
           />
         </div>
       </div>

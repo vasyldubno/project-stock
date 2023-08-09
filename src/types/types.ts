@@ -42,33 +42,37 @@ interface INasdaqDividends {
 export interface ISupaStock {
   analystRatingBuy: number | null;
   annualDividend: number | null;
+  beta: number | null;
   created_at: string | null;
-  dividendYield: number | null;
   de: number | null;
+  dividend_increase_track_record: number | null;
+  dividend_upcoming_date: string | null;
+  dividend_upcoming_value: number | null;
+  dividendYield: number | null;
   eps_growth_past_5y: number | null;
-  exchange: string | null;
+  exchange: string;
   gfValue: number | null;
   gfValueMargin: number | null;
+  gross_margin: number | null;
   id: string;
   index: string | null;
+  is_dividend: boolean;
   isDividendAristocrat: boolean;
   isDividendKing: boolean;
   marketCap: number | null;
   name: string | null;
+  net_margin: number | null;
   payoutRation: number | null;
   pe: number | null;
   price_current: number | null;
   price_growth: number | null;
   price_target: number | null;
+  price_year_high: number | null;
+  report_date: string | null;
   roe: number | null;
   sector: string;
   subIndustry: string;
   ticker: string;
-  report_date: string | null;
-  beta: number | null;
-  gross_margin: number | null;
-  net_margin: number | null;
-  price_year_high: number | null;
   yearRange?: number;
 }
 
@@ -205,6 +209,6 @@ export interface ISupaExit {
 }
 
 export interface IUser {
-  email?: string;
-  id?: string;
+  email: string | null;
+  id: string | null;
 }

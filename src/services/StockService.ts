@@ -1,7 +1,13 @@
 import { CLIENT_URL } from "@/config/consts";
 import { db } from "@/config/firebaseConfig";
 import { supabaseClient } from "@/config/supabaseClient";
-import { IStock, ISupaScreener, ISupaStock, IUser } from "@/types/types";
+import {
+  IStock,
+  ISupaPortfolio,
+  ISupaScreener,
+  ISupaStock,
+  IUser,
+} from "@/types/types";
 import axios from "axios";
 import { collection, getDocs, orderBy, query, where } from "firebase/firestore";
 import { use } from "react";
@@ -11,51 +17,52 @@ export class StockService {
     return axios.post(`${CLIENT_URL}/api/stock/price-current`, { userId });
   }
 
-  static async getCalendarEarnings(user: IUser | null) {
+  static async getCalendarEarnings(
+    user: IUser | null,
+    portfolio: ISupaPortfolio | null
+  ) {
     const supaPortfolio = await supabaseClient
       .from("portfolio")
       .select()
-      .eq("user_id", user?.id);
+      .eq("user_id", user?.id)
+      .eq("id", portfolio?.id)
+      .single();
 
     if (supaPortfolio.data) {
-      const portfolioIds = supaPortfolio.data.map((item) => item.id);
+      const supaStockPortfolio = await supabaseClient
+        .from("stock_portfolio")
+        .select()
+        .eq("portfolio_id", supaPortfolio.data.id);
 
-      if (portfolioIds) {
-        const supaStockPortfolio = await supabaseClient
-          .from("stock_portfolio")
-          .select()
-          .in("portfolio_id", portfolioIds);
+      if (supaStockPortfolio.data) {
+        const stockPortfolioTickers = supaStockPortfolio.data.map(
+          (item) => item.ticker
+        );
 
-        if (supaStockPortfolio.data) {
-          const stockPortfolioTickers = supaStockPortfolio.data.map(
-            (item) => item.ticker
-          );
+        if (stockPortfolioTickers) {
+          const supaStock = await supabaseClient
+            .from("stock")
+            .select()
+            .in("ticker", stockPortfolioTickers)
+            .order("report_date", { ascending: true })
+            .order("ticker", { ascending: true });
 
-          if (stockPortfolioTickers) {
-            const supaStock = await supabaseClient
-              .from("stock")
-              .select()
-              .in("ticker", stockPortfolioTickers)
-              .order("report_date", { ascending: true })
-              .order("ticker", { ascending: true });
+          if (supaStock.data) {
+            const today = new Date();
+            const endOfMonth = new Date(
+              today.getUTCFullYear(),
+              today.getUTCMonth() + 1,
+              0
+            );
 
-            if (supaStock.data) {
-              const today = new Date();
-              const endOfMonth = new Date(
-                today.getUTCFullYear(),
-                today.getUTCMonth() + 1,
-                0
-              );
+            const result = supaStock.data.filter((item) => {
+              if (item.report_date) {
+                const objDate = new Date(item.report_date);
+                return objDate >= today && objDate <= endOfMonth;
+              }
+            });
 
-              const result = supaStock.data.filter((item) => {
-                if (item.report_date) {
-                  const objDate = new Date(item.report_date);
-                  return objDate >= today && objDate <= endOfMonth;
-                }
-              });
-
-              return result;
-            }
+            return result;
           }
         }
       }
@@ -117,9 +124,11 @@ export class StockService {
             if (screener.roe.startsWith(">")) {
               const value = parseFloat(screener.roe.slice(1));
               query.gt("roe", value);
+              query.gte("roe", 0);
             } else if (screener.roe.startsWith("<")) {
               const value = parseFloat(screener.roe.slice(1));
               query.lt("roe", value);
+              query.gte("roe", 0);
             }
           }
 
@@ -157,9 +166,11 @@ export class StockService {
             if (screener.pe.startsWith(">")) {
               const value = parseFloat(screener.pe.slice(1));
               query.gt("pe", value);
+              query.gte("pe", 0);
             } else if (screener.pe.startsWith("<")) {
               const value = parseFloat(screener.pe.slice(1));
               query.lt("pe", value);
+              query.gte("pe", 0);
             }
           }
 

@@ -4,6 +4,7 @@ import { Select } from "../Select/Select";
 import { STOCKS } from "@/assets/stock";
 import { Input } from "../Input/Input";
 import s from "./styles.module.scss";
+import { ClearIcon } from "@/icons/ClearIcon";
 
 type Props = {
   screener: ISupaScreener | null;
@@ -16,10 +17,6 @@ export const ScreenerFilter: FC<Props> = ({
 }) => {
   const [selectedSector, setSelectedSector] = useState<string | null>(null);
   const [selectedIndustry, setSelectedIndustry] = useState<string | null>(null);
-
-  if (screener) {
-    console.log(screener.pe ?? "");
-  }
 
   return (
     <>
@@ -73,7 +70,6 @@ export const ScreenerFilter: FC<Props> = ({
           </div>
           <div className={s.grid__item}>
             <Input
-              // defaultValue={screener.roe ?? ""}
               value={screener.roe ?? ""}
               label="ROE"
               onChange={(e: ChangeEvent<HTMLInputElement>) => {
@@ -87,11 +83,27 @@ export const ScreenerFilter: FC<Props> = ({
                   return null;
                 });
               }}
+              icon={{
+                delete: {
+                  element: <ClearIcon size="1.2rem" />,
+                  onClick: (e: ChangeEvent<HTMLInputElement>) => {
+                    setSelectedScreener((prev) => {
+                      if (prev) {
+                        return {
+                          ...prev,
+                          roe: "",
+                        };
+                      }
+                      return null;
+                    });
+                  },
+                  open: !!screener?.roe,
+                },
+              }}
             />
           </div>
           <div className={s.grid__item}>
             <Input
-              // defaultValue={screener.pe ?? ""}
               value={screener.pe ?? ""}
               label="P/E"
               onChange={(e: ChangeEvent<HTMLInputElement>) => {
@@ -105,11 +117,27 @@ export const ScreenerFilter: FC<Props> = ({
                   return null;
                 });
               }}
+              icon={{
+                delete: {
+                  element: <ClearIcon size="1.2rem" />,
+                  onClick: (e: ChangeEvent<HTMLInputElement>) => {
+                    setSelectedScreener((prev) => {
+                      if (prev) {
+                        return {
+                          ...prev,
+                          pe: "",
+                        };
+                      }
+                      return null;
+                    });
+                  },
+                  open: !!screener?.pe,
+                },
+              }}
             />
           </div>
           <div className={s.grid__item}>
             <Input
-              // defaultValue={screener.de ?? ""}
               value={screener.de ?? ""}
               label="D/E"
               onChange={(e: ChangeEvent<HTMLInputElement>) => {
@@ -123,11 +151,27 @@ export const ScreenerFilter: FC<Props> = ({
                   return null;
                 });
               }}
+              icon={{
+                delete: {
+                  element: <ClearIcon size="1.2rem" />,
+                  onClick: (e: ChangeEvent<HTMLInputElement>) => {
+                    setSelectedScreener((prev) => {
+                      if (prev) {
+                        return {
+                          ...prev,
+                          de: "",
+                        };
+                      }
+                      return null;
+                    });
+                  },
+                  open: !!screener?.de,
+                },
+              }}
             />
           </div>
           <div className={s.grid__item}>
             <Input
-              // defaultValue={screener.payout_ratio ?? ""}
               value={screener.payout_ratio ?? ""}
               label="Payout Ratio"
               onChange={(e: ChangeEvent<HTMLInputElement>) => {
@@ -141,11 +185,27 @@ export const ScreenerFilter: FC<Props> = ({
                   return null;
                 });
               }}
+              icon={{
+                delete: {
+                  element: <ClearIcon size="1.2rem" />,
+                  onClick: (e: ChangeEvent<HTMLInputElement>) => {
+                    setSelectedScreener((prev) => {
+                      if (prev) {
+                        return {
+                          ...prev,
+                          payout_ratio: e.target.value,
+                        };
+                      }
+                      return null;
+                    });
+                  },
+                  open: !!screener?.payout_ratio,
+                },
+              }}
             />
           </div>
           <div className={s.grid__item}>
             <Input
-              // defaultValue={screener.dividend_yield ?? ""}
               value={screener.dividend_yield ?? ""}
               label="Dividend Yield"
               onChange={(e: ChangeEvent<HTMLInputElement>) => {
@@ -159,12 +219,28 @@ export const ScreenerFilter: FC<Props> = ({
                   return null;
                 });
               }}
+              icon={{
+                delete: {
+                  element: <ClearIcon size="1.2rem" />,
+                  onClick: (e: ChangeEvent<HTMLInputElement>) => {
+                    setSelectedScreener((prev) => {
+                      if (prev) {
+                        return {
+                          ...prev,
+                          dividend_yield: e.target.value,
+                        };
+                      }
+                      return null;
+                    });
+                  },
+                  open: !!screener?.dividend_yield,
+                },
+              }}
             />
           </div>
 
           <div className={s.grid__item}>
             <Input
-              // defaultValue={screener.analyst ?? ""}
               value={screener.analyst ?? ""}
               label="Analyst Rating to Buy"
               onChange={(e: ChangeEvent<HTMLInputElement>) => {
@@ -178,12 +254,28 @@ export const ScreenerFilter: FC<Props> = ({
                   return null;
                 });
               }}
+              icon={{
+                delete: {
+                  element: <ClearIcon size="1.2rem" />,
+                  onClick: (e: ChangeEvent<HTMLInputElement>) => {
+                    setSelectedScreener((prev) => {
+                      if (prev) {
+                        return {
+                          ...prev,
+                          analyst: e.target.value,
+                        };
+                      }
+                      return null;
+                    });
+                  },
+                  open: !!screener?.analyst,
+                },
+              }}
             />
           </div>
 
           <div className={s.grid__item}>
             <Input
-              // defaultValue={screener.margin_safety ?? ""}
               value={screener.margin_safety ?? ""}
               label="Instrinic Margin"
               onChange={(e: ChangeEvent<HTMLInputElement>) => {
@@ -197,12 +289,28 @@ export const ScreenerFilter: FC<Props> = ({
                   return null;
                 });
               }}
+              icon={{
+                delete: {
+                  element: <ClearIcon size="1.2rem" />,
+                  onClick: (e: ChangeEvent<HTMLInputElement>) => {
+                    setSelectedScreener((prev) => {
+                      if (prev) {
+                        return {
+                          ...prev,
+                          margin_safety: e.target.value,
+                        };
+                      }
+                      return null;
+                    });
+                  },
+                  open: !!screener?.margin_safety,
+                },
+              }}
             />
           </div>
 
           <div className={s.grid__item}>
             <Input
-              // defaultValue={screener.priceGrowth ?? ""}
               value={screener.priceGrowth ?? ""}
               label="Price Growth"
               onChange={(e: ChangeEvent<HTMLInputElement>) => {
@@ -215,6 +323,23 @@ export const ScreenerFilter: FC<Props> = ({
                   }
                   return null;
                 });
+              }}
+              icon={{
+                delete: {
+                  element: <ClearIcon size="1.2rem" />,
+                  onClick: (e: ChangeEvent<HTMLInputElement>) => {
+                    setSelectedScreener((prev) => {
+                      if (prev) {
+                        return {
+                          ...prev,
+                          priceGrowth: e.target.value,
+                        };
+                      }
+                      return null;
+                    });
+                  },
+                  open: !!screener?.priceGrowth,
+                },
               }}
             />
           </div>

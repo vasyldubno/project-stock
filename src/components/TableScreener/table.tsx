@@ -6,6 +6,18 @@ import s from "./styles.module.scss";
 
 const columnHelper = createColumnHelper<ISupaStock>();
 
+const Cell = ({ value }: { value: string | number | null }) => {
+  return (
+    <>
+      {value ? (
+        <p style={{ width: "80px", textAlign: "center" }}>{value}</p>
+      ) : (
+        <p style={{ width: "80px", textAlign: "center" }}>-- --</p>
+      )}
+    </>
+  );
+};
+
 export const columns = [
   columnHelper.accessor("ticker", {
     header: "Ticker",
@@ -64,66 +76,48 @@ export const columns = [
   }),
   columnHelper.accessor("marketCap", {
     header: "Market Cap",
-    cell: ({ getValue, row: { original } }) => (
+    cell: ({ getValue }) => (
       <>
-        {getValue() && (
-          <p style={{ width: "80px" }}>
+        {getValue() ? (
+          <p style={{ width: "80px", textAlign: "center" }}>
             {millify(Number(getValue()), {
               precision: 2,
               locales: "en",
             })}
           </p>
-        )}
-      </>
-    ),
-  }),
-  columnHelper.accessor("price_current", {
-    header: "Price Current",
-    cell: ({ getValue }) => <p style={{ width: "80px" }}>{getValue()}</p>,
-  }),
-  columnHelper.accessor("pe", {
-    header: "PE",
-    cell: ({ getValue }) => (
-      <>
-        {getValue() ? (
-          <p style={{ width: "80px", textAlign: "center" }}>{getValue()}</p>
         ) : (
           <p style={{ width: "80px", textAlign: "center" }}>-- --</p>
         )}
       </>
     ),
   }),
+  columnHelper.accessor("price_current", {
+    header: "Price Current",
+    cell: ({ getValue }) => <Cell value={getValue()} />,
+  }),
+  columnHelper.accessor("pe", {
+    header: "PE",
+    cell: ({ getValue }) => <Cell value={getValue()} />,
+  }),
   columnHelper.accessor("roe", {
     header: "ROE",
-    cell: ({ getValue }) => (
-      <>
-        <p style={{ width: "80px", textAlign: "center" }}>{getValue()}</p>
-      </>
-    ),
+    cell: ({ getValue }) => <Cell value={getValue()} />,
   }),
   columnHelper.accessor("de", {
     header: "D/E",
-    cell: ({ getValue }) => (
-      <p style={{ width: "80px", textAlign: "center" }}>{getValue()}</p>
-    ),
+    cell: ({ getValue }) => <Cell value={getValue()} />,
   }),
   columnHelper.accessor("gross_margin", {
     header: "Gross Margin",
-    cell: ({ getValue }) => (
-      <p style={{ width: "80px", textAlign: "center" }}>{getValue()}</p>
-    ),
+    cell: ({ getValue }) => <Cell value={getValue()} />,
   }),
   columnHelper.accessor("net_margin", {
     header: "Net Margin",
-    cell: ({ getValue }) => (
-      <p style={{ width: "80px", textAlign: "center" }}>{getValue()}</p>
-    ),
+    cell: ({ getValue }) => <Cell value={getValue()} />,
   }),
   columnHelper.accessor("beta", {
     header: "Beta",
-    cell: ({ getValue }) => (
-      <p style={{ width: "80px", textAlign: "center" }}>{getValue()}</p>
-    ),
+    cell: ({ getValue }) => <Cell value={getValue()} />,
   }),
   columnHelper.accessor("yearRange", {
     header: "52 Week Range",

@@ -274,6 +274,7 @@ export interface Database {
           beta: number | null
           created_at: string | null
           de: number | null
+          dividend_increase_track_record: number | null
           dividend_upcoming_date: string | null
           dividend_upcoming_value: number | null
           dividendYield: number | null
@@ -308,6 +309,7 @@ export interface Database {
           beta?: number | null
           created_at?: string | null
           de?: number | null
+          dividend_increase_track_record?: number | null
           dividend_upcoming_date?: string | null
           dividend_upcoming_value?: number | null
           dividendYield?: number | null
@@ -342,6 +344,7 @@ export interface Database {
           beta?: number | null
           created_at?: string | null
           de?: number | null
+          dividend_increase_track_record?: number | null
           dividend_upcoming_date?: string | null
           dividend_upcoming_value?: number | null
           dividendYield?: number | null

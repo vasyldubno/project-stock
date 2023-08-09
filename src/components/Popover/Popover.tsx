@@ -6,7 +6,7 @@ import { MixerHorizontalIcon, Cross2Icon } from "@radix-ui/react-icons";
 
 type Props = {
   trigger: ReactNode;
-  content: ReactNode;
+  content: ReactNode[];
 };
 
 export const Popover: FC<Props> = ({ trigger, content }) => {
@@ -21,7 +21,8 @@ export const Popover: FC<Props> = ({ trigger, content }) => {
       </PopoverRadix.PopoverTrigger>
       <PopoverRadix.Portal>
         <PopoverRadix.Content className={s.PopoverContent} sideOffset={5}>
-          {content}
+          {content &&
+            content.map((item, index) => <div key={index}>{item}</div>)}
           <PopoverRadix.Close className={s.PopoverClose} aria-label="Close">
             <Cross2Icon />
           </PopoverRadix.Close>

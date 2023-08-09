@@ -7,6 +7,7 @@ import { FC, PropsWithChildren, useEffect, useState } from "react";
 
 export const StockProvider: FC<PropsWithChildren> = ({ children }) => {
   const [user, setUser] = useState<{ email: string; id: string } | null>(null);
+  const [isLoaded, setIsLoaded] = useState(false);
 
   const router = useRouter();
 
@@ -14,27 +15,26 @@ export const StockProvider: FC<PropsWithChildren> = ({ children }) => {
     UserService.getUser().then((res) => {
       if (res) {
         if (res.error) {
+          setIsLoaded(true);
           router.push("/login");
         }
         if (res.email && res.id) {
           setUser({ email: res.email, id: res.id });
+          setIsLoaded(true);
         }
       }
     });
   }, []);
 
-  useEffect(() => {
-    if (user && user.id) {
-      // StockService.updatePriceCurrent(user.id);
-      // PortfolioService.updateDividends(user.id);
-      // StockService.updateFundamentals();
-    }
-  }, [user]);
-
   return (
     <>
       <AuthContext.Provider
-        value={{ id: user?.id, email: user?.email, setUser: setUser }}
+        value={{
+          id: user?.id ?? null,
+          email: user?.email ?? null,
+          isLoaded,
+          setUser: setUser,
+        }}
       >
         {children}
       </AuthContext.Provider>

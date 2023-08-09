@@ -1,7 +1,15 @@
 import { SoldOutScreener } from "@/screens/SoldOutScreener/SoldOutScreener";
+import Head from "next/head";
 
 const SoldOutPage = () => {
-  return <SoldOutScreener />;
+  return (
+    <>
+      <Head>
+        <title>Sold Out</title>
+      </Head>
+      <SoldOutScreener />
+    </>
+  );
 };
 
 export default SoldOutPage;

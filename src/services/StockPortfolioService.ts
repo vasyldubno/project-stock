@@ -64,7 +64,6 @@ export class StockPortfolioService {
 
       const b = await Promise.all(aPromises);
 
-      console.log(b);
       return b.sort((a, b) => Number(a.price_growth) - Number(b.price_growth));
     }
   }

@@ -8,10 +8,13 @@ import dynamic from "next/dynamic";
 import { useEffect, useState } from "react";
 import { usePortfolios, useStocks } from "./queries";
 import {
+  portfolioDelete,
   portfolioInsert,
   stockPortfolioInsert,
   stockPortfolioUpdate,
 } from "./supabase";
+import { DeleteIcon } from "@/icons/DeleteIcon";
+import { PortfolioService } from "@/services/PortfolioService";
 
 const TablePortfolioDynamic = dynamic(
   () =>
@@ -31,10 +34,16 @@ export const PortfolioScreen = () => {
 
   stockPortfolioInsert(selectedPortfolio, setStocks);
   stockPortfolioUpdate(selectedPortfolio, setStocks);
-  portfolioInsert(setPortfolios, setSelectedPortfolio);
+  portfolioDelete(setPortfolios, setSelectedPortfolio);
 
   const queryPortfolios = usePortfolios(user);
   const queryStocks = useStocks(selectedPortfolio);
+
+  useEffect(() => {
+    if (user) {
+      portfolioInsert(setPortfolios, user);
+    }
+  }, [user]);
 
   useEffect(() => {
     if (queryPortfolios) {
@@ -77,6 +86,11 @@ export const PortfolioScreen = () => {
                         {item.title}
                       </p>
                     ),
+                    iconDelete: selectedPortfolio?.id === item.id && (
+                      <DeleteIcon size="1rem" />
+                    ),
+                    onDelete: () =>
+                      PortfolioService.deletePortfolio(selectedPortfolio),
                   }))}
                 />
 

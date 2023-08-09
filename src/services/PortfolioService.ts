@@ -340,27 +340,37 @@ export class PortfolioService {
       },
     ];
 
-    const response = await supabaseClient
+    const supaStockPortfolio = await supabaseClient
       .from("stock_portfolio")
       .select()
       .eq("portfolio_id", portfolio?.id)
-      .not("dividend_upcoming_value", "is", null)
-      .order("dividend_upcoming_date", { ascending: true });
+      .eq("is_trading", true);
 
-    if (response.data) {
-      response.data.forEach((item) => {
-        const month = moment(item.dividend_upcoming_date).format("MM");
-        const current = result.find((item) => item.monthNumber === month);
-        if (current) {
-          const newValue = ROUND(
-            (current.amount += item.dividend_upcoming_value ?? 0)
-          );
-          current.amount = newValue;
-        }
-      });
+    if (supaStockPortfolio.data) {
+      const tickers = supaStockPortfolio.data.map((item) => item.ticker);
+
+      const response = await supabaseClient
+        .from("stock")
+        .select()
+        .in("ticker", tickers)
+        .not("dividend_upcoming_value", "is", null)
+        .order("dividend_upcoming_date", { ascending: true });
+
+      if (response.data) {
+        response.data.forEach((item) => {
+          const month = moment(item.dividend_upcoming_date).format("MM");
+          const current = result.find((item) => item.monthNumber === month);
+          if (current) {
+            const newValue = ROUND(
+              (current.amount += item.dividend_upcoming_value ?? 0)
+            );
+            current.amount = newValue;
+          }
+        });
+      }
+
+      return result;
     }
-
-    return result;
   }
 
   static async addPortfolio(title: string, user: IUser | null) {
@@ -391,6 +401,10 @@ export class PortfolioService {
     }
   }
 
+  static async deletePortfolio(portfolio: ISupaPortfolio | null) {
+    await supabaseClient.from("portfolio").delete().eq("id", portfolio?.id);
+  }
+
   static async getPortfolios(user: IUser | null) {
     if (user) {
       const portfolios = await supabaseClient
@@ -400,37 +414,13 @@ export class PortfolioService {
 
       return portfolios;
     }
-
-    // if (user && user.uid) {
-    //   const portfolioRef = query(
-    //     collection(db, "portfolio"),
-    //     where("userId", "==", user.uid)
-    //   );
-    //   const portfolios = (await getDocs(portfolioRef)).docs.map((item) => {
-    //     return { ...item.data(), id: item.id };
-    //   });
-    //   return portfolios as IPortfolio[];
-    // }
   }
 
-  static async getMarketValue(portfolioId: string) {
-    // const stockPortfolioRef = query(
-    //   collection(db, "stock_portfolio"),
-    //   where("portfolioId", "==", portfolioId)
-    // );
-    // const stockPortfolio = (await getDocs(stockPortfolioRef)).docs.map((item) =>
-    //   item.data()
-    // ) as IStockPortfolio[];
-    // const result = stockPortfolio.reduce(
-    //   (acc, item) => (acc += item.amountActiveShares * item.priceCurrent),
-    //   0
-    // );
-    // return result;
-
+  static async getMarketValue(portfolio: ISupaPortfolio | null) {
     const supaStockPortfolio = await supabaseClient
       .from("stock_portfolio")
       .select()
-      .eq("portfolio_id", portfolioId);
+      .eq("portfolio_id", portfolio?.id);
     if (supaStockPortfolio.data) {
       const result = supaStockPortfolio.data.reduce(
         (acc, item) =>
@@ -439,6 +429,17 @@ export class PortfolioService {
         0
       );
       return result;
+    }
+  }
+
+  static async getCost(portfolio: ISupaPortfolio | null) {
+    const supaStockPortfolio = await supabaseClient
+      .from("portfolio")
+      .select()
+      .eq("id", portfolio?.id)
+      .single();
+    if (supaStockPortfolio.data) {
+      return supaStockPortfolio.data.cost;
     }
   }
 

@@ -3,22 +3,20 @@ import { SortIcon } from "@/icons/SortIcon";
 import { ISupaStockPortfolio } from "@/types/types";
 import {
   SortingState,
-  createColumnHelper,
   flexRender,
   getCoreRowModel,
   getSortedRowModel,
   useReactTable,
 } from "@tanstack/react-table";
+import { useRouter } from "next/router";
 import { FC, useState } from "react";
 import { Button } from "../Button/Button";
 import { FormAddStock } from "../FormAddStock/FormAddStock";
 import { Modal } from "../Modal/Modal";
-import { TableCardPrice } from "../TableCardPrice/TableCardPrice";
 import { TableDetails } from "../TableDetails/TableDetails";
 import { TableDivider } from "../TableDivider/TableDivider";
 import s from "./TablePortfolio.module.scss";
-import { useRouter } from "next/router";
-import Link from "next/link";
+import { columns } from "./table";
 
 type Props = {
   portfolioId: string;
@@ -31,8 +29,6 @@ export const TablePortfolio: FC<Props> = ({ portfolioId, data }) => {
   const [selectedStock, setSelectedStock] =
     useState<ISupaStockPortfolio | null>(null);
   const [isOpenModal, setIsOpenModal] = useState(false);
-
-  const router = useRouter();
 
   const showDetail = async (ticker: string) => {
     setSelectedTicker((prev) => {
@@ -47,112 +43,8 @@ export const TablePortfolio: FC<Props> = ({ portfolioId, data }) => {
     });
   };
 
-  const columnHelper = createColumnHelper<ISupaStockPortfolio>();
-
-  const columns = [
-    columnHelper.accessor("ticker", {
-      header: "Ticker",
-      cell: (info) => (
-        <div style={{ textAlign: "center" }}>
-          <Link className={s.cell__ticker} href={`/stock/${info.getValue()}`}>
-            {info.getValue()}
-          </Link>
-        </div>
-      ),
-    }),
-    columnHelper.accessor("gain_margin", {
-      header: "Gain",
-      cell: (info) => (
-        <>
-          {info.row.original.is_trading ? (
-            <TableCardPrice content={info.getValue()?.toFixed(2)} />
-          ) : (
-            <TableCardPrice content={null} />
-          )}
-        </>
-      ),
-    }),
-    columnHelper.accessor("price_current", {
-      header: "Market Price",
-      cell: (info) => (
-        <p style={{ textAlign: "center" }}>{info.getValue()?.toFixed(2)}</p>
-      ),
-    }),
-    columnHelper.accessor("average_cost_per_share", {
-      header: "Cost / Share",
-      cell: ({ getValue }) => (
-        <p style={{ textAlign: "center" }}>{getValue()}</p>
-      ),
-    }),
-    columnHelper.accessor("total_dividend_income", {
-      header: "Total Dividends",
-      cell: (info) => (
-        <>
-          {info.getValue() ? (
-            <p style={{ textAlign: "center" }}>{info.getValue()?.toFixed(2)}</p>
-          ) : (
-            <p style={{ textAlign: "center" }}>-- --</p>
-          )}
-        </>
-      ),
-    }),
-    columnHelper.accessor("total_return_margin", {
-      header: "Total Return",
-      cell: (info) => (
-        <div style={{ textAlign: "center" }}>
-          {info.row.original.total_return_margin ? (
-            <p style={{ fontSize: "0.8rem" }}>
-              {info.row.original.total_return_margin.toFixed(2)}%
-            </p>
-          ) : (
-            <p style={{ fontSize: "0.8rem" }}>-- --</p>
-          )}
-
-          {info.row.original.total_return_margin ? (
-            <p style={{ fontSize: "0.8rem" }}>
-              {info.row.original.total_return_margin.toFixed(2)}
-            </p>
-          ) : (
-            <p style={{ fontSize: "0.8rem" }}>-- --</p>
-          )}
-        </div>
-      ),
-    }),
-    columnHelper.accessor("price_growth", {
-      header: "Target",
-      cell: (info) => (
-        <div style={{ textAlign: "center" }}>
-          {/* {info.getValue()} */}
-          {info.row.original.price_target ? (
-            <p style={{ fontSize: "0.8rem" }}>
-              {info.row.original.price_target.toFixed(2)}
-            </p>
-          ) : (
-            <p style={{ fontSize: "0.8rem" }}>-- --</p>
-          )}
-          {info.row.original.price_growth ? (
-            <p style={{ fontSize: "0.8rem" }}>
-              {`${info.row.original.price_growth.toFixed(2)}`}%
-            </p>
-          ) : (
-            <p style={{ fontSize: "0.8rem" }}>-- --</p>
-          )}
-        </div>
-      ),
-    }),
-
-    columnHelper.accessor("perc_of_portfolio", {
-      header: "% of Portfolio",
-      cell: (info) => (
-        <>
-          <p style={{ textAlign: "center" }}>{info.getValue()?.toFixed(2)}%</p>
-        </>
-      ),
-    }),
-  ];
-
   const table = useReactTable({
-    columns,
+    columns: columns,
     data,
     getCoreRowModel: getCoreRowModel(),
     getSortedRowModel: getSortedRowModel(),
@@ -178,7 +70,7 @@ export const TablePortfolio: FC<Props> = ({ portfolioId, data }) => {
   };
 
   return (
-    <>
+    <div style={{ overflow: "auto" }}>
       <table className={s.table}>
         <thead>
           {table.getHeaderGroups().map((headerGroup, headerGroupIndex) => (
@@ -298,6 +190,6 @@ export const TablePortfolio: FC<Props> = ({ portfolioId, data }) => {
           price={selectedStock?.price_current}
         />
       </Modal>
-    </>
+    </div>
   );
 };

@@ -1,0 +1,15 @@
+.section__charts {
+  display: flex;
+  @media screen and (max-width: 920px) {
+    flex-direction: column-reverse;
+    gap: 2rem;
+    align-items: center;
+  }
+}
+
+.chart__wrapper {
+  width: 70%;
+  @media screen and (max-width: 1200px) {
+    width: 99%;
+  }
+}

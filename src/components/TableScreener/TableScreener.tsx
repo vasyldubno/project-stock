@@ -44,7 +44,7 @@ export const TableScreener = ({ data }: { data: ISupaStock[] }) => {
   };
 
   return (
-    <>
+    <div style={{ overflow: "auto", maxHeight: "100dvh" }}>
       <table
         style={{
           borderCollapse: "collapse",
@@ -53,7 +53,14 @@ export const TableScreener = ({ data }: { data: ISupaStock[] }) => {
           width: "100%",
         }}
       >
-        <thead style={{ fontSize: "0.8rem" }}>
+        <thead
+          style={{
+            fontSize: "0.8rem",
+            position: "sticky",
+            top: "0",
+            backgroundColor: "white",
+          }}
+        >
           {table.getHeaderGroups().map((headerGroup, headerGroupIndex) => (
             <tr key={`${headerGroup.id}-${headerGroupIndex}`}>
               {headerGroup.headers.map((header, headerIndex) => (
@@ -118,6 +125,6 @@ export const TableScreener = ({ data }: { data: ISupaStock[] }) => {
           type="buy"
         />
       </Modal>
-    </>
+    </div>
   );
 };

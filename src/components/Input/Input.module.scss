@@ -6,3 +6,16 @@
   display: block;
   width: 100%;
 }
+
+.icon__clear {
+  cursor: pointer;
+  position: absolute;
+  top: 50%;
+  right: 0.2rem;
+  transform: translateY(-50%);
+  transition: all 0.3s ease;
+  &:hover {
+    scale: 1.1;
+    transition: all 0.3s ease;
+  }
+}

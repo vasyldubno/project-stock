@@ -5,9 +5,9 @@ import Head from "next/head";
 const ActivityPage = () => {
   return (
     <>
-      {/* <Head>
+      <Head>
         <title>Activity | {TITLE}</title>
-      </Head> */}
+      </Head>
       <ActivityScreener />
     </>
   );

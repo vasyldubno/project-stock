@@ -2,6 +2,8 @@ import { ISupaStock } from "@/types/types";
 import { FC } from "react";
 import { TableDivider } from "../TableDivider/TableDivider";
 import moment from "moment";
+import s from "./styles.module.scss";
+import Link from "next/link";
 
 type CalendarEarningsProps = {
   calendarEarning: ISupaStock[];
@@ -63,7 +65,13 @@ export const CalendarEarnings: FC<CalendarEarningsProps> = ({
                 <div style={{ display: "flex", gap: "0.5rem" }}>
                   <p>{item.name}</p>
                   <p>||</p>
-                  <p>{item.ticker}</p>
+                  {/* <p className={s.item__ticker}>{item.ticker}</p> */}
+                  <Link
+                    href={`/stock/${item.ticker}`}
+                    className={s.item__ticker}
+                  >
+                    {item.ticker}
+                  </Link>
                 </div>
               </div>
             );

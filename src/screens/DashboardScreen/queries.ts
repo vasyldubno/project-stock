@@ -14,19 +14,13 @@ export const usePortfolios = (user: IUser | null) => {
   return data?.data ?? null;
 };
 
-export const useBalance = (user: IUser | null) => {
+export const useCalendarEarning = (
+  user: IUser | null,
+  portfolio: ISupaPortfolio | null
+) => {
   const { data } = useQuery({
-    queryKey: ["balance", { user }],
-    queryFn: () => UserService.getBalance(user),
-    enabled: !!user,
-  });
-  return data ?? null;
-};
-
-export const useCalendarEarning = (user: IUser | null) => {
-  const { data } = useQuery({
-    queryKey: ["calendarEarning", { user }],
-    queryFn: () => StockService.getCalendarEarnings(user),
+    queryKey: ["calendarEarning", { user, portfolio }],
+    queryFn: () => StockService.getCalendarEarnings(user, portfolio),
     enabled: !!user,
   });
   return data ?? null;
@@ -84,6 +78,24 @@ export const usePortfolioGainMargin = (
   const { data } = useQuery({
     queryKey: ["gainMargin", { selectedPortfolio }],
     queryFn: () => PortfolioService.getGainMargin(selectedPortfolio),
+    enabled: !!selectedPortfolio,
+  });
+  return data ?? null;
+};
+
+export const usePortfolioValue = (selectedPortfolio: ISupaPortfolio | null) => {
+  const { data } = useQuery({
+    queryKey: ["value", { selectedPortfolio }],
+    queryFn: () => PortfolioService.getMarketValue(selectedPortfolio),
+    enabled: !!selectedPortfolio,
+  });
+  return data ?? null;
+};
+
+export const usePortfolioCost = (selectedPortfolio: ISupaPortfolio | null) => {
+  const { data } = useQuery({
+    queryKey: ["cost", { selectedPortfolio }],
+    queryFn: () => PortfolioService.getCost(selectedPortfolio),
     enabled: !!selectedPortfolio,
   });
   return data ?? null;

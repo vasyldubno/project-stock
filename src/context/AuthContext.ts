@@ -2,8 +2,9 @@ import { User } from "firebase/auth";
 import { Dispatch, SetStateAction, createContext } from "react";
 
 export const AuthContext = createContext<{
-  email?: string;
-  id?: string;
+  email: string | null;
+  id: string | null;
+  isLoaded: boolean;
   setUser: Dispatch<
     SetStateAction<{
       email: string;

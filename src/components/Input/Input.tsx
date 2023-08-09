@@ -1,7 +1,8 @@
-import { FC, HTMLInputTypeAttribute } from "react";
+import { FC, HTMLInputTypeAttribute, ReactNode } from "react";
 import s from "./Input.module.scss";
 import { FieldErrors, UseFormRegister } from "react-hook-form";
 import { FormError } from "../FormError/FormError";
+import { ClearIcon } from "@/icons/ClearIcon";
 
 type InputProps = {
   label?: string;
@@ -12,6 +13,13 @@ type InputProps = {
   onBlur?: any;
   value?: string;
   defaultValue?: string;
+  icon?: {
+    delete: {
+      element: ReactNode;
+      open: boolean;
+      onClick: (props?: any) => void;
+    };
+  };
 };
 
 export const Input: FC<InputProps> = ({
@@ -23,19 +31,28 @@ export const Input: FC<InputProps> = ({
   onFocus,
   value,
   defaultValue,
+  icon,
 }) => {
   return (
     <div style={{ display: "block", width: "100%" }}>
       <label>{label}</label>
-      <input
-        className={s.input}
-        type={type ?? "text"}
-        onChange={onChange}
-        onFocus={onFocus}
-        onBlur={onBlur}
-        value={value}
-        defaultValue={defaultValue}
-      />
+      <div style={{ position: "relative" }}>
+        <input
+          className={s.input}
+          type={type ?? "text"}
+          onChange={onChange}
+          onFocus={onFocus}
+          onBlur={onBlur}
+          value={value}
+          defaultValue={defaultValue}
+        />
+        {icon?.delete.open && (
+          <div className={s.icon__clear} onClick={icon.delete.onClick}>
+            {/* <ClearIcon size="1.2rem" /> */}
+            {icon.delete.element}
+          </div>
+        )}
+      </div>
     </div>
   );
 };
