@@ -184,7 +184,7 @@ export const columns = [
       <>
         {info.getValue() ? (
           <p style={{ width: "110px", textAlign: "center" }}>
-            {info.getValue()}%
+            {info.getValue()}
           </p>
         ) : (
           <p style={{ width: "110px", textAlign: "center" }}>-- --</p>

@@ -71,7 +71,12 @@ export const DashboardScreen: FC = () => {
                 }}
               >
                 <div
-                  style={{ display: "flex", gap: "1rem", marginBottom: "1rem" }}
+                  style={{
+                    display: "flex",
+                    gap: "1rem",
+                    marginBottom: "1rem",
+                    flexWrap: "wrap",
+                  }}
                 >
                   <div style={{ display: "flex", gap: "1rem" }}>
                     <div
@@ -125,11 +130,9 @@ export const DashboardScreen: FC = () => {
                 </div>
 
                 <div className={s.section__charts}>
-                  <div style={{}}>
-                    {calendarEarning && (
-                      <CalendarEarnings calendarEarning={calendarEarning} />
-                    )}
-                  </div>
+                  {calendarEarning && (
+                    <CalendarEarnings calendarEarning={calendarEarning} />
+                  )}
 
                   <div
                     style={{

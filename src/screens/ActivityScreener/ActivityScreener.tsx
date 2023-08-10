@@ -19,7 +19,14 @@ export const ActivityScreener = () => {
       {user && (
         <>
           <Header />
-          <div style={{ margin: "0 auto", width: "1280px", padding: "1rem 0" }}>
+          <div
+            style={{
+              margin: "0 auto",
+              // maxWidth: "1280px",
+              padding: "1rem 1rem",
+              overflow: "auto",
+            }}
+          >
             <DynamicTableActivity />
           </div>
         </>

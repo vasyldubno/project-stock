@@ -20,7 +20,7 @@ export const CalendarEarnings: FC<CalendarEarningsProps> = ({
             border: "1px solid var(--color-gray)",
             padding: "1rem",
             borderRadius: "1rem",
-            width: "500px",
+            width: "100%",
             display: "flex",
             flexDirection: "column",
             gap: "1rem",
@@ -31,6 +31,7 @@ export const CalendarEarnings: FC<CalendarEarningsProps> = ({
               textAlign: "center",
               fontWeight: "bold",
               fontSize: "1.2rem",
+              width: "100%",
             }}
           >
             Calendar Earnings
@@ -44,7 +45,9 @@ export const CalendarEarnings: FC<CalendarEarningsProps> = ({
                   display: "flex",
                   alignItems: "center",
                   gap: "1rem",
+                  width: "100%",
                 }}
+                className={s.content}
               >
                 <div
                   style={{
@@ -65,7 +68,6 @@ export const CalendarEarnings: FC<CalendarEarningsProps> = ({
                 <div style={{ display: "flex", gap: "0.5rem" }}>
                   <p>{item.name}</p>
                   <p>||</p>
-                  {/* <p className={s.item__ticker}>{item.ticker}</p> */}
                   <Link
                     href={`/stock/${item.ticker}`}
                     className={s.item__ticker}

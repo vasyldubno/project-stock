@@ -1,56 +1,28 @@
-import { PortfolioService } from "@/services/PortfolioService";
-import { ISupaTransaction } from "@/types/types";
+import { TableDivider } from "@/components/TableDivider/TableDivider";
+import { ArrowRight } from "@/icons/ArrowRight";
+import { SortIcon } from "@/icons/SortIcon";
+import { ISupaExit } from "@/types/types";
 import {
   SortingState,
-  createColumnHelper,
   flexRender,
   getCoreRowModel,
   getSortedRowModel,
   useReactTable,
 } from "@tanstack/react-table";
-import { useEffect, useState } from "react";
-import { SortIcon } from "@/icons/SortIcon";
-import moment from "moment";
+import { FC, useState } from "react";
+import s from "./styles.module.scss";
+import { columns } from "./table";
 
-export const TableActivity = () => {
-  const [data, setData] = useState<ISupaTransaction[]>([]);
+type Props = {
+  portfolioId: string;
+  data: ISupaExit[];
+};
+
+export const TableSoldOut: FC<Props> = ({ portfolioId, data }) => {
   const [sorting, setSorting] = useState<SortingState>([]);
 
-  useEffect(() => {
-    PortfolioService.getTransactions().then((res) => setData(res));
-  }, []);
-
-  const columnHelper = createColumnHelper<ISupaTransaction>();
-
-  const columns = [
-    columnHelper.accessor("ticker", {
-      header: "Ticker",
-      cell: (info) => <p style={{ textAlign: "center" }}>{info.getValue()}</p>,
-    }),
-    columnHelper.accessor("count", {
-      header: "Amount Shares",
-      cell: (info) => <p style={{ textAlign: "center" }}>{info.getValue()}</p>,
-    }),
-    columnHelper.accessor("date", {
-      header: "Date",
-      cell: (info) => (
-        <p style={{ textAlign: "center" }}>
-          {moment(info.getValue()).format("DD.MM.YYYY")}
-        </p>
-      ),
-    }),
-    columnHelper.accessor("type", {
-      header: "Type",
-      cell: (info) => <p style={{ textAlign: "center" }}>{info.getValue()}</p>,
-    }),
-    columnHelper.accessor("change", {
-      header: "Change",
-      cell: (info) => <p style={{ textAlign: "center" }}>{info.getValue()}</p>,
-    }),
-  ];
-
   const table = useReactTable({
-    columns,
+    columns: columns,
     data,
     getCoreRowModel: getCoreRowModel(),
     getSortedRowModel: getSortedRowModel(),
@@ -76,15 +48,8 @@ export const TableActivity = () => {
   };
 
   return (
-    <>
-      <table
-        style={{
-          width: "100%",
-          overflowX: "scroll",
-          border: "1px solid var(--color-gray)",
-          borderCollapse: "collapse",
-        }}
-      >
+    <div style={{ overflow: "auto" }}>
+      <table className={s.table}>
         <thead>
           {table.getHeaderGroups().map((headerGroup, headerGroupIndex) => (
             <tr key={`${headerGroup.id}-${headerGroupIndex}`}>
@@ -92,17 +57,13 @@ export const TableActivity = () => {
                 <th
                   key={`${header.id}-${headerIndex}`}
                   onClick={toggleSortingHandler(header.column.id)}
-                  style={{
-                    border: "1px solid var(--color-gray)",
-                    padding: "5px 0",
-                  }}
                 >
                   {header.isPlaceholder ? null : (
                     <div
                       style={{
                         display: "flex",
                         justifyContent: "center",
-                        gap: "0.3rem",
+                        gap: "1rem",
                       }}
                     >
                       <div style={{ cursor: "pointer" }}>
@@ -140,21 +101,32 @@ export const TableActivity = () => {
         {table.getRowModel().rows.map((row, rowIndex) => (
           <tbody key={`data-${row.id}-${rowIndex}`}>
             <tr>
+              <td colSpan={columns.length + 2}>
+                <TableDivider />
+              </td>
+            </tr>
+            <tr>
               {row.getVisibleCells().map((cell, cellIndex) => (
                 <td
                   key={`${cell.id}-${cellIndex}`}
-                  style={{
-                    padding: "5px 5px",
-                    border: "1px solid var(--color-gray)",
-                  }}
+                  style={{ padding: "5px 0" }}
                 >
                   {flexRender(cell.column.columnDef.cell, cell.getContext())}
                 </td>
               ))}
+              <td>
+                <div
+                  style={{
+                    padding: "5px 0",
+                    display: "flex",
+                    justifyContent: "center",
+                  }}
+                ></div>
+              </td>
             </tr>
           </tbody>
         ))}
       </table>
-    </>
+    </div>
   );
 };

@@ -421,14 +421,31 @@ export class PortfolioService {
       .from("stock_portfolio")
       .select()
       .eq("portfolio_id", portfolio?.id);
+
     if (supaStockPortfolio.data) {
-      const result = supaStockPortfolio.data.reduce(
-        (acc, item) =>
-          (acc +=
-            Number(item.amount_active_shares) * Number(item.price_current)),
-        0
-      );
-      return result;
+      const tickers = supaStockPortfolio.data.map((item) => item.ticker);
+
+      if (tickers) {
+        const supaStock = await supabaseClient
+          .from("stock")
+          .select()
+          .in("ticker", tickers);
+
+        if (supaStock.data) {
+          const result = supaStock.data.reduce(
+            (acc, stock) =>
+              (acc +=
+                Number(stock.price_current) *
+                Number(
+                  supaStockPortfolio.data.find(
+                    (stockPortfolio) => stockPortfolio.ticker === stock.ticker
+                  )?.amount_active_shares
+                )),
+            0
+          );
+          return ROUND(result);
+        }
+      }
     }
   }
 

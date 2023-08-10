@@ -10,6 +10,7 @@ import { useEffect, useState } from "react";
 import { QueryClient, useQuery } from "react-query";
 import { Item } from "./Item/Item";
 import { TableDivider } from "@/components/TableDivider/TableDivider";
+import { TableSoldOut } from "./TableSoldOut/TableSoldOut";
 
 export const SoldOutScreener = () => {
   const [portfolios, setPortfolios] = useState<ISupaPortfolio[] | null>(null);
@@ -20,7 +21,7 @@ export const SoldOutScreener = () => {
   const user = useUser();
 
   useQuery({
-    queryKey: ["portfolios"],
+    queryKey: ["portfolios", { user }],
     queryFn: () => PortfolioService.getPortfolios(user),
     enabled: !!user,
     onSuccess(data) {
@@ -62,7 +63,11 @@ export const SoldOutScreener = () => {
               />
             )}
 
-            {exits && exits.length > 0 && (
+            {exits && selectedPortfolio && (
+              <TableSoldOut data={exits} portfolioId={selectedPortfolio?.id} />
+            )}
+
+            {/* {exits && exits.length > 0 && (
               <>
                 <div
                   style={{
@@ -71,12 +76,12 @@ export const SoldOutScreener = () => {
                     marginTop: "0.5rem",
                   }}
                 >
-                  <p style={{ width: "33%", fontWeight: "bold" }}>Ticker</p>
-                  <p style={{ width: "33%", fontWeight: "bold" }}>
+                  <p style={{ width: "25%", fontWeight: "bold" }}>Ticker</p>
+                  <p style={{ width: "25%", fontWeight: "bold" }}>
                     Average Buy Price
                   </p>
-                  <p style={{ width: "33%", fontWeight: "bold" }}>Exit Date</p>
-                  <p style={{ width: "33%", fontWeight: "bold" }}>Margin</p>
+                  <p style={{ width: "25%", fontWeight: "bold" }}>Exit Date</p>
+                  <p style={{ width: "25%", fontWeight: "bold" }}>Margin</p>
                 </div>
                 <div style={{ marginBottom: "0.5rem" }}>
                   <TableDivider />
@@ -85,7 +90,7 @@ export const SoldOutScreener = () => {
                   <Item key={exit.id} exit={exit} />
                 ))}
               </>
-            )}
+            )} */}
           </Container>
         </>
       )}

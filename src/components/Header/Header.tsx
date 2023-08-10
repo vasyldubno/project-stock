@@ -8,6 +8,7 @@ import s from "./Header.module.scss";
 import { UserIcon } from "@/icons/UserIcon";
 import { Popover } from "../Popover/Popover";
 import { useBalance } from "./queries";
+import { DropdownMenu } from "../DropdownMenu/DropdownMenu";
 
 type Link = {
   link: string;
@@ -31,7 +32,9 @@ export const Header: FC = () => {
   return (
     <div className={s.wrapper}>
       <div className={s.content}>
-        <nav>
+        <DropdownMenu />
+        <h1 className={s.title}>Stocker</h1>
+        {/* <nav>
           <ul className={s.ul}>
             {links.map((link, index) => (
               <li key={index}>
@@ -47,7 +50,7 @@ export const Header: FC = () => {
               </li>
             ))}
           </ul>
-        </nav>
+        </nav> */}
         <div className={s.user}>
           <Popover
             trigger={<UserIcon size="2rem" />}
