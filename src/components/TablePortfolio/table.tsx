@@ -41,6 +41,18 @@ export const columns = [
       </>
     ),
   }),
+  columnHelper.accessor("price_growth_todat_perc", {
+    header: "Today's Gain",
+    cell: ({ getValue }) => (
+      <>
+        {getValue() ? (
+          <TableCardPrice content={getValue()?.toFixed(2)} />
+        ) : (
+          <TableCardPrice content={0} />
+        )}
+      </>
+    ),
+  }),
   columnHelper.accessor("price_current", {
     header: "Market Price",
     cell: (info) => (

@@ -7,12 +7,17 @@ import { FC } from "react";
 import { ChartTradingView } from "../../components/ChartTradingView/ChartTradingView";
 import millify from "millify";
 import { Header } from "@/components/Header/Header";
+import { ROUND } from "@/utils/round";
 
 type Props = {
   data: ISupaStock | null;
 };
 
 const TickerPage: FC<Props> = ({ data }) => {
+  const yearRange = ROUND(
+    (Number(data?.price_current) / Number(data?.price_year_high)) * 100
+  );
+
   return (
     <>
       <header>
@@ -187,6 +192,36 @@ const TickerPage: FC<Props> = ({ data }) => {
                   Dividend Increase Track Record:{" "}
                   {data.dividend_increase_track_record} years
                 </p>
+              </div>
+
+              <div
+                style={{
+                  border: "1px solid var(--color-gray)",
+                  borderRadius: "0.5rem",
+                  width: "fit-content",
+                  padding: "1rem",
+                  display: "flex",
+                  gap: "1rem",
+                }}
+              >
+                <p>52 Year Range:</p>
+                <div
+                  style={{
+                    width: "140px",
+                    height: "25px",
+                    border: "1px solid black",
+                    borderRadius: "0.2rem",
+                    overflow: "hidden",
+                  }}
+                >
+                  <div
+                    style={{
+                      backgroundColor: yearRange > 60 ? "red" : "green",
+                      width: `${yearRange}%`,
+                      height: "100%",
+                    }}
+                  />
+                </div>
               </div>
             </div>
             <ChartTradingView data={data} />

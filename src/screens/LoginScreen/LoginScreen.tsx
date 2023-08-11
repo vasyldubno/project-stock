@@ -10,7 +10,7 @@ export const LoginScreen = () => {
   };
 
   return (
-    <div style={{ margin: "1rem auto", width: "500px" }}>
+    <div style={{ margin: "1rem auto", padding: "0 1rem", maxWidth: "500px" }}>
       <FormLogin afterSubmit={afterSubmit} />
       <p style={{ textAlign: "center", fontSize: "0.8rem", marginTop: "2rem" }}>
         If you don&apos;t have account,{" "}

@@ -29,7 +29,6 @@ export const Select: FC<Props> = ({
             width: "100%",
           }}
           onChange={onChange}
-          defaultValue={defaultValue ?? "-- --"}
           value={value ?? "-- --"}
         >
           <option value={""}>-- --</option>

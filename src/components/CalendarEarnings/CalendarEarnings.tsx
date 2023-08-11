@@ -21,9 +21,11 @@ export const CalendarEarnings: FC<CalendarEarningsProps> = ({
             padding: "1rem",
             borderRadius: "1rem",
             width: "100%",
+            maxWidth: "500px",
             display: "flex",
             flexDirection: "column",
             gap: "1rem",
+            height: "fit-content",
           }}
         >
           <p

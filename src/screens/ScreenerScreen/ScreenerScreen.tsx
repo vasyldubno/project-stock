@@ -7,13 +7,12 @@ import { ScreenerFilter } from "@/components/ScreenerFilter/ScreenerFilter";
 import { TableScreener } from "@/components/TableScreener/TableScreener";
 import { TabsPortfolio } from "@/components/TabsPortfolio/TabsPortfolio";
 import { useUser } from "@/hooks/useUser";
+import { DeleteIcon } from "@/icons/DeleteIcon";
+import { ScreenerService } from "@/services/ScreenerService";
 import { ISupaScreener } from "@/types/types";
 import { useEffect, useState } from "react";
 import { useScreeners, useStocks } from "./queries";
 import { supaScreenerDelete, supaScreenerInsert } from "./supabase";
-import { supabaseClient } from "@/config/supabaseClient";
-import { ScreenerService } from "@/services/ScreenerService";
-import { DeleteIcon } from "@/icons/DeleteIcon";
 
 export const ScreenerScreen = () => {
   const [isOpen, setIsOpen] = useState(false);

@@ -276,6 +276,25 @@ export class PortfolioService {
     return result;
   }
 
+  static async getDividendIncomeByYear(
+    year: number,
+    portfolio: ISupaPortfolio | null
+  ) {
+    const resposne = await supabaseClient
+      .from("dividend")
+      .select()
+      .eq("portfolio_id", portfolio?.id)
+      .eq("year", year);
+
+    if (resposne.data) {
+      const result = resposne.data.reduce(
+        (acc, item) => (acc += item.totalAmount),
+        0
+      );
+      return ROUND(result);
+    }
+  }
+
   static async getUpcomingDividends(portfolio: ISupaPortfolio | null) {
     const result = [
       {
@@ -370,6 +389,47 @@ export class PortfolioService {
       }
 
       return result;
+    }
+  }
+
+  static async getDividendsListByYear(
+    portfolio: ISupaPortfolio | null,
+    year: number
+  ) {
+    const result = await supabaseClient
+      .from("dividend")
+      .select()
+      .order("payDate", { ascending: false })
+      .eq("portfolio_id", portfolio?.id)
+      .eq("year", year);
+
+    if (result.data) {
+      return result.data;
+    }
+    return null;
+  }
+
+  static async getUpcomingDividendsList(portfolio: ISupaPortfolio | null) {
+    const supaStockPortfolio = await supabaseClient
+      .from("stock_portfolio")
+      .select()
+      .eq("portfolio_id", portfolio?.id)
+      .eq("is_trading", true);
+
+    if (supaStockPortfolio.data) {
+      const tickers = supaStockPortfolio.data.map((item) => item.ticker);
+
+      const response = await supabaseClient
+        .from("stock")
+        .select()
+        .in("ticker", tickers)
+        .not("dividend_upcoming_value", "is", null)
+        .order("dividend_upcoming_date", { ascending: true });
+
+      if (response.data) {
+        return response.data;
+      }
+      return null;
     }
   }
 

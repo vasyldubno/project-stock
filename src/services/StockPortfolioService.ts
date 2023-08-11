@@ -57,6 +57,7 @@ export class StockPortfolioService {
           dividend_upcoming_value:
             supaStock.data?.dividend_upcoming_value ?? null,
           perc_of_portfolio: percOfPortfolio,
+          price_growth_todat_perc: supaStock.data?.price_growth_today_perc,
         };
 
         return result;

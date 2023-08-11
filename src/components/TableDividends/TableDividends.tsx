@@ -1,7 +1,6 @@
-import { TableDivider } from "@/components/TableDivider/TableDivider";
 import { ArrowRight } from "@/icons/ArrowRight";
 import { SortIcon } from "@/icons/SortIcon";
-import { ISupaExit } from "@/types/types";
+import { ISupaDividend, ISupaStockPortfolio } from "@/types/types";
 import {
   SortingState,
   flexRender,
@@ -10,16 +9,21 @@ import {
   useReactTable,
 } from "@tanstack/react-table";
 import { FC, useState } from "react";
+import { TableDetails } from "../TableDetails/TableDetails";
+import { TableDivider } from "../TableDivider/TableDivider";
 import s from "./styles.module.scss";
 import { columns } from "./table";
 
 type Props = {
-  portfolioId: string;
-  data: ISupaExit[];
+  data: ISupaDividend[];
 };
 
-export const TableSoldOut: FC<Props> = ({ portfolioId, data }) => {
+export const TableDividends: FC<Props> = ({ data }) => {
   const [sorting, setSorting] = useState<SortingState>([]);
+  const [selectedTicker, setSelectedTicker] = useState<string[]>([]);
+  const [selectedStock, setSelectedStock] =
+    useState<ISupaStockPortfolio | null>(null);
+  const [isOpenModal, setIsOpenModal] = useState(false);
 
   const table = useReactTable({
     columns: columns,
@@ -48,7 +52,7 @@ export const TableSoldOut: FC<Props> = ({ portfolioId, data }) => {
   };
 
   return (
-    <div style={{ overflow: "auto", padding: "1rem 0" }}>
+    <div style={{ overflow: "auto", maxHeight: "300px" }}>
       <table className={s.table}>
         <thead>
           {table.getHeaderGroups().map((headerGroup, headerGroupIndex) => (
@@ -72,7 +76,7 @@ export const TableSoldOut: FC<Props> = ({ portfolioId, data }) => {
                           header.getContext()
                         )}
                       </div>
-                      {/* {sorting.some((sort) => sort.id === header.column.id) ? (
+                      {sorting.some((sort) => sort.id === header.column.id) ? (
                         <span style={{ display: "flex", alignItems: "center" }}>
                           {sorting.find((sort) => sort.id === header.column.id)
                             ?.desc ? (
@@ -89,7 +93,7 @@ export const TableSoldOut: FC<Props> = ({ portfolioId, data }) => {
                             height: "1rem",
                           }}
                         ></div>
-                      )} */}
+                      )}
                     </div>
                   )}
                 </th>
@@ -109,21 +113,25 @@ export const TableSoldOut: FC<Props> = ({ portfolioId, data }) => {
               {row.getVisibleCells().map((cell, cellIndex) => (
                 <td
                   key={`${cell.id}-${cellIndex}`}
-                  style={{ padding: "5px 10px" }}
+                  style={{ padding: "5px 0" }}
                 >
                   {flexRender(cell.column.columnDef.cell, cell.getContext())}
                 </td>
               ))}
-              <td>
-                <div
-                  style={{
-                    padding: "5px 0",
-                    display: "flex",
-                    justifyContent: "center",
-                  }}
-                ></div>
-              </td>
             </tr>
+            {selectedTicker.includes(row.original.ticker) && (
+              <>
+                <tr>
+                  <td colSpan={columns.length + 2}>
+                    <TableDetails
+                      ticker={selectedTicker.find((item) =>
+                        item.includes(row.original.ticker)
+                      )}
+                    />
+                  </td>
+                </tr>
+              </>
+            )}
           </tbody>
         ))}
       </table>

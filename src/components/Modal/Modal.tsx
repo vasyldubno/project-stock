@@ -1,7 +1,7 @@
 import { FC, PropsWithChildren, useEffect, useRef, useState } from "react";
 import { Portal } from "../Portal/Portal";
 import { useOnClickOutside } from "@/hooks/useOnClickOutside";
-import s from "./Modal.module.css";
+import s from "./styles.module.scss";
 
 interface ModalProps {
   open: boolean;

@@ -31,5 +31,3 @@ export const DividendIcon: FC<DividendIconProps> = ({ size }) => {
     </svg>
   );
 };
-
-// <style>.cls-1{fill:none;stroke:#020202;stroke-linecap:square;stroke-miterlimit:10;stroke-width:2px;}</style>

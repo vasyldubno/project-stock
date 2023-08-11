@@ -1,5 +1,7 @@
 .tab_list {
   border-bottom: 1px solid black;
+  overflow: auto;
+  white-space: nowrap;
 }
 
 .tab {

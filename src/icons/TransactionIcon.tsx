@@ -14,7 +14,6 @@ export const TransactionIcon: FC<TransactionIcon> = ({ size }) => {
       stroke="#020202"
       strokeWidth="2px"
       strokeMiterlimit={10}
-      // strokeLinecap="square"
       fill="none"
     >
       <g id="reciept_alternatif" data-name="reciept alternatif">

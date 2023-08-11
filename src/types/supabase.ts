@@ -272,6 +272,7 @@ export interface Database {
           analystRatingBuy: number | null
           annualDividend: number | null
           beta: number | null
+          country: string | null
           created_at: string | null
           de: number | null
           dividend_increase_track_record: number | null
@@ -295,6 +296,7 @@ export interface Database {
           pe: number | null
           price_current: number | null
           price_growth: number | null
+          price_growth_today_perc: number | null
           price_target: number | null
           price_year_high: number | null
           report_date: string | null
@@ -307,6 +309,7 @@ export interface Database {
           analystRatingBuy?: number | null
           annualDividend?: number | null
           beta?: number | null
+          country?: string | null
           created_at?: string | null
           de?: number | null
           dividend_increase_track_record?: number | null
@@ -330,6 +333,7 @@ export interface Database {
           pe?: number | null
           price_current?: number | null
           price_growth?: number | null
+          price_growth_today_perc?: number | null
           price_target?: number | null
           price_year_high?: number | null
           report_date?: string | null
@@ -342,6 +346,7 @@ export interface Database {
           analystRatingBuy?: number | null
           annualDividend?: number | null
           beta?: number | null
+          country?: string | null
           created_at?: string | null
           de?: number | null
           dividend_increase_track_record?: number | null
@@ -365,6 +370,7 @@ export interface Database {
           pe?: number | null
           price_current?: number | null
           price_growth?: number | null
+          price_growth_today_perc?: number | null
           price_target?: number | null
           price_year_high?: number | null
           report_date?: string | null

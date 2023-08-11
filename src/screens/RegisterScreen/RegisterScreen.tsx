@@ -9,7 +9,7 @@ export const RegisterScreen = () => {
   };
 
   return (
-    <div style={{ width: "500px", margin: "1rem auto" }}>
+    <div style={{ maxWidth: "500px", margin: "1rem auto", padding: "0 1rem" }}>
       <FormRegister afterSubmit={afterSubmit} />
     </div>
   );

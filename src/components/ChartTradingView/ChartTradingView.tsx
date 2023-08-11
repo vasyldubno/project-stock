@@ -39,21 +39,24 @@ export const ChartTradingView: FC<Props> = ({ data }) => {
 
     function createWidget() {
       if (
-        document.getElementById("tradingview_4c89e") &&
+        document.getElementById("tradingview_e500f") &&
         "TradingView" in window
       ) {
         // @ts-ignore
         new window.TradingView.widget({
           autosize: true,
           symbol: `${data.exchange}:${data.ticker}`,
-          interval: "D",
           timezone: "Etc/UTC",
           theme: "light",
           style: "3",
           locale: "en",
           enable_publishing: false,
-          allow_symbol_change: true,
-          container_id: "tradingview_4c89e",
+          hide_top_toolbar: true,
+          hide_legend: true,
+          withdateranges: true,
+          range: "YTD",
+          save_image: false,
+          container_id: "tradingview_e500f",
         });
       }
     }
@@ -61,7 +64,7 @@ export const ChartTradingView: FC<Props> = ({ data }) => {
 
   return (
     <div className="tradingview-widget-container">
-      <div id="tradingview_4c89e" style={{ width: "100%", height: "500px" }} />
+      <div id="tradingview_e500f" style={{ width: "100%", height: "500px" }} />
       <div className="tradingview-widget-copyright">
         <a
           href="https://www.tradingview.com/"

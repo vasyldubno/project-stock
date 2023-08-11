@@ -1,16 +1,12 @@
 import { STOCKS } from "@/assets/stock";
-import { Header } from "@/components/Header/Header";
-import { Input } from "@/components/Input/Input";
-import { ChangeEvent, useEffect, useState } from "react";
-import s from "./styles.module.scss";
-import { useQuery } from "react-query";
-import { supabaseClient } from "@/config/supabaseClient";
-import { useStocks } from "./queries";
-import { TableCompare } from "@/components/TableCompare/TableCompare";
-import { Select } from "@/components/Select/Select";
 import { Button } from "@/components/Button/Button";
-import { Modal } from "@/components/Modal/Modal";
 import { Container } from "@/components/Container/Container";
+import { Header } from "@/components/Header/Header";
+import { Modal } from "@/components/Modal/Modal";
+import { Select } from "@/components/Select/Select";
+import { TableCompare } from "@/components/TableCompare/TableCompare";
+import { ChangeEvent, useState } from "react";
+import { useStocks } from "./queries";
 
 export const CompareScreener = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -54,6 +50,7 @@ export const CompareScreener = () => {
               onChange={(e: ChangeEvent<HTMLSelectElement>) => {
                 setSelectedTicker(e.target.value);
               }}
+              value={selectedTicker}
             />
           </div>
           <Button

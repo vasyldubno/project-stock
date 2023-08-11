@@ -1,5 +1,12 @@
 import { ISupaScreener } from "@/types/types";
-import { ChangeEvent, Dispatch, FC, SetStateAction, useState } from "react";
+import {
+  ChangeEvent,
+  Dispatch,
+  FC,
+  SetStateAction,
+  useEffect,
+  useState,
+} from "react";
 import { Select } from "../Select/Select";
 import { STOCKS } from "@/assets/stock";
 import { Input } from "../Input/Input";
@@ -17,6 +24,15 @@ export const ScreenerFilter: FC<Props> = ({
 }) => {
   const [selectedSector, setSelectedSector] = useState<string | null>(null);
   const [selectedIndustry, setSelectedIndustry] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (screener && screener.sector) {
+      setSelectedSector(screener.sector);
+    }
+    if (screener && screener.industry) {
+      setSelectedIndustry(screener.industry);
+    }
+  }, [screener]);
 
   return (
     <>

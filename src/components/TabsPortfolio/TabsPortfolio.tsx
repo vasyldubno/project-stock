@@ -1,7 +1,5 @@
 import { FC, ReactNode, useState } from "react";
 import s from "./Tabs.module.scss";
-import { LostIcon } from "@/icons/LotsIcon";
-import { ScreenerService } from "@/services/ScreenerService";
 
 interface TabsProps {
   tabs: {

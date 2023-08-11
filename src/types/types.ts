@@ -21,6 +21,7 @@ export interface ISupaStockPortfolio {
   dividend_upcoming_value: number | null;
   perc_of_portfolio: number;
   last_change_portfolio: string | null;
+  price_growth_todat_perc?: number | null;
 }
 
 interface INasdaqDividends {
@@ -211,4 +212,17 @@ export interface ISupaExit {
 export interface IUser {
   email: string | null;
   id: string | null;
+}
+
+export interface ISupaDividend {
+  amount_shares: number;
+  created_at: string | null;
+  dividendValue: number;
+  dividendYield: number;
+  id: string;
+  payDate: string;
+  portfolio_id: string;
+  ticker: string;
+  totalAmount: number;
+  year: number;
 }

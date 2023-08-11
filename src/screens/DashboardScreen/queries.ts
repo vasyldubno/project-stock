@@ -41,12 +41,51 @@ export const useDividendIncomeInMonth = (
   return data ?? null;
 };
 
+export const useDividendIncomeByYear = (
+  selectedPortfolio: ISupaPortfolio | null
+) => {
+  const { data } = useQuery({
+    queryKey: ["dividendIncomeByYear", { selectedPortfolio }],
+    queryFn: () =>
+      PortfolioService.getDividendIncomeByYear(
+        new Date().getUTCFullYear(),
+        selectedPortfolio
+      ),
+    enabled: !!selectedPortfolio,
+  });
+  return data ?? null;
+};
+
 export const useUpcomingDividends = (
   selectedPortfolio: ISupaPortfolio | null
 ) => {
   const { data } = useQuery({
     queryKey: ["upcomingDividends", { selectedPortfolio }],
     queryFn: () => PortfolioService.getUpcomingDividends(selectedPortfolio),
+    enabled: !!selectedPortfolio,
+  });
+  return data ?? null;
+};
+
+export const useDividendsList = (selectedPortfolio: ISupaPortfolio | null) => {
+  const { data } = useQuery({
+    queryKey: ["dividendList", { selectedPortfolio }],
+    queryFn: () =>
+      PortfolioService.getDividendsListByYear(
+        selectedPortfolio,
+        new Date().getUTCFullYear()
+      ),
+    enabled: !!selectedPortfolio,
+  });
+  return data ?? null;
+};
+
+export const useUpcomingDividendsList = (
+  selectedPortfolio: ISupaPortfolio | null
+) => {
+  const { data } = useQuery({
+    queryKey: ["upcomingDividendsList", { selectedPortfolio }],
+    queryFn: () => PortfolioService.getUpcomingDividendsList(selectedPortfolio),
     enabled: !!selectedPortfolio,
   });
   return data ?? null;
