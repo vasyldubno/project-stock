@@ -15,14 +15,15 @@ import {
 } from "./supabase";
 import { DeleteIcon } from "@/icons/DeleteIcon";
 import { PortfolioService } from "@/services/PortfolioService";
+import { TablePortfolio } from "@/components/TablePortfolio/TablePortfolio";
 
-const TablePortfolioDynamic = dynamic(
-  () =>
-    import("@/components/TablePortfolio/TablePortfolio").then(
-      (res) => res.TablePortfolio
-    ),
-  { ssr: false }
-);
+// const TablePortfolioDynamic = dynamic(
+//   () =>
+//     import("@/components/TablePortfolio/TablePortfolio").then(
+//       (res) => res.TablePortfolio
+//     ),
+//   { ssr: false }
+// );
 
 export const PortfolioScreen = () => {
   const [portfolios, setPortfolios] = useState<ISupaPortfolio[] | null>(null);
@@ -99,7 +100,7 @@ export const PortfolioScreen = () => {
                     <p>Loading...</p>
                   ) : selectedPortfolio && stocks && stocks?.length > 0 ? (
                     <div style={{ margin: "1rem" }}>
-                      <TablePortfolioDynamic
+                      <TablePortfolio
                         portfolioId={selectedPortfolio.id}
                         data={stocks}
                       />
