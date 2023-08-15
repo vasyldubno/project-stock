@@ -5,8 +5,8 @@ type Props = {
   onChange: (props?: any) => void;
   data: string[] | null;
   label?: string;
-  defaultValue?: string | null;
-  value?: string | null;
+  defaultValue?: string;
+  value?: string | number;
 };
 
 export const Select: FC<Props> = ({
@@ -25,9 +25,10 @@ export const Select: FC<Props> = ({
             <select
               className={s.select}
               onChange={onChange}
-              value={value ?? "-- --"}
+              value={value}
+              defaultValue={defaultValue}
             >
-              {/* <option value={""}>-- --</option> */}
+              <option value={""}>-- --</option>
               {data.map((item, index) => (
                 <option key={index} value={item}>
                   {item}

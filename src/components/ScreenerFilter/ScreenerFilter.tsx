@@ -12,6 +12,9 @@ import { STOCKS } from "@/assets/stock";
 import { Input } from "../Input/Input";
 import s from "./styles.module.scss";
 import { ClearIcon } from "@/icons/ClearIcon";
+import { useUpdateScreener } from "./queries";
+import { MutationKey, useMutation, useQueryClient } from "react-query";
+import { supabaseClient } from "@/config/supabaseClient";
 
 type Props = {
   screener: ISupaScreener | null;
@@ -34,6 +37,8 @@ export const ScreenerFilter: FC<Props> = ({
     }
   }, [screener]);
 
+  const updateScreener = useUpdateScreener();
+
   return (
     <>
       {screener && (
@@ -53,11 +58,17 @@ export const ScreenerFilter: FC<Props> = ({
                   }
                   return null;
                 });
+                updateScreener.mutate({
+                  field: "sector",
+                  value: e.target.value,
+                  screener,
+                });
               }}
               label="Sector"
-              value={screener.sector}
+              value={screener.sector ?? ""}
             />
           </div>
+
           <div className={s.grid__item}>
             <Select
               data={
@@ -79,11 +90,17 @@ export const ScreenerFilter: FC<Props> = ({
                   }
                   return null;
                 });
+                updateScreener.mutate({
+                  field: "industry",
+                  value: e.target.value,
+                  screener,
+                });
               }}
               label="Industry"
-              value={screener.industry}
+              value={screener.industry ?? ""}
             />
           </div>
+
           <div className={s.grid__item}>
             <Input
               value={screener.roe ?? ""}
@@ -97,6 +114,11 @@ export const ScreenerFilter: FC<Props> = ({
                     };
                   }
                   return null;
+                });
+                updateScreener.mutate({
+                  field: "roe",
+                  value: e.target.value,
+                  screener,
                 });
               }}
               icon={{
@@ -132,6 +154,11 @@ export const ScreenerFilter: FC<Props> = ({
                   }
                   return null;
                 });
+                updateScreener.mutate({
+                  field: "pe",
+                  value: e.target.value,
+                  screener,
+                });
               }}
               icon={{
                 delete: {
@@ -165,6 +192,11 @@ export const ScreenerFilter: FC<Props> = ({
                     };
                   }
                   return null;
+                });
+                updateScreener.mutate({
+                  field: "de",
+                  value: e.target.value,
+                  screener,
                 });
               }}
               icon={{
@@ -200,6 +232,11 @@ export const ScreenerFilter: FC<Props> = ({
                   }
                   return null;
                 });
+                updateScreener.mutate({
+                  field: "payout_ratio",
+                  value: e.target.value,
+                  screener,
+                });
               }}
               icon={{
                 delete: {
@@ -233,6 +270,11 @@ export const ScreenerFilter: FC<Props> = ({
                     };
                   }
                   return null;
+                });
+                updateScreener.mutate({
+                  field: "dividend_yield",
+                  value: e.target.value,
+                  screener,
                 });
               }}
               icon={{
@@ -269,6 +311,11 @@ export const ScreenerFilter: FC<Props> = ({
                   }
                   return null;
                 });
+                updateScreener.mutate({
+                  field: "analyst",
+                  value: e.target.value,
+                  screener,
+                });
               }}
               icon={{
                 delete: {
@@ -304,6 +351,11 @@ export const ScreenerFilter: FC<Props> = ({
                   }
                   return null;
                 });
+                updateScreener.mutate({
+                  field: "margin_safety",
+                  value: e.target.value,
+                  screener,
+                });
               }}
               icon={{
                 delete: {
@@ -338,6 +390,11 @@ export const ScreenerFilter: FC<Props> = ({
                     };
                   }
                   return null;
+                });
+                updateScreener.mutate({
+                  field: "priceGrowth",
+                  value: e.target.value,
+                  screener,
                 });
               }}
               icon={{

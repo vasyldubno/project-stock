@@ -36,7 +36,12 @@ export const useScreeners = (
     onSuccess(data) {
       if (data.data) {
         setScreeners(data.data);
-        setSelectedScreener(data.data[0]);
+        setSelectedScreener((prev) => {
+          if (!prev) {
+            return data.data[0];
+          }
+          return prev;
+        });
       }
     },
   });

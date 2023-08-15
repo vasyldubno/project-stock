@@ -17,8 +17,8 @@
 // }
 
 .DropdownMenuContent {
-  min-width: 220px;
-  max-width: 100dvw;
+  // min-width: 220px;
+  // max-width: 100dvw;
   width: 100%;
   background-color: white;
   border-radius: 6px;
@@ -28,6 +28,9 @@
   animation-duration: 400ms;
   animation-timing-function: cubic-bezier(0.16, 1, 0.3, 1);
   will-change: transform, opacity;
+  display: flex;
+  flex-direction: column;
+  gap: 0.1rem;
 }
 .DropdownMenuContent[data-side="top"] {
   animation-name: slideDownAndFade;
@@ -52,7 +55,7 @@
   height: 25px;
   padding: 0 5px;
   position: relative;
-  padding-left: 25px;
+  // padding-left: 25px;
   user-select: none;
   outline: none;
   cursor: pointer;

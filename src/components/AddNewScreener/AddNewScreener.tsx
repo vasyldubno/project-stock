@@ -103,17 +103,18 @@ export const AddNewScreener: FC<Props> = ({ afterSubmit }) => {
         <Controller
           name="title"
           control={control}
-          render={({ field: { onChange } }) => (
+          render={({ field: { onChange, value } }) => (
             <Input
               label="Screener name"
               name="Screener name"
               onChange={onChange}
+              value={value}
             />
           )}
         />
       </div>
 
-      <div style={{ width: "100%" }}>
+      <div className={s.fieldWrapper}>
         <Controller
           name="sector"
           control={control}
@@ -137,7 +138,7 @@ export const AddNewScreener: FC<Props> = ({ afterSubmit }) => {
         />
       </div>
 
-      <div style={{ width: "100%" }}>
+      <div className={s.fieldWrapper}>
         <Controller
           name="industry"
           control={control}
@@ -163,8 +164,8 @@ export const AddNewScreener: FC<Props> = ({ afterSubmit }) => {
             <Controller
               control={control}
               name={item.input}
-              render={({ field: { onChange } }) => (
-                <Input type="number" onChange={onChange} />
+              render={({ field: { onChange, value } }) => (
+                <Input type="number" onChange={onChange} value={value} />
               )}
             />
 
