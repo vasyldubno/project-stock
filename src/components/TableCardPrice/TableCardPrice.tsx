@@ -19,13 +19,23 @@ export const TableCardPrice: FC<CardPriceProps> = ({ content }) => {
               : "rgb(230,244,234)",
           }}
         >
-          <ArrowDown
-            size="0.8rem"
-            fill={
-              isNegative(Number(content)) ? "rgb(165,14,14)" : "rgb(19,115,51)"
-            }
-            rotate={isNegative(Number(content)) ? false : true}
-          />
+          <div
+            style={{
+              transform: isNegative(Number(content))
+                ? "rotate(0deg)"
+                : "rotate(180deg)",
+            }}
+          >
+            <ArrowDown
+              size="0.8rem"
+              fill={
+                isNegative(Number(content))
+                  ? "rgb(165,14,14)"
+                  : "rgb(19,115,51)"
+              }
+              // rotate={isNegative(Number(content)) ? false : true}
+            />
+          </div>
           <p
             style={{
               color: isNegative(Number(content))

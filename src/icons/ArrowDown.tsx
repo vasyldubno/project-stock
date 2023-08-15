@@ -3,10 +3,9 @@ import { FC } from "react";
 interface ArrowDownProps {
   fill?: string;
   size?: string;
-  rotate?: boolean;
 }
 
-export const ArrowDown: FC<ArrowDownProps> = ({ fill, size, rotate }) => {
+export const ArrowDown: FC<ArrowDownProps> = ({ fill, size }) => {
   return (
     <svg
       xmlns="http://www.w3.org/2000/svg"
@@ -14,7 +13,6 @@ export const ArrowDown: FC<ArrowDownProps> = ({ fill, size, rotate }) => {
       height={size ?? "800px"}
       viewBox="0 0 20 20"
       version="1.1"
-      transform={rotate ? "rotate(180)" : "rotate(0)"}
     >
       <title>arrow_down [#360]</title>
       <desc>Created with Sketch.</desc>
