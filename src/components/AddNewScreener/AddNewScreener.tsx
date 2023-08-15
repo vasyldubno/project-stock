@@ -8,57 +8,9 @@ import { useUser } from "@/hooks/useUser";
 import { ChangeEvent, FC, useEffect, useState } from "react";
 import { Select } from "../Select/Select";
 import { STOCKS } from "@/assets/stock";
-
-const data: {
-  label: string;
-  select:
-    | "peExpression"
-    | "roeExpression"
-    | "deExpression"
-    | "priceGrowthExpression"
-    | "marginSafetyExpression"
-    | "analystExpression"
-    | "payoutRatioExpression"
-    | "dividendYieldExpression";
-  input:
-    | "pe"
-    | "roe"
-    | "de"
-    | "priceGrowth"
-    | "marginSafety"
-    | "analyst"
-    | "payoutRatio"
-    | "dividendYield";
-}[] = [
-  { label: "PE", select: "peExpression", input: "pe" },
-  { label: "ROE", select: "roeExpression", input: "roe" },
-  { label: "Debt/Equity", select: "deExpression", input: "de" },
-  {
-    label: "Price Growth",
-    select: "priceGrowthExpression",
-    input: "priceGrowth",
-  },
-  {
-    label: "Margin of Safety",
-    select: "marginSafetyExpression",
-    input: "marginSafety",
-  },
-  {
-    label: "Analyst Rating Buy",
-    select: "analystExpression",
-    input: "analyst",
-  },
-  {
-    input: "payoutRatio",
-    label: "Payout Ratio",
-    select: "payoutRatioExpression",
-  },
-  {
-    input: "dividendYield",
-    label: "Dividend Yield",
-    select: "dividendYieldExpression",
-  },
-];
+import { data } from "./assets";
+import { FormSchema, formSchema } from "./form";
+import s from "./styles.module.scss";
 
 type Props = {
   afterSubmit: () => void;
@@ -67,38 +19,7 @@ type Props = {
 export const AddNewScreener: FC<Props> = ({ afterSubmit }) => {
   const user = useUser();
 
-  const formSchema = z.object({
-    title: z.string().min(1),
-    peExpression: z.enum(["less", "greater"]),
-    roeExpression: z.enum(["less", "greater"]),
-    deExpression: z.enum(["less", "greater"]),
-    priceGrowthExpression: z.enum(["less", "greater"]),
-    marginSafetyExpression: z.enum(["less", "greater"]),
-    analystExpression: z.enum(["less", "greater"]),
-    payoutRatioExpression: z.enum(["less", "greater"]),
-    dividendYieldExpression: z.enum(["less", "greater"]),
-    pe: z.string().optional(),
-    roe: z.string().optional(),
-    de: z.string().optional(),
-    priceGrowth: z.string().optional(),
-    marginSafety: z.string().optional(),
-    analyst: z.string().optional(),
-    payoutRatio: z.string().optional(),
-    dividendYield: z.string().optional(),
-    sector: z.string().optional(),
-    industry: z.string().optional(),
-  });
-
-  type FormSchema = z.infer<typeof formSchema>;
-
-  const {
-    register,
-    handleSubmit,
-    formState: { errors },
-    control,
-    getValues,
-    setValue,
-  } = useForm<FormSchema>({
+  const { handleSubmit, control, getValues, setValue } = useForm<FormSchema>({
     mode: "onChange",
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -176,37 +97,18 @@ export const AddNewScreener: FC<Props> = ({ afterSubmit }) => {
   }, [selectedSector]);
 
   return (
-    <form
-      style={{
-        width: "500px",
-        display: "flex",
-        flexDirection: "column",
-        alignItems: "center",
-      }}
-      onSubmit={handleSubmit(onSumbit)}
-    >
-      <p
-        style={{
-          paddingBottom: "2rem",
-          fontSize: "1.2rem",
-          fontWeight: "bold",
-          textAlign: "center",
-        }}
-      >
-        New Screener
-      </p>
+    <form className={s.form} onSubmit={handleSubmit(onSumbit)}>
+      <p className={s.title}>New Screener</p>
       <div style={{ marginBottom: "1rem", width: "100%" }}>
         <Controller
           name="title"
           control={control}
           render={({ field: { onChange } }) => (
-            <>
-              <Input
-                label="Screener name"
-                name="Screener name"
-                onChange={onChange}
-              />
-            </>
+            <Input
+              label="Screener name"
+              name="Screener name"
+              onChange={onChange}
+            />
           )}
         />
       </div>
@@ -257,14 +159,7 @@ export const AddNewScreener: FC<Props> = ({ afterSubmit }) => {
       {data.map((item, index) => (
         <div style={{ width: "100%" }} key={index}>
           <p>{item.label}</p>
-          <div
-            style={{
-              marginBottom: "1rem",
-              width: "100%",
-              display: "flex",
-              gap: "1rem",
-            }}
-          >
+          <div className={s.fieldWrapper}>
             <Controller
               control={control}
               name={item.input}
@@ -277,17 +172,7 @@ export const AddNewScreener: FC<Props> = ({ afterSubmit }) => {
               control={control}
               name={item.select}
               render={({ field: { onChange } }) => (
-                <select
-                  style={{
-                    border: "1px solid var(--color-gray)",
-                    borderRadius: "0.3rem",
-                    padding: "0.4rem",
-                    outline: "transparent",
-                    display: "block",
-                    width: "100%",
-                  }}
-                  onChange={onChange}
-                >
+                <select className={s.fieldSelect} onChange={onChange}>
                   <option value={"less"}>less than (&lt;)</option>
                   <option value={"greater"}>greater than (&gt;)</option>
                 </select>

@@ -34,12 +34,7 @@
 .user {
   align-items: center;
   display: flex;
-  // transition: all 0.3s ease;
   cursor: pointer;
-  // &:hover {
-  //   transform: scale(1.1);
-  //   transition: all 0.3s ease;
-  // }
 }
 
 .title {
@@ -49,4 +44,22 @@
   @media screen and (max-width: 240px) {
     display: none;
   }
+}
+
+.modalWrapper {
+  width: 300px;
+}
+
+.modalTitle {
+  fontsize: 1.3rem;
+  fontweight: bold;
+  margin: 0 0 2rem 0;
+  textalign: center;
+}
+
+.modalForm {
+  display: flex;
+  flexdirection: column;
+  alignitems: center;
+  gap: 1rem;
 }

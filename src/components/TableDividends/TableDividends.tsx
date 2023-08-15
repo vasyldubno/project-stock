@@ -1,6 +1,5 @@
-import { ArrowRight } from "@/icons/ArrowRight";
 import { SortIcon } from "@/icons/SortIcon";
-import { ISupaDividend, ISupaStockPortfolio } from "@/types/types";
+import { ISupaDividend } from "@/types/types";
 import {
   SortingState,
   flexRender,
@@ -9,7 +8,6 @@ import {
   useReactTable,
 } from "@tanstack/react-table";
 import { FC, useState } from "react";
-import { TableDetails } from "../TableDetails/TableDetails";
 import { TableDivider } from "../TableDivider/TableDivider";
 import s from "./styles.module.scss";
 import { columns } from "./table";
@@ -20,10 +18,6 @@ type Props = {
 
 export const TableDividends: FC<Props> = ({ data }) => {
   const [sorting, setSorting] = useState<SortingState>([]);
-  const [selectedTicker, setSelectedTicker] = useState<string[]>([]);
-  const [selectedStock, setSelectedStock] =
-    useState<ISupaStockPortfolio | null>(null);
-  const [isOpenModal, setIsOpenModal] = useState(false);
 
   const table = useReactTable({
     columns: columns,
@@ -119,19 +113,6 @@ export const TableDividends: FC<Props> = ({ data }) => {
                 </td>
               ))}
             </tr>
-            {selectedTicker.includes(row.original.ticker) && (
-              <>
-                <tr>
-                  <td colSpan={columns.length + 2}>
-                    <TableDetails
-                      ticker={selectedTicker.find((item) =>
-                        item.includes(row.original.ticker)
-                      )}
-                    />
-                  </td>
-                </tr>
-              </>
-            )}
           </tbody>
         ))}
       </table>

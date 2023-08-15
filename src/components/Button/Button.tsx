@@ -8,6 +8,7 @@ interface ButtonProps {
   onClick?: () => void;
   type?: "submit" | "reset" | "button";
   width?: string;
+  disabled?: boolean;
 }
 
 export const Button: FC<ButtonProps> = ({
@@ -17,9 +18,11 @@ export const Button: FC<ButtonProps> = ({
   color,
   type,
   width,
+  disabled = false,
 }) => {
   return (
     <button
+      disabled={disabled}
       onClick={onClick}
       style={{
         backgroundColor,
@@ -33,5 +36,3 @@ export const Button: FC<ButtonProps> = ({
     </button>
   );
 };
-
-// Button.defaultProps = { color: "#fff", backgroundColor: "#827878" };

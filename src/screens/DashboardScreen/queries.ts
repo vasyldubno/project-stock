@@ -1,7 +1,6 @@
 import { PortfolioService } from "@/services/PortfolioService";
 import { StockPortfolioService } from "@/services/StockPortfolioService";
 import { StockService } from "@/services/StockService";
-import { UserService } from "@/services/UserService";
 import { ISupaPortfolio, IUser } from "@/types/types";
 import { useQuery } from "react-query";
 
@@ -135,6 +134,17 @@ export const usePortfolioCost = (selectedPortfolio: ISupaPortfolio | null) => {
   const { data } = useQuery({
     queryKey: ["cost", { selectedPortfolio }],
     queryFn: () => PortfolioService.getCost(selectedPortfolio),
+    enabled: !!selectedPortfolio,
+  });
+  return data ?? null;
+};
+
+export const usePortfolioSectors = (
+  selectedPortfolio: ISupaPortfolio | null
+) => {
+  const { data } = useQuery({
+    queryKey: ["portfolioSectors", { selectedPortfolio }],
+    queryFn: () => PortfolioService.getPortfolioSectors(selectedPortfolio),
     enabled: !!selectedPortfolio,
   });
   return data ?? null;

@@ -1,4 +1,3 @@
-import { PortfolioService } from "@/services/PortfolioService";
 import {
   BarElement,
   CategoryScale,
@@ -7,7 +6,7 @@ import {
   LinearScale,
   Tooltip,
 } from "chart.js";
-import { FC, useEffect, useState } from "react";
+import { FC } from "react";
 import { Bar } from "react-chartjs-2";
 
 ChartJS.register(Legend, Tooltip, BarElement, CategoryScale, LinearScale);

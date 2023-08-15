@@ -1,16 +1,7 @@
 import { CLIENT_URL } from "@/config/consts";
-import { db } from "@/config/firebaseConfig";
 import { supabaseClient } from "@/config/supabaseClient";
-import {
-  IStock,
-  ISupaPortfolio,
-  ISupaScreener,
-  ISupaStock,
-  IUser,
-} from "@/types/types";
+import { ISupaPortfolio, ISupaScreener, IUser } from "@/types/types";
 import axios from "axios";
-import { collection, getDocs, orderBy, query, where } from "firebase/firestore";
-import { use } from "react";
 
 export class StockService {
   static async updatePriceCurrent(userId: string) {
@@ -67,32 +58,6 @@ export class StockService {
         }
       }
     }
-  }
-
-  static async updateFundamentals() {
-    return axios.get(`${CLIENT_URL}/api/stock/fundamentals`);
-  }
-
-  static async updateUpcomingDividends(userId: string) {
-    return axios.post(`${CLIENT_URL}/api/stock/update-upcome-dividends`, {
-      userId,
-    });
-  }
-
-  static async getStocksDividends() {
-    const response = await supabaseClient
-      .from("stock")
-      .select()
-      .gte("dividendYield", 1)
-      // .lte("payoutRation", 70)
-      // .lte("pe", 30)
-      // .lte("de", 3)
-      .gte("price_growth", 5)
-      // .gte("roe", 20)
-      .gte("analystRatingBuy", 5)
-      .or("isDividendAristocrat.eq.true,isDividendKing.eq.true");
-
-    return response.data;
   }
 
   static async getStocks(screener: ISupaScreener | null, user: IUser | null) {
@@ -344,55 +309,18 @@ export class StockService {
         return result.data;
       }
     }
-
-    /* --- SUPABASE --- */
-    // const stocks = await supabaseClient
-    //   .from("stock")
-    //   .select()
-    //   .gte("roe", 20)
-    //   .gte("price_growth", 15)
-    //   .gte("analystRatingBuy", 10)
-    //   .lte("pe", 30)
-    //   .gt("pe", 0)
-    //   .gte("gfValueMargin", 10)
-    //   .lte("de", 3)
-    //   .order("price_growth", { ascending: false });
-    // const stockPortfolio = await supabaseClient
-    //   .from("stock_portfolio")
-    //   .select()
-    //   .eq("is_trading", true);
-    // if (stocks.data && stockPortfolio.data) {
-    //   return stocks.data.filter(
-    //     (stock) =>
-    //       !stockPortfolio.data.some(
-    //         (stockPortfolio) => stockPortfolio.ticker === stock.ticker
-    //       )
-    //   );
-    // }
-    /* --- FIREBASE --- */
-    // const stockRef = query(
-    //   collection(db, "stock"),
-    //   where("priceGrowth", ">=", 20),
-    //   orderBy("priceGrowth", "desc")
-    // );
-    // const stocks = (await getDocs(stockRef)).docs.map((item) => item.data());
-    // const filretedData = stocks.filter(
-    //   (item) =>
-    //     item.roe >= 20 &&
-    //     item.analystRatingBuy >= 10 &&
-    //     item.de <= 3 &&
-    //     item.intrinsicMargin >= 10
-    // );
-    // return filretedData;
   }
 
-  static async getAllStocks() {
-    const stockRef = query(collection(db, "stock"), orderBy("ticker", "asc"));
+  static async getPriceCurrentByTicker(ticker: string) {
+    const supaStock = await supabaseClient
+      .from("stock")
+      .select()
+      .eq("ticker", ticker)
+      .single();
 
-    const stocks = (await getDocs(stockRef)).docs.map((item) =>
-      item.data()
-    ) as IStock[];
-
-    return stocks;
+    if (supaStock.data) {
+      return supaStock.data.price_current;
+    }
+    return null;
   }
 }

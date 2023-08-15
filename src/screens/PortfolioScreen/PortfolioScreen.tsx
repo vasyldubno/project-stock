@@ -59,7 +59,7 @@ export const PortfolioScreen = () => {
 
   useEffect(() => {
     if (queryStocks) {
-      setStocks(queryStocks);
+      setStocks(queryStocks.data);
     }
   }, [queryStocks]);
 
@@ -95,7 +95,9 @@ export const PortfolioScreen = () => {
                 />
 
                 <div>
-                  {selectedPortfolio && stocks && stocks?.length > 0 ? (
+                  {queryStocks.isFetching ? (
+                    <p>Loading...</p>
+                  ) : selectedPortfolio && stocks && stocks?.length > 0 ? (
                     <div style={{ margin: "1rem" }}>
                       <TablePortfolioDynamic
                         portfolioId={selectedPortfolio.id}

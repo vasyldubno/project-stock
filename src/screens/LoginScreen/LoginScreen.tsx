@@ -1,6 +1,7 @@
 import { FormLogin } from "@/components/FormLogin/FormLogin";
 import Link from "next/link";
 import { useRouter } from "next/router";
+import s from "./styles.module.scss";
 
 export const LoginScreen = () => {
   const router = useRouter();
@@ -10,9 +11,9 @@ export const LoginScreen = () => {
   };
 
   return (
-    <div style={{ margin: "1rem auto", padding: "0 1rem", maxWidth: "500px" }}>
+    <div className={s.wrapper}>
       <FormLogin afterSubmit={afterSubmit} />
-      <p style={{ textAlign: "center", fontSize: "0.8rem", marginTop: "2rem" }}>
+      <p className={s.text}>
         If you don&apos;t have account,{" "}
         <Link href={"/register"} style={{ color: "blue" }}>
           Register

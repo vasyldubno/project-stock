@@ -173,6 +173,7 @@ export const TablePortfolio: FC<Props> = ({ portfolioId, data }) => {
                       ticker={selectedTicker.find((item) =>
                         item.includes(row.original.ticker)
                       )}
+                      portfolioId={portfolioId}
                     />
                   </td>
                 </tr>

@@ -1,14 +1,12 @@
-import { SubmitHandler, useForm } from "react-hook-form";
-import { Button } from "../Button/Button";
-import s from "./FormLogin.module.scss";
-import { z } from "zod";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { FormError } from "../FormError/FormError";
 import { supabaseClient } from "@/config/supabaseClient";
-import { FC, useState } from "react";
-import { signInWithEmailAndPassword } from "firebase/auth";
-import { auth } from "@/config/firebaseConfig";
 import { useUser } from "@/hooks/useUser";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { FC, useState } from "react";
+import { SubmitHandler, useForm } from "react-hook-form";
+import { z } from "zod";
+import { Button } from "../Button/Button";
+import { FormError } from "../FormError/FormError";
+import s from "./FormLogin.module.scss";
 
 type FormRegisterProps = {
   afterSubmit?: () => void;

@@ -46,7 +46,8 @@ const TickerPage: FC<Props> = ({ data }) => {
                 fontSize: "1rem",
               }}
             >
-              {data.sector} | {data.subIndustry} | {data.exchange}
+              {data.sector} | {data.subIndustry} | {data.exchange} |{" "}
+              {data.country}
             </p>
 
             <div

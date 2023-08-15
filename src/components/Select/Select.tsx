@@ -1,8 +1,9 @@
 import { FC } from "react";
+import s from "./styles.module.scss";
 
 type Props = {
   onChange: (props?: any) => void;
-  data: string[];
+  data: string[] | null;
   label?: string;
   defaultValue?: string | null;
   value?: string | null;
@@ -16,29 +17,26 @@ export const Select: FC<Props> = ({
   value,
 }) => {
   return (
-    <div style={{ width: "100%" }}>
-      <fieldset>
-        {label && <label>{label}</label>}
-        <select
-          style={{
-            border: "1px solid var(--color-gray)",
-            borderRadius: "0.3rem",
-            padding: "0.4rem",
-            outline: "transparent",
-            display: "block",
-            width: "100%",
-          }}
-          onChange={onChange}
-          value={value ?? "-- --"}
-        >
-          <option value={""}>-- --</option>
-          {data.map((item, index) => (
-            <option key={index} value={item}>
-              {item}
-            </option>
-          ))}
-        </select>
-      </fieldset>
-    </div>
+    <>
+      {data && (
+        <div className={s.wrapper}>
+          <fieldset>
+            {label && <label>{label}</label>}
+            <select
+              className={s.select}
+              onChange={onChange}
+              value={value ?? "-- --"}
+            >
+              {/* <option value={""}>-- --</option> */}
+              {data.map((item, index) => (
+                <option key={index} value={item}>
+                  {item}
+                </option>
+              ))}
+            </select>
+          </fieldset>
+        </div>
+      )}
+    </>
   );
 };

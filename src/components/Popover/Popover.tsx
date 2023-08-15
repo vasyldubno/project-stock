@@ -1,7 +1,6 @@
-import { UserIcon } from "@/icons/UserIcon";
 import { Cross2Icon } from "@radix-ui/react-icons";
 import * as PopoverRadix from "@radix-ui/react-popover";
-import { Dispatch, FC, ReactNode, SetStateAction, useState } from "react";
+import { Dispatch, FC, ReactNode, SetStateAction } from "react";
 import { TableDivider } from "../TableDivider/TableDivider";
 import s from "./styles.module.scss";
 
@@ -23,9 +22,7 @@ export const Popover: FC<Props> = ({ trigger, content, open, setOpen }) => {
           }
         }}
       >
-        <button>
-          <UserIcon size="2rem" />
-        </button>
+        <button>{trigger}</button>
       </PopoverRadix.PopoverTrigger>
       <PopoverRadix.Portal>
         <PopoverRadix.Content className={s.PopoverContent} sideOffset={5}>

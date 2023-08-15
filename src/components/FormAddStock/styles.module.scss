@@ -1,11 +1,7 @@
 .dropdownSelectors__wrapper {
   position: absolute;
-  // bottom: "-150px";
-  // height: "150px";
   top: 80px;
   max-height: 175px;
-  // minHeight: "200px";
-  // height: "100%";
   background-color: white;
   width: calc(100% - 2rem);
   overflow: hidden;
@@ -13,6 +9,7 @@
   border: 1px solid var(--color-gray);
   border-radius: 0.3rem;
   padding: 0.3rem;
+  z-index: 2;
 }
 
 .dropdownSelectors__item {
@@ -20,4 +17,18 @@
   &:hover {
     background-color: var(--color-gray);
   }
+}
+
+.form {
+  width: 500px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.form__field__wrapper {
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 1rem;
+  width: 100%;
 }

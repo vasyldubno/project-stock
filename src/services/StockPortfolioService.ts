@@ -13,7 +13,8 @@ export class StockPortfolioService {
     if (supaStockPortfolio.data) {
       const portfolioValue = supaStockPortfolio.data.reduce(
         (acc, item) =>
-          (acc += Number(item.amount_active_shares) * item.price_current),
+          (acc +=
+            Number(item.amount_active_shares) * Number(item.price_current)),
         0
       );
 

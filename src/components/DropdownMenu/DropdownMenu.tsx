@@ -1,15 +1,9 @@
-import React from "react";
 import * as DropdownMenuRadix from "@radix-ui/react-dropdown-menu";
-import {
-  HamburgerMenuIcon,
-  DotFilledIcon,
-  CheckIcon,
-  ChevronRightIcon,
-} from "@radix-ui/react-icons";
-// import "./styles.css";
-import s from "./styles.module.scss";
+import { HamburgerMenuIcon } from "@radix-ui/react-icons";
+import React from "react";
 import Link from "next/link";
 import { useRouter } from "next/router";
+import s from "./styles.module.scss";
 
 type Link = {
   link: string;
@@ -26,10 +20,6 @@ const links: Link[] = [
 ];
 
 export const DropdownMenu = () => {
-  const [bookmarksChecked, setBookmarksChecked] = React.useState(true);
-  const [urlsChecked, setUrlsChecked] = React.useState(false);
-  const [person, setPerson] = React.useState("pedro");
-
   const router = useRouter();
 
   return (
@@ -45,13 +35,6 @@ export const DropdownMenu = () => {
           className={s.DropdownMenuContent}
           sideOffset={5}
         >
-          {/* <DropdownMenuRadix.Item className={s.DropdownMenuItem}>
-            New Tab
-          </DropdownMenuRadix.Item>
-          <DropdownMenuRadix.Item className={s.DropdownMenuItem}>
-            New Window
-          </DropdownMenuRadix.Item> */}
-
           {links.map((link, index) => (
             <DropdownMenuRadix.Item
               key={index}

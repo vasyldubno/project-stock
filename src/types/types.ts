@@ -44,6 +44,7 @@ export interface ISupaStock {
   analystRatingBuy: number | null;
   annualDividend: number | null;
   beta: number | null;
+  country: string | null;
   created_at: string | null;
   de: number | null;
   dividend_increase_track_record: number | null;
@@ -67,6 +68,7 @@ export interface ISupaStock {
   pe: number | null;
   price_current: number | null;
   price_growth: number | null;
+  price_growth_today_perc: number | null;
   price_target: number | null;
   price_year_high: number | null;
   report_date: string | null;
@@ -95,14 +97,15 @@ export interface ISupaDividendsInMonth {
 }
 
 export interface ISupaTransaction {
+  change: string;
   count: number;
   created_at: string | null;
   date: string;
   id: string;
+  portfolio_id: string;
   price: number;
   ticker: string;
   type: string;
-  change: string;
 }
 
 export interface ISupaPortfolio {

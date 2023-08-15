@@ -1,15 +1,12 @@
-import { SubmitHandler, useForm } from "react-hook-form";
-import { Button } from "../Button/Button";
-import s from "./FormRegister.module.scss";
-import { z } from "zod";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { FormError } from "../FormError/FormError";
 import { supabaseClient } from "@/config/supabaseClient";
-import { FC, useState } from "react";
-import { createUserWithEmailAndPassword } from "firebase/auth";
-import { auth, db } from "@/config/firebaseConfig";
-import { doc, getDoc, setDoc } from "firebase/firestore";
 import { useUser } from "@/hooks/useUser";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { FC, useState } from "react";
+import { SubmitHandler, useForm } from "react-hook-form";
+import { z } from "zod";
+import { Button } from "../Button/Button";
+import { FormError } from "../FormError/FormError";
+import s from "./FormRegister.module.scss";
 
 type FormRegisterProps = {
   afterSubmit?: () => void;
@@ -57,28 +54,6 @@ export const FormRegister: FC<FormRegisterProps> = ({ afterSubmit }) => {
         }
       }
     }
-
-    // const existUser = await getDoc(doc(db, "user", data.email));
-
-    // if (existUser.exists()) {
-    //   setErrorMessage(
-    //     `User with email ${data.email} exist. Choose another email`
-    //   );
-    // }
-
-    // if (!existUser.exists()) {
-    //   const user = await createUserWithEmailAndPassword(
-    //     auth,
-    //     data.email,
-    //     data.password
-    //   );
-    //   if (user.user) {
-    //     await setDoc(doc(db, "user", data.email), {
-    //       firstName: data.name,
-    //       email: data.email,
-    //     });
-    //   }
-    // }
   };
 
   return (

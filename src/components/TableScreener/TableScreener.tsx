@@ -11,6 +11,7 @@ import { Button } from "../Button/Button";
 import { FormAddStock } from "../FormAddStock/FormAddStock";
 import { Modal } from "../Modal/Modal";
 import { columns } from "./table";
+import s from "./styles.module.scss";
 
 export const TableScreener = ({ data }: { data: ISupaStock[] }) => {
   const [sorting, setSorting] = useState<SortingState>([]);
@@ -44,23 +45,9 @@ export const TableScreener = ({ data }: { data: ISupaStock[] }) => {
   };
 
   return (
-    <div style={{ overflow: "auto", maxHeight: "100dvh" }}>
-      <table
-        style={{
-          borderCollapse: "collapse",
-          borderSpacing: "0",
-          overflowX: "scroll",
-          width: "100%",
-        }}
-      >
-        <thead
-          style={{
-            fontSize: "0.8rem",
-            position: "sticky",
-            top: "0",
-            backgroundColor: "white",
-          }}
-        >
+    <div className={s.wrapper}>
+      <table className={s.table}>
+        <thead className={s.thead}>
           {table.getHeaderGroups().map((headerGroup, headerGroupIndex) => (
             <tr key={`${headerGroup.id}-${headerGroupIndex}`}>
               {headerGroup.headers.map((header, headerIndex) => (
@@ -69,18 +56,11 @@ export const TableScreener = ({ data }: { data: ISupaStock[] }) => {
                   onClick={toggleSortingHandler(header.column.id)}
                 >
                   {header.isPlaceholder ? null : (
-                    <div
-                      style={{
-                        display: "flex",
-                        justifyContent: "center",
-                      }}
-                    >
-                      <div style={{ cursor: "pointer" }}>
-                        {flexRender(
-                          header.column.columnDef.header,
-                          header.getContext()
-                        )}
-                      </div>
+                    <div style={{ cursor: "pointer" }}>
+                      {flexRender(
+                        header.column.columnDef.header,
+                        header.getContext()
+                      )}
                     </div>
                   )}
                 </th>

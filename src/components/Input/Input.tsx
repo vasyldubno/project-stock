@@ -1,8 +1,5 @@
 import { FC, HTMLInputTypeAttribute, ReactNode } from "react";
 import s from "./Input.module.scss";
-import { FieldErrors, UseFormRegister } from "react-hook-form";
-import { FormError } from "../FormError/FormError";
-import { ClearIcon } from "@/icons/ClearIcon";
 
 type InputProps = {
   label?: string;
@@ -11,7 +8,8 @@ type InputProps = {
   onChange?: any;
   onFocus?: any;
   onBlur?: any;
-  value?: string;
+  onClick?: (props?: any) => void;
+  value?: string | number | null;
   defaultValue?: string;
   icon?: {
     delete: {
@@ -20,6 +18,7 @@ type InputProps = {
       onClick: (props?: any) => void;
     };
   };
+  step?: number;
 };
 
 export const Input: FC<InputProps> = ({
@@ -29,9 +28,11 @@ export const Input: FC<InputProps> = ({
   onChange,
   onBlur,
   onFocus,
+  onClick,
   value,
   defaultValue,
   icon,
+  step,
 }) => {
   return (
     <div style={{ display: "block", width: "100%" }}>
@@ -43,12 +44,13 @@ export const Input: FC<InputProps> = ({
           onChange={onChange}
           onFocus={onFocus}
           onBlur={onBlur}
-          value={value}
+          value={value ?? ""}
           defaultValue={defaultValue}
+          step={step}
+          onClick={onClick}
         />
         {icon?.delete.open && (
           <div className={s.icon__clear} onClick={icon.delete.onClick}>
-            {/* <ClearIcon size="1.2rem" /> */}
             {icon.delete.element}
           </div>
         )}

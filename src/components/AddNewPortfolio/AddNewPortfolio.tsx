@@ -2,11 +2,13 @@ import { useUser } from "@/hooks/useUser";
 import { PortfolioService } from "@/services/PortfolioService";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useState } from "react";
-import { SubmitHandler, useForm } from "react-hook-form";
+import { Controller, SubmitHandler, useForm } from "react-hook-form";
 import { z } from "zod";
 import { Button } from "../Button/Button";
 import { FormError } from "../FormError/FormError";
 import { Modal } from "../Modal/Modal";
+import s from "./styles.module.scss";
+import { Input } from "../Input/Input";
 
 export const AddNewPortfolio = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -25,7 +27,7 @@ export const AddNewPortfolio = () => {
   type FormSchema = z.infer<typeof formSchema>;
 
   const {
-    register,
+    control,
     formState: { errors },
     handleSubmit,
   } = useForm<FormSchema>({
@@ -51,26 +53,15 @@ export const AddNewPortfolio = () => {
         <form
           onSubmit={handleSubmit(onSubmit)}
           onChange={() => setErrorMessage("")}
-          style={{
-            width: "300px",
-            display: "flex",
-            flexDirection: "column",
-            gap: "1rem",
-            alignItems: "center",
-          }}
+          className={s.form}
         >
           <div style={{ width: "100%" }}>
-            <label htmlFor="name">Portfolio Name</label>
-            <input
-              style={{
-                border: "1px solid var(--color-gray)",
-                borderRadius: "0.3rem",
-                padding: "0.4rem",
-                outline: "transparent",
-                display: "block",
-                width: "100%",
-              }}
-              {...register("name")}
+            <Controller
+              control={control}
+              name="name"
+              render={({ field: { onChange } }) => (
+                <Input label="Portfolio Name" onChange={onChange} />
+              )}
             />
             {errors.name && <FormError>{errors.name.message}</FormError>}
           </div>

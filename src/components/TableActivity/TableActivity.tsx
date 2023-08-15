@@ -2,58 +2,38 @@ import { PortfolioService } from "@/services/PortfolioService";
 import { ISupaTransaction } from "@/types/types";
 import {
   SortingState,
-  createColumnHelper,
   flexRender,
   getCoreRowModel,
+  getPaginationRowModel,
   getSortedRowModel,
   useReactTable,
 } from "@tanstack/react-table";
-import { useEffect, useState } from "react";
+import { FC, useEffect, useState } from "react";
 import { SortIcon } from "@/icons/SortIcon";
 import moment from "moment";
+import { columns } from "./table";
+import s from "./styles.module.scss";
+import { Button } from "../Button/Button";
+import { Pagination } from "../Pagination/Pagination";
 
-export const TableActivity = () => {
-  const [data, setData] = useState<ISupaTransaction[]>([]);
+type Props = {
+  data: ISupaTransaction[];
+};
+
+export const TableActivity: FC<Props> = ({ data }) => {
+  // const [data, setData] = useState<ISupaTransaction[]>([]);
   const [sorting, setSorting] = useState<SortingState>([]);
 
-  useEffect(() => {
-    PortfolioService.getTransactions().then((res) => setData(res));
-  }, []);
-
-  const columnHelper = createColumnHelper<ISupaTransaction>();
-
-  const columns = [
-    columnHelper.accessor("ticker", {
-      header: "Ticker",
-      cell: (info) => <p style={{ textAlign: "center" }}>{info.getValue()}</p>,
-    }),
-    columnHelper.accessor("count", {
-      header: "Amount Shares",
-      cell: (info) => <p style={{ textAlign: "center" }}>{info.getValue()}</p>,
-    }),
-    columnHelper.accessor("date", {
-      header: "Date",
-      cell: (info) => (
-        <p style={{ textAlign: "center" }}>
-          {moment(info.getValue()).format("DD.MM.YYYY")}
-        </p>
-      ),
-    }),
-    columnHelper.accessor("type", {
-      header: "Type",
-      cell: (info) => <p style={{ textAlign: "center" }}>{info.getValue()}</p>,
-    }),
-    columnHelper.accessor("change", {
-      header: "Change",
-      cell: (info) => <p style={{ textAlign: "center" }}>{info.getValue()}</p>,
-    }),
-  ];
+  // useEffect(() => {
+  //   PortfolioService.getTransactions().then((res) => setData(res));
+  // }, []);
 
   const table = useReactTable({
-    columns,
+    columns: columns,
     data,
     getCoreRowModel: getCoreRowModel(),
     getSortedRowModel: getSortedRowModel(),
+    getPaginationRowModel: getPaginationRowModel(),
     state: { sorting: sorting },
     onSortingChange: setSorting,
   });
@@ -75,16 +55,13 @@ export const TableActivity = () => {
     }
   };
 
+  useEffect(() => {
+    table.setPageSize(10);
+  }, []);
+
   return (
     <>
-      <table
-        style={{
-          width: "100%",
-          overflowX: "scroll",
-          border: "1px solid var(--color-gray)",
-          borderCollapse: "collapse",
-        }}
-      >
+      <table className={s.table}>
         <thead>
           {table.getHeaderGroups().map((headerGroup, headerGroupIndex) => (
             <tr key={`${headerGroup.id}-${headerGroupIndex}`}>
@@ -141,13 +118,7 @@ export const TableActivity = () => {
           <tbody key={`data-${row.id}-${rowIndex}`}>
             <tr>
               {row.getVisibleCells().map((cell, cellIndex) => (
-                <td
-                  key={`${cell.id}-${cellIndex}`}
-                  style={{
-                    padding: "5px 5px",
-                    border: "1px solid var(--color-gray)",
-                  }}
-                >
+                <td key={`${cell.id}-${cellIndex}`} className={s.tbody__td}>
                   {flexRender(cell.column.columnDef.cell, cell.getContext())}
                 </td>
               ))}
@@ -155,6 +126,7 @@ export const TableActivity = () => {
           </tbody>
         ))}
       </table>
+      <Pagination table={table} />
     </>
   );
 };

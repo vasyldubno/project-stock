@@ -6,3 +6,22 @@
     font-weight: 700;
   }
 }
+
+.wrapper {
+  overflow: auto;
+  max-height: 100dvh;
+}
+
+.table {
+  border-collapse: collapse;
+  border-spacing: 0;
+  overflow-x: scroll;
+  width: 100%;
+}
+
+.thead {
+  font-size: 0.8rem;
+  position: sticky;
+  top: 0;
+  background-color: white;
+}

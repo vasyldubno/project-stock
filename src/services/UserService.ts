@@ -1,16 +1,8 @@
-import { db } from "@/config/firebaseConfig";
 import { supabaseClient } from "@/config/supabaseClient";
 import { IUser } from "@/types/types";
-import { doc, getDoc } from "firebase/firestore";
-import { Dispatch, SetStateAction } from "react";
 
 export class UserService {
   static async getBalance(user: IUser | null) {
-    // const user = (await getDoc(doc(db, "user", email))).data();
-    // if (user) {
-    //   return user.balance;
-    // }
-
     const supaUser = await supabaseClient
       .from("user")
       .select()

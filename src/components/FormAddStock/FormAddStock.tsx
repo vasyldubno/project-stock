@@ -1,17 +1,20 @@
 import { STOCKS } from "@/assets/stock";
 import { useUser } from "@/hooks/useUser";
 import { PortfolioService } from "@/services/PortfolioService";
+import { UserService } from "@/services/UserService";
 import { zodResolver } from "@hookform/resolvers/zod";
 import moment from "moment";
-import { FC, useEffect, useState } from "react";
+import { ChangeEvent, FC, useEffect, useState } from "react";
 import { DayPicker } from "react-day-picker";
 import "react-day-picker/dist/style.css";
-import { SubmitHandler, useForm } from "react-hook-form";
+import { Controller, SubmitHandler, useForm } from "react-hook-form";
 import { z } from "zod";
 import { Button } from "../Button/Button";
 import { FormError } from "../FormError/FormError";
+import { Input } from "../Input/Input";
+import { Select } from "../Select/Select";
+import { usePortfolios, usePriceCurrent } from "./queries";
 import s from "./styles.module.scss";
-import { ISupaPortfolio } from "@/types/types";
 
 type Props = {
   ticker?: string;
@@ -35,9 +38,13 @@ export const FormAddStock: FC<Props> = ({
   const [dropdownSelectors, setDropdownSelectors] = useState<
     { ticker: string; name: string }[] | null
   >(null);
-  const [portfolios, setPortfolios] = useState<ISupaPortfolio[] | null>(null);
+  const [isOpenDropdownSelectors, setIsOpenDropdownSelectors] = useState(false);
+
+  const priceCurrent = usePriceCurrent(searchValue);
 
   const user = useUser();
+
+  const portfolios = usePortfolios(user);
 
   const formSchema = z.object({
     ticker: z.string().min(1),
@@ -49,10 +56,11 @@ export const FormAddStock: FC<Props> = ({
   type FormSchema = z.infer<typeof formSchema>;
 
   const {
-    register,
     formState: { errors },
     handleSubmit,
     setValue,
+    getValues,
+    control,
   } = useForm<FormSchema>({
     mode: "onChange",
     resolver: zodResolver(formSchema),
@@ -65,14 +73,10 @@ export const FormAddStock: FC<Props> = ({
   });
 
   useEffect(() => {
-    if (user) {
-      PortfolioService.getPortfolios(user).then((res) => {
-        if (res) {
-          setPortfolios(res.data);
-        }
-      });
+    if (priceCurrent) {
+      setValue("price", priceCurrent.toString());
     }
-  }, [user]);
+  }, [priceCurrent]);
 
   useEffect(() => {
     if (searchValue) {
@@ -85,68 +89,68 @@ export const FormAddStock: FC<Props> = ({
 
   const onSubmit: SubmitHandler<FormSchema> = async (data) => {
     if (user && user.id) {
-      const response = await PortfolioService.addTransaction(
-        data.ticker,
-        data.price,
-        data.count,
-        type,
-        moment(selectedDate).format("YYYY-MM-DD"),
-        data.portfolio,
-        user.id
-      );
-      if (response.status === 200) {
-        onClose();
+      if (type === "buy") {
+        const balance = await UserService.getBalance(user);
+        const purchase =
+          Number(data.count) * Number(data.price.replace(",", "."));
+
+        if (balance && balance - purchase >= 0) {
+          const response = await PortfolioService.addTransaction(
+            data.ticker,
+            data.price,
+            data.count,
+            type,
+            moment(selectedDate).format("YYYY-MM-DD"),
+            data.portfolio,
+            user.id
+          );
+          if (response.status === 200) {
+            onClose();
+          }
+        } else {
+          setErrorTransaction(true);
+        }
       }
     }
   };
 
   return (
     <form
-      style={{
-        width: "500px",
-        display: "flex",
-        flexDirection: "column",
-        alignItems: "center",
-      }}
+      className={s.form}
       onSubmit={handleSubmit(onSubmit)}
       onChange={() => setErrorTransaction(false)}
     >
-      <div
-        style={{
-          display: "flex",
-          flexDirection: "column",
-          marginBottom: "1rem",
-          width: "100%",
-        }}
-      >
-        <label htmlFor="ticker">Ticker</label>
-        <input
-          id="ticker"
-          type="text"
-          style={{
-            border: "1px solid var(--color-gray)",
-            borderRadius: "0.3rem",
-            padding: "0.4rem",
-            outline: "transparent",
-          }}
-          {...register("ticker")}
-          onChange={(e) => {
-            if (e.target.value.length === 0) {
-              setSearchValue("");
-              setDropdownSelectors(null);
-            } else {
-              setSearchValue(e.target.value.toUpperCase());
-            }
-          }}
+      <div className={s.form__field__wrapper}>
+        <Controller
+          control={control}
+          name="ticker"
+          render={() => (
+            <Input
+              label="Ticker"
+              onChange={(e: ChangeEvent<HTMLInputElement>) => {
+                setIsOpenDropdownSelectors(true);
+                if (e.target.value.length === 0) {
+                  setSearchValue("");
+                  setDropdownSelectors(null);
+                  setValue("ticker", "");
+                } else {
+                  setSearchValue(e.target.value.toUpperCase());
+                  setValue("ticker", "");
+                }
+              }}
+              value={searchValue}
+            />
+          )}
         />
-        {dropdownSelectors && (
+        {isOpenDropdownSelectors && dropdownSelectors && (
           <div className={s.dropdownSelectors__wrapper}>
             {dropdownSelectors.map((item, index) => (
               <p
                 key={index}
                 onClick={() => {
+                  setIsOpenDropdownSelectors(false);
                   setValue("ticker", item.ticker);
-                  setSearchValue("");
+                  setSearchValue(item.ticker);
                   setDropdownSelectors(null);
                 }}
                 className={s.dropdownSelectors__item}
@@ -156,14 +160,25 @@ export const FormAddStock: FC<Props> = ({
             ))}
           </div>
         )}
-        {errors.ticker && (
-          <p style={{ color: "red", fontSize: "0.7rem" }}>
-            {errors.ticker.message}
-          </p>
-        )}
+        {errors.ticker && <FormError>{errors.ticker.message}</FormError>}
       </div>
 
-      <div
+      <div className={s.form__field__wrapper}>
+        <Controller
+          control={control}
+          name="count"
+          render={({ field: { onChange } }) => (
+            <Input
+              label="Count"
+              onChange={onChange}
+              value={getValues("count")}
+            />
+          )}
+        />
+        {errors.count && <FormError>{errors.count.message}</FormError>}
+      </div>
+
+      {/* <div
         style={{
           display: "flex",
           flexDirection: "column",
@@ -188,9 +203,25 @@ export const FormAddStock: FC<Props> = ({
             {errors.count.message}
           </p>
         )}
+      </div> */}
+
+      <div className={s.form__field__wrapper}>
+        <Controller
+          control={control}
+          name="price"
+          render={({ field: { onChange } }) => (
+            <Input
+              label="Price"
+              onChange={onChange}
+              step={0.01}
+              value={priceCurrent}
+            />
+          )}
+        />
+        {errors.price && <FormError>{errors.price.message}</FormError>}
       </div>
 
-      <div
+      {/* <div
         style={{
           display: "flex",
           flexDirection: "column",
@@ -216,9 +247,28 @@ export const FormAddStock: FC<Props> = ({
             {errors.price.message}
           </p>
         )}
+      </div> */}
+
+      <div className={s.form__field__wrapper}>
+        <Input
+          label="Date"
+          onClick={() => {
+            setIsOpenDatePicker(true);
+          }}
+          value={moment(selectedDate).format("DD.MM.YYYY")}
+        />
+        {isOpenDatePicker && (
+          <DayPicker
+            selected={selectedDate}
+            onDayClick={(day) => {
+              setSelectedDate(day);
+              setIsOpenDatePicker(false);
+            }}
+          />
+        )}
       </div>
 
-      <div
+      {/* <div
         style={{
           display: "flex",
           flexDirection: "column",
@@ -251,9 +301,26 @@ export const FormAddStock: FC<Props> = ({
             }}
           />
         )}
+      </div> */}
+
+      <div className={s.form__field__wrapper}>
+        <Controller
+          control={control}
+          name="portfolio"
+          render={({ field: { onChange } }) => (
+            <Select
+              label="Choose Portfolio"
+              onChange={onChange}
+              data={portfolios?.map((item) => item.title) ?? null}
+              value={getValues("portfolio")}
+              // defaultValue={portfolios[0].title ?? "-- --"}
+            />
+          )}
+        />
+        {errors.portfolio && <FormError>{errors.portfolio.message}</FormError>}
       </div>
 
-      <div
+      {/* <div
         style={{
           display: "flex",
           flexDirection: "column",
@@ -283,7 +350,7 @@ export const FormAddStock: FC<Props> = ({
             {errors.portfolio.message}
           </p>
         )}
-      </div>
+      </div> */}
 
       {errorTransaction && (
         <FormError styles={{ margin: "1rem 0" }}>

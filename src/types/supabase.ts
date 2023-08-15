@@ -405,7 +405,7 @@ export interface Database {
           lastDividendPayDate: string | null
           perc_of_portfolio: number
           portfolio_id: string
-          price_current: number
+          price_current: number | null
           price_growth: number | null
           price_target: number | null
           startTradeDate: string | null
@@ -430,7 +430,7 @@ export interface Database {
           lastDividendPayDate?: string | null
           perc_of_portfolio?: number
           portfolio_id: string
-          price_current: number
+          price_current?: number | null
           price_growth?: number | null
           price_target?: number | null
           startTradeDate?: string | null
@@ -455,7 +455,7 @@ export interface Database {
           lastDividendPayDate?: string | null
           perc_of_portfolio?: number
           portfolio_id?: string
-          price_current?: number
+          price_current?: number | null
           price_growth?: number | null
           price_target?: number | null
           startTradeDate?: string | null

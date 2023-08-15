@@ -13,10 +13,13 @@ export const usePortfolios = (user: IUser | null) => {
 };
 
 export const useStocks = (selectedPortfolio: ISupaPortfolio | null) => {
-  const { data } = useQuery({
+  const { data, isFetching } = useQuery({
     queryKey: ["stocks", { selectedPortfolio }],
     queryFn: () => StockPortfolioService.getStocks(selectedPortfolio),
     enabled: !!selectedPortfolio,
   });
-  return data ?? null;
+  return {
+    data: data ?? null,
+    isFetching,
+  };
 };

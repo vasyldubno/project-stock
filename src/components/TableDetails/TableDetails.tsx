@@ -7,23 +7,26 @@ import { RowDividend } from "./RowDividend/RowDividend";
 import { RowShareLots } from "./RowShareLots/RowShareLots";
 import { RowTransaction } from "./RowTransaction/RowTransaction";
 import { TableHead } from "./TableHead/TableHead";
-import { getData } from "./queries";
+import { useDividends, useShareLots, useTransactions } from "./queries";
 import { Dividend, ShareLots, Transaction } from "./types";
+import { useUser } from "@/hooks/useUser";
 
 interface TableDetailsProps {
   ticker: string | undefined;
+  portfolioId: string;
 }
 
-export const TableDetails: FC<TableDetailsProps> = ({ ticker }) => {
-  const [dividends, setDividends] = useState<Dividend[]>([]);
-  const [transactions, setTransactions] = useState<Transaction[]>([]);
-  const [shareLots, setShareLots] = useState<ShareLots[]>([]);
-
-  useEffect(() => {
-    getData({ ticker, setDividends, setShareLots, setTransactions });
-  }, [ticker]);
+export const TableDetails: FC<TableDetailsProps> = ({
+  ticker,
+  portfolioId,
+}) => {
+  const user = useUser();
 
   const width = "966px";
+
+  const shareLots = useShareLots(user, ticker, portfolioId);
+  const dividends = useDividends(user, ticker, portfolioId);
+  const transactions = useTransactions(user, ticker, portfolioId);
 
   return (
     <div>
@@ -37,7 +40,7 @@ export const TableDetails: FC<TableDetailsProps> = ({ ticker }) => {
           {
             content: (
               <>
-                {shareLots.length > 0 ? (
+                {shareLots ? (
                   <table style={{ width }}>
                     <TableHead
                       columns={[
@@ -50,17 +53,15 @@ export const TableDetails: FC<TableDetailsProps> = ({ ticker }) => {
                       ]}
                     />
                     <tbody>
-                      {shareLots.map((item, index) => (
-                        <RowShareLots
-                          key={index}
-                          averagePrice={item.averagePrice}
-                          gain={item.gain}
-                          marketPrice={item.marketPrice}
-                          shares={item.shares}
-                          totalCost={item.totalCost}
-                          tradeDate={item.tradeDate}
-                        />
-                      ))}
+                      <RowShareLots
+                        key={shareLots.id}
+                        averagePrice={shareLots.averagePrice}
+                        gain={shareLots.gain}
+                        marketPrice={shareLots.marketPrice}
+                        shares={shareLots.shares}
+                        totalCost={shareLots.totalCost}
+                        tradeDate={shareLots.tradeDate}
+                      />
                     </tbody>
                   </table>
                 ) : (
@@ -94,7 +95,7 @@ export const TableDetails: FC<TableDetailsProps> = ({ ticker }) => {
           {
             content: (
               <>
-                {dividends.length > 0 ? (
+                {dividends && dividends.length > 0 ? (
                   <table style={{ width }}>
                     <TableHead
                       columns={[

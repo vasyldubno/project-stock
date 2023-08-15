@@ -27,11 +27,7 @@ export const TabsPortfolio: FC<TabsProps> = ({ tabs }) => {
               >
                 <button
                   onClick={() => setActiveTab(index)}
-                  style={{
-                    display: "flex",
-                    alignItems: "center",
-                    gap: "0.5rem",
-                  }}
+                  className={s.button}
                 >
                   {tab.icon && <div>{tab.icon}</div>}
                   <span>{tab.content}</span>

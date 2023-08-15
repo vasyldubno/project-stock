@@ -52,7 +52,7 @@ export const TableUpcomingDividends: FC<Props> = ({ data }) => {
   };
 
   return (
-    <div style={{ overflow: "auto", maxHeight: "300px" }}>
+    <div className={s.wrapper}>
       <table className={s.table}>
         <thead>
           {table.getHeaderGroups().map((headerGroup, headerGroupIndex) => (

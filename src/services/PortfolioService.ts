@@ -1,38 +1,10 @@
 import { supabaseClient } from "@/config/supabaseClient";
-import {
-  ISupaStockPortfolio,
-  ISupaDividendsInMonth,
-  IPortfolio,
-  IStockPortfolio,
-  ISupaPortfolio,
-  IUser,
-} from "@/types/types";
-import axios from "axios";
-import { UserService } from "./UserService";
-import { auth, db } from "@/config/firebaseConfig";
-import {
-  addDoc,
-  collection,
-  doc,
-  getDocs,
-  query,
-  setDoc,
-  where,
-} from "firebase/firestore";
-import { User, onAuthStateChanged } from "firebase/auth";
-import moment from "moment";
+import { ISupaPortfolio, IUser } from "@/types/types";
 import { ROUND } from "@/utils/round";
+import axios from "axios";
+import moment from "moment";
 import { StockPortfolioService } from "./StockPortfolioService";
-
-interface IResponseGetStocks {
-  stocks: [];
-}
-
-interface IResponseGetPortfolio {
-  gainRealizedPercentage: number;
-  gainUnrealizedPercentage: number;
-  portfolio: ISupaStockPortfolio[];
-}
+import { UserService } from "./UserService";
 
 export class PortfolioService {
   static async addTransaction(
@@ -44,20 +16,6 @@ export class PortfolioService {
     portfolioId: string | undefined,
     userId: string
   ) {
-    // const user = await UserService.getUser();
-    // console.log(user);
-    // if (user.data.user) {
-    //   return axios.post("/api/portfolio/add-transaction", {
-    //     ticker,
-    //     price: Number(price),
-    //     count: Number(count),
-    //     type,
-    //     date,
-    //     portfolioId,
-    //     userId: user.data.user.id,
-    //   });
-    // }
-
     const response = await axios.post("/api/portfolio/add-transaction", {
       ticker,
       price: Number(price),
@@ -70,70 +28,14 @@ export class PortfolioService {
     return response;
   }
 
-  // static async getStocks() {
-  //   const stocks = await supabaseClient
-  //     .from("stock")
-  //     .select()
-  //     .gte("roe", 20)
-  //     .gte("price_growth", 15)
-  //     .gte("analystRatingBuy", 10)
-  //     .lte("pe", 30)
-  //     .gt("pe", 0)
-  //     .gte("gfValue", 10)
-  //     .lte("de", 3)
-  //     .order("price_growth", { ascending: false });
-
-  //   const stockPortfolio = await supabaseClient
-  //     .from("stock_portfolio")
-  //     .select()
-  //     .eq("is_trading", true);
-
-  //   if (stocks.data && stockPortfolio.data) {
-  //     return stocks.data.filter(
-  //       (stock) =>
-  //         !stockPortfolio.data.some(
-  //           (stockPortfolio) => stockPortfolio.ticker === stock.ticker
-  //         )
-  //     );
-  //   }
-  // }
-
-  static async getPortfolioStocks() {
-    const user = await UserService.getUser();
-    const portfolio = await supabaseClient
-      .from("stock_portfolio")
-      .select()
-      .eq("is_trading", true)
-      .order("price_growth", {
-        ascending: true,
-        nullsFirst: false,
-      });
-    return {
-      portfolio: portfolio.data,
-    };
-  }
-
-  static async getPortfolioMap() {
-    const portfolio = await supabaseClient
-      .from("stock_portfolio")
-      .select()
-      .eq("is_trading", true)
-      .order("perc_of_portfolio", {
-        ascending: false,
-        nullsFirst: false,
-      });
-    return {
-      portfolio: portfolio.data,
-    };
-  }
-
-  static async getPortfolioSectors() {
+  static async getPortfolioSectors(portfolio: ISupaPortfolio | null) {
     let sectors: { sector: string; count: number }[] = [];
 
     const stocks = await supabaseClient
       .from("stock_portfolio")
       .select()
       .eq("is_trading", true)
+      .eq("portfolio_id", portfolio?.id)
       .order("gain_margin", {
         ascending: false,
         nullsFirst: false,
@@ -164,30 +66,6 @@ export class PortfolioService {
     }
 
     return sectors.sort((a, b) => b.count - a.count);
-  }
-
-  static async getTransactions() {
-    const response = await supabaseClient
-      .from("transaction")
-      .select()
-      .order("date", { ascending: false });
-    if (response.data) {
-      return response.data;
-    }
-    return [];
-  }
-
-  // static async updatePortfolio() {
-  //   return axios.get(
-  //     `${process.env.NEXT_PUBLIC_CLIENT_URL}/api/portfolio/update-portfolio`
-  //   );
-  // }
-
-  static async updateDividends(userId: string) {
-    return axios.post(
-      `${process.env.NEXT_PUBLIC_CLIENT_URL}/api/portfolio/update-dividends`,
-      { userId }
-    );
   }
 
   static async getDividendIncomeInMonth(

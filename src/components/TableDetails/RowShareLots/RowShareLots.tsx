@@ -1,3 +1,5 @@
+import moment from "moment";
+
 export const RowShareLots = ({
   averagePrice,
   gain,
@@ -15,7 +17,7 @@ export const RowShareLots = ({
 }) => {
   return (
     <tr>
-      <td>{tradeDate}</td>
+      <td>{moment(tradeDate).format("DD.MM.YYYY")}</td>
       <td>{shares}</td>
       <td>{averagePrice}</td>
       <td>{totalCost}</td>

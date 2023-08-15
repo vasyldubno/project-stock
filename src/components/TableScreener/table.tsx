@@ -20,7 +20,7 @@ const Cell = ({ value }: { value: string | number | null }) => {
 
 export const columns = [
   columnHelper.accessor("ticker", {
-    header: "Ticker",
+    header: ({ header }) => <p style={{ textAlign: "left" }}>Ticker</p>,
     cell: (info) => (
       <div style={{ width: "60px" }}>
         <Link href={`/stock/${info.getValue()}`} className={s.cell__ticker}>
@@ -30,7 +30,7 @@ export const columns = [
     ),
   }),
   columnHelper.accessor("name", {
-    header: "Name",
+    header: () => <p style={{ textAlign: "left" }}>Name</p>,
     cell: ({ getValue }) => (
       <p
         style={{
@@ -45,7 +45,7 @@ export const columns = [
     ),
   }),
   columnHelper.accessor("sector", {
-    header: "Sector",
+    header: () => <p style={{ textAlign: "left" }}>Sector</p>,
     cell: ({ getValue }) => (
       <p
         style={{
@@ -60,7 +60,22 @@ export const columns = [
     ),
   }),
   columnHelper.accessor("subIndustry", {
-    header: "Industry",
+    header: () => <p style={{ textAlign: "left" }}>Industry</p>,
+    cell: ({ getValue }) => (
+      <p
+        style={{
+          width: "150px",
+          whiteSpace: "nowrap",
+          overflow: "hidden",
+          textOverflow: "ellipsis",
+        }}
+      >
+        {getValue()}
+      </p>
+    ),
+  }),
+  columnHelper.accessor("country", {
+    header: () => <p style={{ textAlign: "left" }}>Country</p>,
     cell: ({ getValue }) => (
       <p
         style={{
