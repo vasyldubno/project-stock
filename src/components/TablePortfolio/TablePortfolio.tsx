@@ -131,10 +131,14 @@ export const TablePortfolio: FC<Props> = ({ portfolioId, data }) => {
             <tr>
               <td>
                 <div
-                  style={{ cursor: "pointer" }}
+                  style={{
+                    cursor: "pointer",
+                  }}
                   onClick={() => showDetail(row.original.ticker)}
                 >
-                  <ArrowRight />
+                  <div style={{ transform: "rotate(180deg)" }}>
+                    <ArrowRight />
+                  </div>
                 </div>
               </td>
               {row.getVisibleCells().map((cell, cellIndex) => (
