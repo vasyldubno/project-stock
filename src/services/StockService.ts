@@ -4,10 +4,6 @@ import { ISupaPortfolio, ISupaScreener, IUser } from "@/types/types";
 import axios from "axios";
 
 export class StockService {
-  static async updatePriceCurrent(userId: string) {
-    return axios.post(`${CLIENT_URL}/api/stock/price-current`, { userId });
-  }
-
   static async getCalendarEarnings(
     user: IUser | null,
     portfolio: ISupaPortfolio | null

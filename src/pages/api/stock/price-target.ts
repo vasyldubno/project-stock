@@ -1,5 +1,4 @@
 import { supabaseClient } from "@/config/supabaseClient";
-import { xataClient } from "@/config/xataClient";
 import axios from "axios";
 import { NextApiRequest, NextApiResponse } from "next";
 
@@ -7,7 +6,6 @@ export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse
 ) {
-  // const stocks = await xataClient.db.stock.getAll();
   const stocks = await supabaseClient.from("stock").select();
 
   if (stocks.data) {
@@ -27,37 +25,7 @@ export default async function handler(
             .from("stock")
             .update({ analystRatingBuy: buy, price_target: priceTarget })
             .eq("ticker", stock.ticker);
-
-          // if (stock.ticker) {
-          // const xataStock = await xataClient.db.stock
-          //   .filter("ticker", stock.ticker)
-          //   .getFirst();
-
-          // if (xataStock) {
-          //   if (!xataStock.analystRating?.id) {
-          //     const newAnalystRating =
-          //       await xataClient.db.analystRating.create({
-          //         buy,
-          //       });
-
-          //     await xataClient.db.stock.update(xataStock.id, {
-          //       priceTarget,
-          //       analystRating: { id: newAnalystRating.id },
-          //     });
-          //   } else {
-          //     await xataClient.db.analystRating.update(
-          //       xataStock.analystRating.id,
-          //       { buy }
-          //     );
-          //     await xataClient.db.stock.update(xataStock.id, { priceTarget });
-          //   }
-          // }
-          // }
-
-          // console.log(index, stock.ticker);
-        } catch (err) {
-          // console.log("ERROR =>", stock.ticker, err);
-        }
+        } catch (err) {}
       }, 200 * index);
     });
   }

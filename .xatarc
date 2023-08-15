@@ -1,6 +1,0 @@
-{
-  "databaseURL": "https://s-workspace-8e3sca.us-east-1.xata.sh/db/stock",
-  "codegen": {
-    "output": "src/types/xata.ts"
-  }
-}
