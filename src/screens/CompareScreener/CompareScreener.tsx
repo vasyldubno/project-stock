@@ -43,7 +43,7 @@ export const CompareScreener = () => {
               onChange={(e: ChangeEvent<HTMLSelectElement>) => {
                 setSelectedTicker(e.target.value);
               }}
-              value={selectedTicker}
+              value={selectedTicker ?? ""}
             />
           </div>
           <Button
