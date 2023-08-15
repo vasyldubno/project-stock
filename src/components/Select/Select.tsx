@@ -3,6 +3,7 @@ import s from "./styles.module.scss";
 
 type Props = {
   onChange: (props?: any) => void;
+  onFocus?: (props?: any) => void;
   data: string[] | null;
   label?: string;
   defaultValue?: string;
@@ -12,6 +13,7 @@ type Props = {
 export const Select: FC<Props> = ({
   data,
   onChange,
+  onFocus,
   label,
   defaultValue,
   value,
@@ -25,6 +27,7 @@ export const Select: FC<Props> = ({
             <select
               className={s.select}
               onChange={onChange}
+              onFocus={onFocus}
               value={value}
               defaultValue={defaultValue}
             >

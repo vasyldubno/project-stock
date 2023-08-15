@@ -33,7 +33,6 @@ export const TableCardPrice: FC<CardPriceProps> = ({ content }) => {
                   ? "rgb(165,14,14)"
                   : "rgb(19,115,51)"
               }
-              // rotate={isNegative(Number(content)) ? false : true}
             />
           </div>
           <p

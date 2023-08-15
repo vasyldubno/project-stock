@@ -59,8 +59,12 @@ export const AddNewPortfolio = () => {
             <Controller
               control={control}
               name="name"
-              render={({ field: { onChange } }) => (
-                <Input label="Portfolio Name" onChange={onChange} />
+              render={({ field: { onChange, value } }) => (
+                <Input
+                  label="Portfolio Name"
+                  onChange={onChange}
+                  value={value}
+                />
               )}
             />
             {errors.name && <FormError>{errors.name.message}</FormError>}

@@ -73,6 +73,13 @@ export const FormAddStock: FC<Props> = ({
   });
 
   useEffect(() => {
+    setValue(
+      "portfolio",
+      portfolios?.find((item) => item.id === portfolioId)?.title ?? ""
+    );
+  }, []);
+
+  useEffect(() => {
     if (priceCurrent) {
       setValue("price", priceCurrent.toString());
     }
@@ -93,7 +100,6 @@ export const FormAddStock: FC<Props> = ({
         const balance = await UserService.getBalance(user);
         const purchase =
           Number(data.count) * Number(data.price.replace(",", "."));
-
         if (balance && balance - purchase >= 0) {
           const response = await PortfolioService.addTransaction(
             data.ticker,
@@ -178,76 +184,21 @@ export const FormAddStock: FC<Props> = ({
         {errors.count && <FormError>{errors.count.message}</FormError>}
       </div>
 
-      {/* <div
-        style={{
-          display: "flex",
-          flexDirection: "column",
-          marginBottom: "1rem",
-          width: "100%",
-        }}
-      >
-        <label htmlFor="count">Count</label>
-        <input
-          {...register("count")}
-          id="count"
-          type="number"
-          style={{
-            border: "1px solid var(--color-gray)",
-            borderRadius: "0.3rem",
-            padding: "0.4rem",
-            outline: "transparent",
-          }}
-        />
-        {errors.count && (
-          <p style={{ color: "red", fontSize: "0.7rem" }}>
-            {errors.count.message}
-          </p>
-        )}
-      </div> */}
-
       <div className={s.form__field__wrapper}>
         <Controller
           control={control}
           name="price"
-          render={({ field: { onChange } }) => (
+          render={({ field: { onChange, value } }) => (
             <Input
               label="Price"
               onChange={onChange}
               step={0.01}
-              value={priceCurrent}
+              value={value}
             />
           )}
         />
         {errors.price && <FormError>{errors.price.message}</FormError>}
       </div>
-
-      {/* <div
-        style={{
-          display: "flex",
-          flexDirection: "column",
-          marginBottom: "1rem",
-          width: "100%",
-        }}
-      >
-        <label htmlFor="price">Price</label>
-        <input
-          {...register("price")}
-          id="price"
-          type="number"
-          step={0.01}
-          style={{
-            border: "1px solid var(--color-gray)",
-            borderRadius: "0.3rem",
-            padding: "0.4rem",
-            outline: "transparent",
-          }}
-        />
-        {errors.price && (
-          <p style={{ color: "red", fontSize: "0.7rem" }}>
-            {errors.price.message}
-          </p>
-        )}
-      </div> */}
 
       <div className={s.form__field__wrapper}>
         <Input
@@ -268,41 +219,6 @@ export const FormAddStock: FC<Props> = ({
         )}
       </div>
 
-      {/* <div
-        style={{
-          display: "flex",
-          flexDirection: "column",
-          marginBottom: "1rem",
-          width: "100%",
-        }}
-      >
-        <label htmlFor="date">Date</label>
-        <input
-          id="date"
-          type="text"
-          style={{
-            border: "1px solid var(--color-gray)",
-            borderRadius: "0.3rem",
-            padding: "0.4rem",
-            outline: "transparent",
-          }}
-          onClick={() => {
-            setIsOpenDatePicker(true);
-          }}
-          value={moment(selectedDate).format("DD.MM.YYYY")}
-        />
-
-        {isOpenDatePicker && (
-          <DayPicker
-            selected={selectedDate}
-            onDayClick={(day) => {
-              setSelectedDate(day);
-              setIsOpenDatePicker(false);
-            }}
-          />
-        )}
-      </div> */}
-
       <div className={s.form__field__wrapper}>
         <Controller
           control={control}
@@ -313,44 +229,11 @@ export const FormAddStock: FC<Props> = ({
               onChange={onChange}
               data={portfolios?.map((item) => item.title) ?? null}
               value={getValues("portfolio")}
-              // defaultValue={portfolios[0].title ?? "-- --"}
             />
           )}
         />
         {errors.portfolio && <FormError>{errors.portfolio.message}</FormError>}
       </div>
-
-      {/* <div
-        style={{
-          display: "flex",
-          flexDirection: "column",
-          marginBottom: "1rem",
-          width: "100%",
-        }}
-      >
-        <label htmlFor="price">Choose Portfolio</label>
-        <select
-          {...register("portfolio")}
-          style={{
-            border: "1px solid var(--color-gray)",
-            borderRadius: "0.3rem",
-            padding: "0.4rem",
-            outline: "transparent",
-          }}
-        >
-          {portfolios &&
-            portfolios.map((item) => (
-              <option key={item.id} value={item.id}>
-                {item.title}
-              </option>
-            ))}
-        </select>
-        {errors.portfolio && (
-          <p style={{ color: "red", fontSize: "0.7rem" }}>
-            {errors.portfolio.message}
-          </p>
-        )}
-      </div> */}
 
       {errorTransaction && (
         <FormError styles={{ margin: "1rem 0" }}>

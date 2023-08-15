@@ -8,17 +8,10 @@
   justify-content: center;
   color: black;
   background-color: white;
-  // box-shadow: 0 2px 2px white;
   outline: transparent;
 }
 
-// .IconButton:focus {
-//   box-shadow: 0 0 0 2px black;
-// }
-
 .DropdownMenuContent {
-  // min-width: 220px;
-  // max-width: 100dvw;
   width: 100%;
   background-color: white;
   border-radius: 6px;
@@ -55,16 +48,11 @@
   height: 25px;
   padding: 0 5px;
   position: relative;
-  // padding-left: 25px;
   user-select: none;
   outline: none;
   cursor: pointer;
 }
 
-// .DropdownMenuItem[data-disabled] {
-//   color: blue;
-//   pointer-events: none;
-// }
 .DropdownMenuItem[data-highlighted] {
   background-color: #192b58;
   color: white;
