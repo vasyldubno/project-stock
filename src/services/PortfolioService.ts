@@ -339,8 +339,38 @@ export class PortfolioService {
     }
   }
 
-  static async deletePortfolio(portfolio: ISupaPortfolio | null) {
-    await supabaseClient.from("portfolio").delete().eq("id", portfolio?.id);
+  static async deletePortfolio(
+    portfolio: ISupaPortfolio | null,
+    user: IUser | null
+  ) {
+    const supaStockPortfolio = await supabaseClient
+      .from("stock_portfolio")
+      .select()
+      .eq("portfolio_id", portfolio?.id);
+
+    if (supaStockPortfolio.data) {
+      supaStockPortfolio.data.forEach(async (stockPortfolio) => {
+        const today = moment(new Date()).format("YYYY-MM-DD");
+        const supaStock = await supabaseClient
+          .from("stock")
+          .select()
+          .eq("ticker", stockPortfolio.ticker)
+          .single();
+
+        if (supaStock.data && user && user.id) {
+          await this.addTransaction(
+            stockPortfolio.ticker,
+            Number(supaStock.data.price_current).toString(),
+            Number(stockPortfolio.amount_active_shares).toString(),
+            "sell",
+            today,
+            portfolio?.id,
+            user.id
+          );
+        }
+      });
+      await supabaseClient.from("portfolio").delete().eq("id", portfolio?.id);
+    }
   }
 
   static async getPortfolios(user: IUser | null) {
