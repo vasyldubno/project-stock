@@ -4,7 +4,6 @@ import { Header } from "@/components/Header/Header";
 import { TabsPortfolio } from "@/components/TabsPortfolio/TabsPortfolio";
 import { useUser } from "@/hooks/useUser";
 import { ISupaPortfolio, ISupaStockPortfolio } from "@/types/types";
-import dynamic from "next/dynamic";
 import { useEffect, useState } from "react";
 import { usePortfolios, useStocks } from "./queries";
 import {
@@ -16,14 +15,6 @@ import {
 import { DeleteIcon } from "@/icons/DeleteIcon";
 import { PortfolioService } from "@/services/PortfolioService";
 import { TablePortfolio } from "@/components/TablePortfolio/TablePortfolio";
-
-// const TablePortfolioDynamic = dynamic(
-//   () =>
-//     import("@/components/TablePortfolio/TablePortfolio").then(
-//       (res) => res.TablePortfolio
-//     ),
-//   { ssr: false }
-// );
 
 export const PortfolioScreen = () => {
   const [portfolios, setPortfolios] = useState<ISupaPortfolio[] | null>(null);
@@ -91,7 +82,7 @@ export const PortfolioScreen = () => {
                       <DeleteIcon size="1rem" />
                     ),
                     onDelete: () =>
-                      PortfolioService.deletePortfolio(selectedPortfolio),
+                      PortfolioService.deletePortfolio(selectedPortfolio, user),
                   }))}
                 />
 

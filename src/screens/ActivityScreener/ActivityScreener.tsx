@@ -50,7 +50,7 @@ export const ActivityScreener = () => {
                     <DeleteIcon size="1rem" />
                   ),
                   onDelete: () =>
-                    PortfolioService.deletePortfolio(selectedPortfolio),
+                    PortfolioService.deletePortfolio(selectedPortfolio, user),
                 }))}
               />
             )}
