@@ -16,7 +16,7 @@ export const StockProvider: FC<PropsWithChildren> = ({ children }) => {
       if (res) {
         if (res.error) {
           setIsLoaded(true);
-          router.push("/login");
+          // router.push("/login");
         }
         if (res.email && res.id) {
           setUser({ email: res.email, id: res.id });

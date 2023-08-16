@@ -1,0 +1,52 @@
+.h1 {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+
+  font-size: 4rem;
+  font-weight: 700;
+
+  text-wrap: balance;
+  text-align: center;
+
+  @media (max-width: 1320px) {
+    font-size: 3.5rem;
+  }
+
+  @media (max-width: 1150px) {
+    font-size: 3rem;
+  }
+
+  @media (max-width: 990px) {
+    font-size: 2.5rem;
+  }
+
+  @media (max-width: 830px) {
+    font-size: 2rem;
+  }
+}
+
+.header {
+  max-width: 1200px;
+  max-height: fit-content;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin: 0 auto;
+  padding: 1rem 1rem;
+  color: #fff;
+}
+
+.headerWrapper {
+  background-color: #192b58;
+}
+
+.headerTitle {
+  display: flex;
+  gap: 1rem;
+  align-items: center;
+  justify-content: center;
+  font-size: 2.5rem;
+  font-weight: 700;
+}

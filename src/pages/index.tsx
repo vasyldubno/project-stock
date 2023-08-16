@@ -1,4 +1,6 @@
 import { useUser } from "@/hooks/useUser";
+import { HomeScreen } from "@/screens/HomeScreen/HomeScreen";
+import Head from "next/head";
 import { useRouter } from "next/router";
 import { useEffect } from "react";
 
@@ -12,5 +14,12 @@ export default function Home() {
     }
   }, [user]);
 
-  return <></>;
+  return (
+    <>
+      <Head>
+        <title>Stocker</title>
+      </Head>
+      <HomeScreen />
+    </>
+  );
 }
