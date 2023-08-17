@@ -1,3 +1,5 @@
+import { TITLE } from "@/config/consts";
+import { AuthProvider } from "@/providers/AuthProvider/AuthProvider";
 import { SoldOutScreener } from "@/screens/SoldOutScreener/SoldOutScreener";
 import Head from "next/head";
 
@@ -5,9 +7,11 @@ const SoldOutPage = () => {
   return (
     <>
       <Head>
-        <title>Sold Out</title>
+        <title>Sold Out | {TITLE}</title>
       </Head>
-      <SoldOutScreener />
+      <AuthProvider>
+        <SoldOutScreener />
+      </AuthProvider>
     </>
   );
 };

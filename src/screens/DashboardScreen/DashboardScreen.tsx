@@ -27,6 +27,8 @@ import { ROUND } from "@/utils/round";
 import { TableDividends } from "@/components/TableDividends/TableDividends";
 import { TableUpcomingDividends } from "@/components/TableUpcomingDividends/TableUpcomingDividends";
 import { RationItem } from "./RationItem/RationItem";
+import { AuthProvider } from "@/providers/AuthProvider/AuthProvider";
+import { Loader } from "@/components/Loader/Loader";
 
 export const DashboardScreen: FC = () => {
   const user = useUser();
@@ -54,25 +56,31 @@ export const DashboardScreen: FC = () => {
     }
   }, [portfolios]);
 
+  const isDisplay =
+    !!calendarEarning &&
+    !!stockPortfolio &&
+    !!dividendIncomeInMonth &&
+    !!dividendsList &&
+    !!upcomingDividends &&
+    !!upcomingDividendList;
+
   return (
     <>
-      {user && user.id && (
-        <>
-          <Header />
+      <Header />
 
-          <div style={{ padding: "1rem" }}>
-            {portfolios && (
-              <TabsPortfolio
-                tabs={portfolios.map((item) => ({
-                  content: (
-                    <p onClick={() => setSelectedPortfolio(item)}>
-                      {item.title}
-                    </p>
-                  ),
-                }))}
-              />
-            )}
+      <div style={{ padding: "1rem" }}>
+        {portfolios && (
+          <TabsPortfolio
+            tabs={portfolios.map((item) => ({
+              content: (
+                <p onClick={() => setSelectedPortfolio(item)}>{item.title}</p>
+              ),
+            }))}
+          />
+        )}
 
+        {isDisplay ? (
+          <>
             <div className={s.content}>
               <div className={s.sectionRatios}>
                 <RationItem
@@ -159,9 +167,13 @@ export const DashboardScreen: FC = () => {
                 </div>
               </div>
             </div>
+          </>
+        ) : (
+          <div className={s.loaderWrapper}>
+            <Loader />
           </div>
-        </>
-      )}
+        )}
+      </div>
     </>
   );
 };

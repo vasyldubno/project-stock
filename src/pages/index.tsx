@@ -1,3 +1,4 @@
+import { Loader } from "@/components/Loader/Loader";
 import { useUser } from "@/hooks/useUser";
 import { HomeScreen } from "@/screens/HomeScreen/HomeScreen";
 import Head from "next/head";

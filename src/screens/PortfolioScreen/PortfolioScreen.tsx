@@ -15,6 +15,8 @@ import {
 import { DeleteIcon } from "@/icons/DeleteIcon";
 import { PortfolioService } from "@/services/PortfolioService";
 import { TablePortfolio } from "@/components/TablePortfolio/TablePortfolio";
+import { Loader } from "@/components/Loader/Loader";
+import s from "./styles.module.scss";
 
 export const PortfolioScreen = () => {
   const [portfolios, setPortfolios] = useState<ISupaPortfolio[] | null>(null);
@@ -88,7 +90,9 @@ export const PortfolioScreen = () => {
 
                 <div>
                   {queryStocks.isFetching ? (
-                    <p>Loading...</p>
+                    <div className={s.loaderWrapper}>
+                      <Loader />
+                    </div>
                   ) : selectedPortfolio && stocks && stocks?.length > 0 ? (
                     <div style={{ margin: "1rem" }}>
                       <TablePortfolio
