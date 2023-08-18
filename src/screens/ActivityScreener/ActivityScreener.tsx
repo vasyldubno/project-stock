@@ -46,11 +46,11 @@ export const ActivityScreener = () => {
                       {item.title}
                     </p>
                   ),
-                  iconDelete: selectedPortfolio?.id === item.id && (
-                    <DeleteIcon size="1rem" />
-                  ),
-                  onDelete: () =>
-                    PortfolioService.deletePortfolio(selectedPortfolio, user),
+                  // iconDelete: selectedPortfolio?.id === item.id && (
+                  //   <DeleteIcon size="1rem" />
+                  // ),
+                  // onDelete: () =>
+                  //   PortfolioService.deletePortfolio(selectedPortfolio, user),
                 }))}
               />
             )}

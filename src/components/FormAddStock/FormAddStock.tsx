@@ -34,7 +34,7 @@ export const FormAddStock: FC<Props> = ({
   const [errorTransaction, setErrorTransaction] = useState(false);
   const [isOpenDatePicker, setIsOpenDatePicker] = useState(false);
   const [selectedDate, setSelectedDate] = useState(new Date());
-  const [searchValue, setSearchValue] = useState("");
+  const [searchValue, setSearchValue] = useState(ticker ?? "");
   const [dropdownSelectors, setDropdownSelectors] = useState<
     { ticker: string; name: string }[] | null
   >(null);
