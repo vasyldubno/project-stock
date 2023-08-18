@@ -15,6 +15,7 @@ import { Input } from "../Input/Input";
 import { Select } from "../Select/Select";
 import { usePortfolios, usePriceCurrent } from "./queries";
 import s from "./styles.module.scss";
+import { supabaseClient } from "@/config/supabaseClient";
 
 type Props = {
   ticker?: string;
@@ -31,7 +32,7 @@ export const FormAddStock: FC<Props> = ({
   portfolioId,
   price,
 }) => {
-  const [errorTransaction, setErrorTransaction] = useState(false);
+  const [errorTransaction, setErrorTransaction] = useState("");
   const [isOpenDatePicker, setIsOpenDatePicker] = useState(false);
   const [selectedDate, setSelectedDate] = useState(new Date());
   const [searchValue, setSearchValue] = useState(ticker ?? "");
@@ -114,7 +115,40 @@ export const FormAddStock: FC<Props> = ({
             onClose();
           }
         } else {
-          setErrorTransaction(true);
+          setErrorTransaction("No enough funds in the account");
+        }
+      }
+
+      if (type === "sell") {
+        const supaStockPortfolio = await supabaseClient
+          .from("stock_portfolio")
+          .select()
+          .eq("ticker", ticker)
+          .eq("portfolio_id", portfolioId)
+          .single();
+
+        if (supaStockPortfolio.data) {
+          if (
+            Number(supaStockPortfolio.data.amount_active_shares) >=
+            Number(data.count)
+          ) {
+            const response = await PortfolioService.addTransaction(
+              data.ticker,
+              data.price,
+              data.count,
+              type,
+              moment(selectedDate).format("YYYY-MM-DD"),
+              data.portfolio,
+              user.id
+            );
+            if (response.status === 200) {
+              onClose();
+            }
+          } else {
+            setErrorTransaction(
+              `You can sell only ${supaStockPortfolio.data.amount_active_shares} share`
+            );
+          }
         }
       }
     }
@@ -124,7 +158,7 @@ export const FormAddStock: FC<Props> = ({
     <form
       className={s.form}
       onSubmit={handleSubmit(onSubmit)}
-      onChange={() => setErrorTransaction(false)}
+      onChange={() => setErrorTransaction("")}
     >
       <div className={s.form__field__wrapper}>
         <Controller
@@ -236,9 +270,7 @@ export const FormAddStock: FC<Props> = ({
       </div>
 
       {errorTransaction && (
-        <FormError styles={{ margin: "1rem 0" }}>
-          No enough funds in the account
-        </FormError>
+        <FormError styles={{ margin: "1rem 0" }}>{errorTransaction}</FormError>
       )}
 
       {type === "buy" && <Button title="BUY" type="submit" width="150px" />}

@@ -12,7 +12,7 @@ export const AddNewTransaction: FC<Props> = ({ portfolioId }) => {
 
   return (
     <>
-      <Button title="+ Add Transaction" onClick={() => setIsOpen(true)} />
+      <Button title="Buy Share" onClick={() => setIsOpen(true)} />
       <Modal open={isOpen} onClose={() => setIsOpen(false)}>
         <FormAddStock
           type="buy"
