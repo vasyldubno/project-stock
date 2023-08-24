@@ -116,7 +116,7 @@ export const columns = [
   }),
   columnHelper.accessor("roe", {
     header: "ROE",
-    cell: ({ getValue }) => <Cell value={getValue()} />,
+    cell: ({ getValue }) => <Cell value={`${getValue()?.toFixed(2)}%`} />,
   }),
   columnHelper.accessor("de", {
     header: "D/E",
@@ -124,11 +124,11 @@ export const columns = [
   }),
   columnHelper.accessor("gross_margin", {
     header: "Gross Margin",
-    cell: ({ getValue }) => <Cell value={getValue()} />,
+    cell: ({ getValue }) => <Cell value={`${getValue()}%`} />,
   }),
   columnHelper.accessor("net_margin", {
     header: "Net Margin",
-    cell: ({ getValue }) => <Cell value={getValue()} />,
+    cell: ({ getValue }) => <Cell value={`${getValue()}%`} />,
   }),
   columnHelper.accessor("beta", {
     header: "Beta",
@@ -199,7 +199,7 @@ export const columns = [
       <>
         {info.getValue() ? (
           <p style={{ width: "110px", textAlign: "center" }}>
-            {info.getValue()}
+            {info.getValue()?.toFixed(2)}
           </p>
         ) : (
           <p style={{ width: "110px", textAlign: "center" }}>-- --</p>

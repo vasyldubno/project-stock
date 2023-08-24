@@ -30,7 +30,6 @@ export const Header: FC = () => {
         setErrorMessage("Allow only numbers");
       } else {
         const balance = await UserService.getBalance(user);
-
         await supabaseClient
           .from("user")
           .update({
@@ -39,7 +38,6 @@ export const Header: FC = () => {
               : Number(valueDeposit),
           })
           .eq("id", user.id);
-
         setIsOpenModal(false);
       }
     }
@@ -92,6 +90,7 @@ export const Header: FC = () => {
           <p className={s.modalTitle}>Deposit</p>
           <div className={s.modalForm}>
             <Input
+              type="number"
               value={valueDeposit}
               onChange={(e: ChangeEvent<HTMLInputElement>) => {
                 setDepositValue(e.target.value);

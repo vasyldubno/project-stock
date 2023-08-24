@@ -15,6 +15,8 @@ export const CompareScreener = () => {
   const [compareTickers, setCompareTickers] = useState<string[]>([]);
 
   const stocks = useStocks(compareTickers);
+  console.log(compareTickers);
+  console.log(stocks);
 
   return (
     <>
@@ -22,10 +24,15 @@ export const CompareScreener = () => {
 
       <Container>
         <div className={s.wrapper}>
-          <Button title="+ Add New Stock" onClick={() => setIsOpen(true)} />
+          <Button
+            title="+ Add New Stock"
+            onClick={() => setIsOpen(true)}
+            width="200px"
+          />
           <Button
             title="Clear Compare List"
             onClick={() => setCompareTickers([])}
+            width="200px"
           />
         </div>
 
@@ -39,7 +46,10 @@ export const CompareScreener = () => {
           <div style={{ width: "100%" }}>
             <Select
               label="Choose Stock"
-              data={STOCKS.map((item) => item.ticker)}
+              data={STOCKS.map((item) => ({
+                content: item.ticker,
+                value: item.ticker,
+              }))}
               onChange={(e: ChangeEvent<HTMLSelectElement>) => {
                 setSelectedTicker(e.target.value);
               }}

@@ -1,13 +1,21 @@
 import { ISupaStock } from "@/types/types";
 import { createColumnHelper } from "@tanstack/react-table";
 import millify from "millify";
+import Link from "next/link";
+import s from "./styles.module.scss";
 
 const columnHelper = createColumnHelper<ISupaStock>();
 
 export const columns = [
   columnHelper.accessor("ticker", {
     header: "Ticker",
-    cell: (info) => <p style={{ textAlign: "center" }}>{info.getValue()}</p>,
+    cell: (info) => (
+      <div style={{ textAlign: "center" }}>
+        <Link className={s.cell__ticker} href={`/stock/${info.getValue()}`}>
+          {info.getValue()}
+        </Link>
+      </div>
+    ),
   }),
   columnHelper.accessor("price_current", {
     header: "Price Current",

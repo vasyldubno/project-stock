@@ -1,55 +1,66 @@
-import { CLIENT_URL } from "@/config/consts";
 import { supabaseClient } from "@/config/supabaseClient";
 import { ISupaPortfolio, ISupaScreener, IUser } from "@/types/types";
 import axios from "axios";
+import moment from "moment-timezone";
 
 export class StockService {
   static async getCalendarEarnings(
     user: IUser | null,
     portfolio: ISupaPortfolio | null
   ) {
-    const supaPortfolio = await supabaseClient
-      .from("portfolio")
-      .select()
-      .eq("user_id", user?.id)
-      .eq("id", portfolio?.id)
-      .single();
-
-    if (supaPortfolio.data) {
-      const supaStockPortfolio = await supabaseClient
-        .from("stock_portfolio")
+    const responseTimezone = await axios.get<{ timezone: string }>(
+      "https://ipapi.co/json/"
+    );
+    if (responseTimezone) {
+      const supaPortfolio = await supabaseClient
+        .from("portfolio")
         .select()
-        .eq("portfolio_id", supaPortfolio.data.id);
+        .eq("user_id", user?.id)
+        .eq("id", portfolio?.id)
+        .single();
 
-      if (supaStockPortfolio.data) {
-        const stockPortfolioTickers = supaStockPortfolio.data.map(
-          (item) => item.ticker
-        );
+      if (supaPortfolio.data) {
+        const supaStockPortfolio = await supabaseClient
+          .from("stock_portfolio")
+          .select()
+          .eq("portfolio_id", supaPortfolio.data.id);
 
-        if (stockPortfolioTickers) {
-          const supaStock = await supabaseClient
-            .from("stock")
-            .select()
-            .in("ticker", stockPortfolioTickers)
-            .order("report_date", { ascending: true })
-            .order("ticker", { ascending: true });
+        if (supaStockPortfolio.data) {
+          const stockPortfolioTickers = supaStockPortfolio.data.map(
+            (item) => item.ticker
+          );
 
-          if (supaStock.data) {
-            const today = new Date();
-            const endOfMonth = new Date(
-              today.getUTCFullYear(),
-              today.getUTCMonth() + 1,
-              0
-            );
+          if (stockPortfolioTickers) {
+            const supaStock = await supabaseClient
+              .from("stock")
+              .select()
+              .in("ticker", stockPortfolioTickers)
+              .order("report_date", { ascending: true })
+              .order("ticker", { ascending: true });
 
-            const result = supaStock.data.filter((item) => {
-              if (item.report_date) {
-                const objDate = new Date(item.report_date);
-                return objDate >= today && objDate <= endOfMonth;
-              }
-            });
+            if (supaStock.data) {
+              const result = supaStock.data.filter((item) => {
+                if (item.report_date) {
+                  const objDate = moment(item.report_date)
+                    .tz(responseTimezone.data.timezone)
+                    .toDate();
+                  const today = moment()
+                    .tz(responseTimezone.data.timezone)
+                    .toDate();
+                  const futureDate = moment()
+                    .tz(responseTimezone.data.timezone)
+                    .add(10, "days")
+                    .toDate();
 
-            return result;
+                  return (
+                    moment(objDate).isSameOrAfter(moment(today), "day") &&
+                    moment(objDate).isSameOrBefore(moment(futureDate), "day")
+                  );
+                }
+              });
+
+              return result;
+            }
           }
         }
       }

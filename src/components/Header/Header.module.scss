@@ -51,15 +51,15 @@
 }
 
 .modalTitle {
-  fontsize: 1.3rem;
-  fontweight: bold;
+  font-size: 1.3rem;
+  font-weight: bold;
   margin: 0 0 2rem 0;
-  textalign: center;
+  text-align: center;
 }
 
 .modalForm {
   display: flex;
-  flexdirection: column;
-  alignitems: center;
+  flex-direction: column;
+  align-items: center;
   gap: 1rem;
 }

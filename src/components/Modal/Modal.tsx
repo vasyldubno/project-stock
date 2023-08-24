@@ -17,6 +17,16 @@ export const Modal: FC<PropsWithChildren & ModalProps> = ({
 
   useEffect(() => {
     setIsOpen(open);
+
+    if (open) {
+      document.body.style.overflow = "hidden";
+    } else {
+      document.body.style.overflow = "";
+    }
+
+    return () => {
+      document.body.style.overflow = "";
+    };
   }, [open]);
 
   const ref = useRef(null);

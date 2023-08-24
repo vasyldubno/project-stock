@@ -1,16 +1,15 @@
-import { z } from "zod";
+import { STOCKS } from "@/assets/stock";
+import { useUser } from "@/hooks/useUser";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { ChangeEvent, FC, useState } from "react";
+import { Controller, SubmitHandler, useForm } from "react-hook-form";
 import { Button } from "../Button/Button";
 import { Input } from "../Input/Input";
-import { SubmitHandler, useForm, Controller } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { ScreenerService } from "@/services/ScreenerService";
-import { useUser } from "@/hooks/useUser";
-import { ChangeEvent, FC, useEffect, useState } from "react";
 import { Select } from "../Select/Select";
-import { STOCKS } from "@/assets/stock";
 import { data } from "./assets";
 import { FormSchema, formSchema } from "./form";
 import s from "./styles.module.scss";
+import { ScreenerService } from "@/services/ScreenerService";
 
 type Props = {
   afterSubmit: () => void;
@@ -69,32 +68,48 @@ export const AddNewScreener: FC<Props> = ({ afterSubmit }) => {
         sector: data.sector,
         industry: data.industry,
       });
-
       if (response && response.status === 201) {
         afterSubmit();
       }
     }
   };
 
-  const sectors = Array.from(new Set(STOCKS.map((item) => item.sector)));
-  const [industries, setIndustries] = useState(
-    Array.from(new Set(STOCKS.map((item) => item.subIndustry).sort()))
-  );
-  const [selectedSector, setSelectedSector] = useState<string | null>(null);
+  const [industries, setIndustries] = useState<
+    | {
+        content: string;
+        value: string;
+      }[]
+  >([]);
 
-  useEffect(() => {
-    if (selectedSector) {
-      setIndustries(
-        Array.from(
-          new Set(
-            STOCKS.filter((item) => item.sector === selectedSector)
-              .map((item) => item.subIndustry)
-              .sort()
-          )
-        )
-      );
+  function getUniqueItemArray<T, K extends keyof T>(
+    arr: T[],
+    key: K,
+    sector?: string
+  ) {
+    const uniqueValues: Record<string, boolean> = {};
+    const resultArr: T[] = [];
+
+    const filteredArr = sector
+      ? arr.filter((obj) => (obj as any)["sector"] === sector)
+      : arr;
+
+    for (const obj of filteredArr) {
+      const value = obj[key] as unknown as string;
+      if (!uniqueValues[value]) {
+        uniqueValues[value] = true;
+        resultArr.push(obj);
+      }
     }
-  }, [selectedSector]);
+
+    return resultArr.sort((a, b) =>
+      (a[key] as any).localeCompare(b[key] as any)
+    );
+  }
+
+  const sectors = getUniqueItemArray(STOCKS, "sector").map((item) => ({
+    content: item.sector,
+    value: item.sector,
+  }));
 
   return (
     <form className={s.form} onSubmit={handleSubmit(onSumbit)}>
@@ -124,11 +139,17 @@ export const AddNewScreener: FC<Props> = ({ afterSubmit }) => {
                 data={sectors}
                 onChange={(e: ChangeEvent<HTMLSelectElement>) => {
                   onChange(e);
-                  setSelectedSector(getValues("sector") ?? null);
-                  const selectedIndustry = getValues("industry");
-                  if (selectedIndustry) {
-                    setValue("industry", undefined);
-                  }
+                  setValue("industry", "");
+                  setIndustries(
+                    getUniqueItemArray(
+                      STOCKS,
+                      "subIndustry",
+                      getValues("sector")
+                    ).map((item) => ({
+                      content: item.subIndustry,
+                      value: item.subIndustry,
+                    }))
+                  );
                 }}
                 label="Sector"
                 value={getValues("sector")}
