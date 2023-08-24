@@ -132,7 +132,14 @@ export default async function handler(
   /* --- --- --- SELL --- --- --- */
 
   if (type === "sell") {
-    const stock = await supabaseClient
+    console.log(req.body);
+    const supaStock = await supabaseClient
+      .from("stock")
+      .select()
+      .eq("ticker", ticker)
+      .single();
+
+    const supaStockPortfolio = await supabaseClient
       .from("stock_portfolio")
       .select()
       .eq("ticker", ticker)
@@ -146,16 +153,16 @@ export default async function handler(
       .single();
 
     const lastChangePortfolio = () => {
-      if (stock.data) {
+      if (supaStockPortfolio.data) {
         if (
-          stock.data.average_cost_per_share &&
-          stock.data.amount_active_shares
+          supaStockPortfolio.data.average_cost_per_share &&
+          supaStockPortfolio.data.amount_active_shares
         ) {
-          if (stock.data.amount_active_shares === count) {
+          if (supaStockPortfolio.data.amount_active_shares === count) {
             return "sold";
           } else {
             const change = ROUND(
-              (count / stock.data.amount_active_shares) * 100
+              (count / supaStockPortfolio.data.amount_active_shares) * 100
             );
             return `reduce ${change}`;
           }
@@ -164,7 +171,7 @@ export default async function handler(
       return "";
     };
 
-    await supabaseClient.from("transaction").insert({
+    const resTransaction = await supabaseClient.from("transaction").insert({
       ticker,
       count,
       price,
@@ -173,27 +180,40 @@ export default async function handler(
       change: lastChangePortfolio(),
       portfolio_id: portfolioId,
     });
+    console.log("resTransaction", resTransaction);
 
     if (
-      stock.data &&
+      supaStockPortfolio.data &&
       portfolio.data &&
-      stock.data.amount_active_shares &&
-      stock.data.average_cost_per_share
+      supaStockPortfolio.data.amount_active_shares &&
+      supaStockPortfolio.data.average_cost_per_share
     ) {
-      if (stock.data.amount_active_shares === count) {
+      /* --- SOLD OUT --- */
+      if (supaStockPortfolio.data.amount_active_shares === count) {
         const totalReturnValue = ROUND(
-          Number(stock.data.total_return_value) +
-            getRealizedValue(price, count, stock.data.average_cost_per_share)
+          Number(supaStockPortfolio.data.total_return_value) +
+            getRealizedValue(
+              price,
+              count,
+              supaStockPortfolio.data.average_cost_per_share
+            )
         );
 
         const totalReturnMargin = getTotalReturnMarginStock(
-          stock.data.total_return_value,
-          getRealizedValue(price, count, stock.data.average_cost_per_share),
-          stock.data.amount_active_shares,
-          stock.data.average_cost_per_share
+          supaStockPortfolio.data.total_return_value,
+          getRealizedValue(
+            price,
+            count,
+            supaStockPortfolio.data.average_cost_per_share
+          ),
+          supaStockPortfolio.data.amount_active_shares,
+          supaStockPortfolio.data.average_cost_per_share
         );
 
-        await supabaseClient
+        console.log("totalReturnValue", totalReturnValue);
+        console.log("totalReturnMargin", totalReturnMargin);
+
+        const resStockPortfolio = await supabaseClient
           .from("stock_portfolio")
           .update({
             startTradeDate: null,
@@ -206,23 +226,20 @@ export default async function handler(
           })
           .eq("ticker", ticker)
           .eq("portfolio_id", portfolioId);
+        console.log("resStockPortfolio", resStockPortfolio);
 
-        if (stock.data.startTradeDate) {
-          if (stock.data.is_dividend) {
+        if (supaStockPortfolio.data.startTradeDate) {
+          if (supaStock.data && supaStock.data.is_dividend) {
             const supaDividend = await supabaseClient
               .from("dividend")
               .select()
-              .eq("ticker", stock.data.ticker)
-              .eq("portfolio_id", stock.data.portfolio_id);
+              .eq("ticker", supaStockPortfolio.data.ticker)
+              .eq("portfolio_id", supaStockPortfolio.data.portfolio_id);
 
-            const costValue =
-              stock.data.average_cost_per_share *
-              stock.data.amount_active_shares;
-            const returnValue = price * stock.data.amount_active_shares;
-            const profitMargin = ROUND(
-              ((returnValue - costValue) / costValue) * 100
+            const costValue = ROUND(
+              supaStockPortfolio.data.average_cost_per_share *
+                supaStockPortfolio.data.amount_active_shares
             );
-            const profitValue = ROUND(returnValue - costValue);
 
             if (supaDividend.data) {
               const dividendIncome = supaDividend.data.reduce(
@@ -230,68 +247,100 @@ export default async function handler(
                 0
               );
 
-              await supabaseClient.from("exit").insert({
+              const returnValue = ROUND(
+                price * supaStockPortfolio.data.amount_active_shares +
+                  dividendIncome
+              );
+
+              const profitMargin = ROUND(
+                ((returnValue - costValue) / costValue) * 100
+              );
+
+              const profitValue = ROUND(returnValue - costValue);
+
+              console.log("exit costValue", costValue);
+              console.log("exit returnValue", returnValue);
+              console.log("exit profitValue", profitValue);
+              console.log("exit profitMargin", profitMargin);
+
+              const resExit = await supabaseClient.from("exit").insert({
                 portfolio_id: portfolioId,
                 finish_date: date,
-                average_price_per_share: stock.data.average_cost_per_share,
-                start_date: stock.data.startTradeDate,
-                cost: costValue,
-                return: returnValue + dividendIncome,
-                profit_margin: profitMargin,
-                profit_value: profitValue,
-                ticker: stock.data.ticker,
-              });
-            } else {
-              await supabaseClient.from("exit").insert({
-                portfolio_id: portfolioId,
-                finish_date: date,
-                average_price_per_share: stock.data.average_cost_per_share,
-                start_date: stock.data.startTradeDate,
+                average_price_per_share:
+                  supaStockPortfolio.data.average_cost_per_share,
+                start_date: supaStockPortfolio.data.startTradeDate,
                 cost: costValue,
                 return: returnValue,
                 profit_margin: profitMargin,
                 profit_value: profitValue,
-                ticker: stock.data.ticker,
+                ticker: supaStockPortfolio.data.ticker,
+              });
+              console.log("resExit", resExit);
+            } else {
+              const returnValue = ROUND(
+                price * supaStockPortfolio.data.amount_active_shares
+              );
+              const profitMargin = ROUND(
+                ((returnValue - costValue) / costValue) * 100
+              );
+              const profitValue = ROUND(returnValue - costValue);
+
+              await supabaseClient.from("exit").insert({
+                portfolio_id: portfolioId,
+                finish_date: date,
+                average_price_per_share:
+                  supaStockPortfolio.data.average_cost_per_share,
+                start_date: supaStockPortfolio.data.startTradeDate,
+                cost: costValue,
+                return: returnValue,
+                profit_margin: profitMargin,
+                profit_value: profitValue,
+                ticker: supaStockPortfolio.data.ticker,
               });
             }
           }
         }
       }
 
+      /* --- SOLD --- */
       if (
-        stock.data.amount_active_shares >= count &&
-        stock.data.price_current &&
+        supaStockPortfolio.data.amount_active_shares > count &&
+        supaStockPortfolio.data.price_current &&
         portfolio.data.value
       ) {
-        const priceCurrent = await getPriceCurrent(
-          stock.data.ticker,
-          stock.data.exchange
+        const totalReturnValue = ROUND(
+          Number(supaStockPortfolio.data.total_return_value) +
+            getRealizedValue(
+              price,
+              count,
+              supaStockPortfolio.data.average_cost_per_share
+            )
         );
 
-        if (priceCurrent) {
-          const totalReturnValue =
-            stock.data.total_return_value ??
-            0 +
-              getRealizedValue(price, count, stock.data.average_cost_per_share);
+        const totalReturnMargin = getTotalReturnMarginStock(
+          supaStockPortfolio.data.total_return_value,
+          getRealizedValue(
+            price,
+            count,
+            supaStockPortfolio.data.average_cost_per_share
+          ),
+          supaStockPortfolio.data.amount_active_shares,
+          supaStockPortfolio.data.average_cost_per_share
+        );
 
-          const totalReturnMargin = getTotalReturnMarginStock(
-            stock.data.total_return_value,
-            getRealizedValue(price, count, stock.data.average_cost_per_share),
-            stock.data.amount_active_shares,
-            stock.data.average_cost_per_share
-          );
+        const updatedAmountActiveShares =
+          supaStockPortfolio.data.amount_active_shares - count;
 
-          await supabaseClient
-            .from("stock_portfolio")
-            .update({
-              total_return_value: totalReturnValue,
-              total_return_margin: totalReturnMargin,
-              amount_active_shares: stock.data.amount_active_shares - count,
-              last_change_portfolio: lastChangePortfolio(),
-            })
-            .eq("ticker", stock.data.ticker)
-            .eq("portfolio_id", portfolioId);
-        }
+        await supabaseClient
+          .from("stock_portfolio")
+          .update({
+            total_return_value: totalReturnValue,
+            total_return_margin: totalReturnMargin,
+            amount_active_shares: updatedAmountActiveShares,
+            last_change_portfolio: lastChangePortfolio(),
+          })
+          .eq("ticker", supaStockPortfolio.data.ticker)
+          .eq("portfolio_id", portfolioId);
       }
     }
 
@@ -301,36 +350,34 @@ export default async function handler(
       .eq("id", userId)
       .single();
 
-    if (user.data && stock.data) {
-      if (stock.data.average_cost_per_share) {
-        await supabaseClient
+    if (user.data && supaStockPortfolio.data) {
+      if (supaStockPortfolio.data.average_cost_per_share) {
+        const updatedBalance = ROUND(user.data.balance + price * count);
+
+        const resUser = await supabaseClient
           .from("user")
           .update({
-            balance: ROUND(user.data.balance + price * count),
+            balance: updatedBalance,
           })
           .eq("id", userId);
+        console.log("resUser", resUser);
       }
     }
 
-    if (portfolio.data && portfolio.data.cost && stock.data) {
-      if (stock.data.average_cost_per_share) {
-        const priceCurrent = await getPriceCurrent(
-          stock.data.ticker,
-          stock.data.exchange
+    if (portfolio.data && portfolio.data.cost && supaStockPortfolio.data) {
+      if (supaStockPortfolio.data.average_cost_per_share) {
+        const newCost = ROUND(
+          portfolio.data.cost -
+            supaStockPortfolio.data.average_cost_per_share * count
         );
 
-        if (priceCurrent) {
-          const newCost = ROUND(
-            portfolio.data.cost - stock.data.average_cost_per_share * count
-          );
-
-          await supabaseClient
-            .from("portfolio")
-            .update({
-              cost: newCost,
-            })
-            .eq("id", portfolioId);
-        }
+        const resPortfolio = await supabaseClient
+          .from("portfolio")
+          .update({
+            cost: newCost,
+          })
+          .eq("id", portfolioId);
+        console.log("resPortfolio", resPortfolio);
       }
     }
   }

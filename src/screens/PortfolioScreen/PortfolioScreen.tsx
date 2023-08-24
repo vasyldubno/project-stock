@@ -64,7 +64,7 @@ export const PortfolioScreen = () => {
           <Header />
 
           <div style={{ padding: "1rem" }}>
-            <div style={{ display: "flex", gap: "1rem", marginBottom: "1rem" }}>
+            <div className={s.buttons_wrapper}>
               <AddNewPortfolio />
               {selectedPortfolio && (
                 <AddNewTransaction portfolioId={selectedPortfolio.id} />

@@ -4,3 +4,14 @@
   left: 50%;
   transform: translate(-50%, -50%);
 }
+
+.buttons_wrapper {
+  display: flex;
+  gap: 1rem;
+  margin-bottom: 1rem;
+  @media (max-width: 420px) {
+    flex-direction: column;
+    gap: 0.4rem;
+    align-items: center;
+  }
+}

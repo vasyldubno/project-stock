@@ -1,4 +1,4 @@
-import { FC } from "react";
+import { FC, ReactNode } from "react";
 import s from "./Button.module.scss";
 
 interface ButtonProps {
@@ -9,6 +9,7 @@ interface ButtonProps {
   type?: "submit" | "reset" | "button";
   width?: string;
   disabled?: boolean;
+  rightIcon?: ReactNode;
 }
 
 export const Button: FC<ButtonProps> = ({
@@ -19,6 +20,7 @@ export const Button: FC<ButtonProps> = ({
   type,
   width,
   disabled = false,
+  rightIcon,
 }) => {
   return (
     <button
@@ -27,12 +29,14 @@ export const Button: FC<ButtonProps> = ({
       style={{
         backgroundColor,
         color,
-        width,
+        width: "100%",
+        maxWidth: width,
       }}
       className={s.button}
       type={type}
     >
       {title}
+      {rightIcon}
     </button>
   );
 };

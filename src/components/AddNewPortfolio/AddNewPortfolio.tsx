@@ -48,7 +48,7 @@ export const AddNewPortfolio = () => {
 
   return (
     <>
-      <Button title="+ Add New Portfolio" onClick={onClick} />
+      <Button title="+ Add New Portfolio" onClick={onClick} width="200px" />
       <Modal open={isOpen} onClose={() => setIsOpen(false)}>
         <form
           onSubmit={handleSubmit(onSubmit)}

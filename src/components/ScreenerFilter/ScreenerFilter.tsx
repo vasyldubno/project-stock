@@ -39,13 +39,42 @@ export const ScreenerFilter: FC<Props> = ({
 
   const updateScreener = useUpdateScreener();
 
+  function getUniqueItemArray<T, K extends keyof T>(
+    arr: T[],
+    key: K,
+    sector?: string
+  ) {
+    console.log(sector);
+    const uniqueValues: Record<string, boolean> = {};
+    const resultArr: T[] = [];
+
+    const filteredArr = sector
+      ? arr.filter((obj) => (obj as any)["sector"] === sector)
+      : arr;
+
+    for (const obj of filteredArr) {
+      const value = obj[key] as unknown as string;
+      if (!uniqueValues[value]) {
+        uniqueValues[value] = true;
+        resultArr.push(obj);
+      }
+    }
+
+    return resultArr.sort((a, b) =>
+      (a[key] as any).localeCompare(b[key] as any)
+    );
+  }
+
   return (
     <>
       {screener && (
         <div className={s.grid__container}>
           <div className={s.grid__item}>
             <Select
-              data={Array.from(new Set(STOCKS.map((item) => item.sector)))}
+              data={getUniqueItemArray(STOCKS, "sector").map((item) => ({
+                content: item.sector,
+                value: item.sector,
+              }))}
               onChange={(e: ChangeEvent<HTMLSelectElement>) => {
                 setSelectedSector(e.target.value);
                 setSelectedScreener((prev) => {
@@ -73,14 +102,18 @@ export const ScreenerFilter: FC<Props> = ({
             <Select
               data={
                 selectedSector
-                  ? Array.from(
-                      new Set(
-                        STOCKS.filter((item) => item.sector === selectedSector)
-                          .map((item) => item.subIndustry)
-                          .sort()
-                      )
-                    )
-                  : Array.from(new Set(STOCKS.map((item) => item.subIndustry)))
+                  ? getUniqueItemArray(
+                      STOCKS,
+                      "subIndustry",
+                      selectedSector
+                    ).map((item) => ({
+                      content: item.subIndustry,
+                      value: item.subIndustry,
+                    }))
+                  : getUniqueItemArray(STOCKS, "subIndustry").map((item) => ({
+                      content: item.subIndustry,
+                      value: item.subIndustry,
+                    }))
               }
               onChange={(e: ChangeEvent<HTMLSelectElement>) => {
                 setSelectedIndustry(e.target.value);

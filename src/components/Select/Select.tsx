@@ -4,7 +4,7 @@ import s from "./styles.module.scss";
 type Props = {
   onChange: (props?: any) => void;
   onFocus?: (props?: any) => void;
-  data: string[] | null;
+  data: { value: string | number; content: string | number }[] | null;
   label?: string;
   defaultValue?: string;
   value?: string | number;
@@ -33,8 +33,8 @@ export const Select: FC<Props> = ({
             >
               <option value={""}>-- --</option>
               {data.map((item, index) => (
-                <option key={index} value={item}>
-                  {item}
+                <option key={index} value={item.value}>
+                  {item.content}
                 </option>
               ))}
             </select>

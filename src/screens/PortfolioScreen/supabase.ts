@@ -47,6 +47,7 @@ export const stockPortfolioUpdate = (
           const newValue = await StockPortfolioService.getStocks(
             selectedPortfolio
           );
+          console.log(newValue);
           setState(newValue ?? null);
         }
       }

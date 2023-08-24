@@ -18,7 +18,7 @@ export class PortfolioService {
   ) {
     const response = await axios.post("/api/portfolio/add-transaction", {
       ticker,
-      price: Number(price),
+      price: Number(price.replace(",", ".")),
       count: Number(count),
       type,
       date,

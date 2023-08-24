@@ -1,25 +1,93 @@
 import { FaviconIcon } from "@/icons/FaviconIcon/FaviconIcon";
 import s from "./styles.module.scss";
 import Link from "next/link";
+import { Button } from "@/components/Button/Button";
+import { Unbounded } from "@next/font/google";
+import Image from "next/image";
+import { BenefitCard } from "./BenefitCard/BenefitCard";
+import { SendIcon } from "@/icons/SendIcon";
+
+const UnboundedFont = Unbounded({
+  weight: ["200", "300", "400", "500", "600", "700"],
+  subsets: ["latin"],
+});
 
 export const HomeScreen = () => {
   return (
     <div style={{ width: "100dvw", height: "100dvh" }}>
-      <div className={s.headerWrapper}>
-        <div className={s.header}>
-          <div></div>
-          <div className={s.headerTitle}>
-            <div style={{ width: "60px", height: "60px" }}>
-              <FaviconIcon />
-            </div>
-            <p>Stocker</p>
-          </div>
-          <Link href={"/login"}>
-            <p>Sign In</p>
+      <div
+        style={{
+          backgroundColor: "#468FAF",
+        }}
+      >
+        <div
+          style={{
+            maxWidth: "1000px",
+            width: "100%",
+            margin: "0 auto",
+            padding: "3rem 0",
+            display: "flex",
+            flexDirection: "column",
+            alignItems: "center",
+            gap: "2rem",
+          }}
+        >
+          <h1 style={UnboundedFont.style} className={s.h1}>
+            Stocker
+          </h1>
+          <p className={s.section_first__p}>
+            Seamlessly track, manage, and optimize your investments with our
+            intuitive app. Stay in control of your portfolio&apos;s performance,
+            receive real-time updates, and make informed decisions backed by
+            powerful insights. Whether you&apos;re a seasoned investor or just
+            starting out, InvestSync&apos;s user-friendly interface and
+            comprehensive features provide a personalized experience tailored to
+            your financial goals. Sync up with success today and pave the way
+            for a more secure tomorrow with InvestSync.
+          </p>
+          <Link href={"/login"} style={{ width: "200px" }}>
+            <Button
+              title="Get Started"
+              width="100%"
+              rightIcon={
+                <div style={{ width: "1.5rem", height: "1.5rem" }}>
+                  <SendIcon />
+                </div>
+              }
+            />
           </Link>
+          <div style={{ padding: "1rem", width: "100%", maxWidth: "500px" }}>
+            <div className={s.section_first__image_wrapper}>
+              <Image
+                alt="main photo"
+                src="/1.avif"
+                fill
+                style={{ objectFit: "cover" }}
+              />
+            </div>
+          </div>
         </div>
       </div>
-      <h1 className={s.h1}>The Best Place to Track Your Investing</h1>
+
+      <div style={{ backgroundColor: "#89C2D9" }}>
+        <div className={s.section_second__wrapper}>
+          <BenefitCard
+            imageUrl="/2.jpg"
+            title="Track Investments with Unrivaled Precision"
+            description="Stocker empowers you with real-time insights and a
+                customizable dashboard. Manage your portfolio like a pro and
+                never miss a beat."
+          />
+          <BenefitCard
+            reflect
+            imageUrl="/3.jpg"
+            title="Stay in the Loop with Market Updates"
+            description="Be informed of the latest market trends and adjust your
+                strategies with lightning-fast notifications, keeping you one
+                step ahead."
+          />
+        </div>
+      </div>
     </div>
   );
 };

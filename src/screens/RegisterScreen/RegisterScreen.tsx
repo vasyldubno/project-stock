@@ -20,7 +20,7 @@ export const RegisterScreen = () => {
       </Head>
       <div className={s.headerWrapper}>
         <Link href={"/"} className={s.headerContent}>
-          <div style={{ height: "60px", width: "60px" }}>
+          <div className={s.header__icon}>
             <FaviconIcon />
           </div>
           <p>Stocker</p>

@@ -1,0 +1,7 @@
+.buttons__wrapper {
+  margin-bottom: 1rem;
+  @media (max-width: 520px) {
+    display: flex;
+    justify-content: center;
+  }
+}

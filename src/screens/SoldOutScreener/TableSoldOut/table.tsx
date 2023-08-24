@@ -37,6 +37,12 @@ export const columns = [
       </div>
     ),
   }),
+  columnHelper.accessor("start_date", {
+    header: "Start Date",
+    cell: ({ getValue }) => (
+      <Cell value={moment(getValue()).format("DD.MM.YYYY")} />
+    ),
+  }),
   columnHelper.accessor("finish_date", {
     header: "Exit Date",
     cell: ({ getValue }) => (

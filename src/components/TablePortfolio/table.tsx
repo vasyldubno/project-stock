@@ -44,13 +44,13 @@ export const columns = [
   columnHelper.accessor("price_growth_todat_perc", {
     header: "Today's Gain",
     cell: ({ getValue }) => (
-      <>
+      <p style={{ padding: "0 1rem" }}>
         {getValue() ? (
           <TableCardPrice content={getValue()?.toFixed(2)} />
         ) : (
           <TableCardPrice content={0} />
         )}
-      </>
+      </p>
     ),
   }),
   columnHelper.accessor("price_current", {

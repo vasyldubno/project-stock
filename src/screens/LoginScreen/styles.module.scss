@@ -25,4 +25,15 @@
   margin: 0 auto;
   padding: 1rem 1rem;
   color: #fff;
+  @media (max-width: 400px) {
+    font-size: 2rem;
+  }
+}
+
+.header__icon {
+  height: 60px;
+  width: 60px;
+  @media (max-width: 400px) {
+    display: none;
+  }
 }

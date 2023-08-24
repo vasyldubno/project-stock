@@ -16,6 +16,7 @@ import { Select } from "../Select/Select";
 import { usePortfolios, usePriceCurrent } from "./queries";
 import s from "./styles.module.scss";
 import { supabaseClient } from "@/config/supabaseClient";
+import { useQueryClient } from "react-query";
 
 type Props = {
   ticker?: string;
@@ -41,11 +42,10 @@ export const FormAddStock: FC<Props> = ({
   >(null);
   const [isOpenDropdownSelectors, setIsOpenDropdownSelectors] = useState(false);
 
-  const priceCurrent = usePriceCurrent(searchValue);
-
   const user = useUser();
-
+  const priceCurrent = usePriceCurrent(searchValue);
   const portfolios = usePortfolios(user);
+  const queryClient = useQueryClient();
 
   const formSchema = z.object({
     ticker: z.string().min(1),
@@ -76,7 +76,7 @@ export const FormAddStock: FC<Props> = ({
   useEffect(() => {
     setValue(
       "portfolio",
-      portfolios?.find((item) => item.id === portfolioId)?.title ?? ""
+      portfolios?.find((item) => item.id === portfolioId)?.id ?? ""
     );
   }, []);
 
@@ -143,6 +143,7 @@ export const FormAddStock: FC<Props> = ({
             );
             if (response.status === 200) {
               onClose();
+              queryClient.invalidateQueries(["stocks"]);
             }
           } else {
             setErrorTransaction(
@@ -261,7 +262,12 @@ export const FormAddStock: FC<Props> = ({
             <Select
               label="Choose Portfolio"
               onChange={onChange}
-              data={portfolios?.map((item) => item.title) ?? null}
+              data={
+                portfolios?.map((item) => ({
+                  value: item.id,
+                  content: item.title,
+                })) ?? null
+              }
               value={getValues("portfolio")}
             />
           )}

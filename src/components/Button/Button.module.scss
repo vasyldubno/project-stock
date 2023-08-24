@@ -4,6 +4,10 @@
   color: #fff;
   background-color: #827878;
   transition: all 0.3s ease;
+  display: flex;
+  gap: 1rem;
+  align-items: center;
+  justify-content: center;
 
   &[disabled] {
     background-color: var(--color-gray);

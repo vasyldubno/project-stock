@@ -13,6 +13,7 @@ import { ISupaScreener } from "@/types/types";
 import { useEffect, useState } from "react";
 import { useScreeners, useStocks } from "./queries";
 import { supaScreenerDelete, supaScreenerInsert } from "./supabase";
+import s from "./styles.module.scss";
 
 export const ScreenerScreen = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -37,10 +38,11 @@ export const ScreenerScreen = () => {
         <>
           <Header />
           <Container>
-            <div style={{ marginBottom: "1rem" }}>
+            <div className={s.buttons__wrapper}>
               <Button
                 title="+ Add New Screener"
                 onClick={() => setIsOpen(true)}
+                width="200px"
               />
             </div>
 
