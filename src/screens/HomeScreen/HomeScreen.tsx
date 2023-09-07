@@ -1,11 +1,10 @@
-import { FaviconIcon } from "@/icons/FaviconIcon/FaviconIcon";
-import s from "./styles.module.scss";
-import Link from "next/link";
 import { Button } from "@/components/Button/Button";
+import { SendIcon } from "@/icons/SendIcon";
 import { Unbounded } from "@next/font/google";
 import Image from "next/image";
+import Link from "next/link";
 import { BenefitCard } from "./BenefitCard/BenefitCard";
-import { SendIcon } from "@/icons/SendIcon";
+import s from "./styles.module.scss";
 
 const UnboundedFont = Unbounded({
   weight: ["200", "300", "400", "500", "600", "700"],
@@ -17,21 +16,10 @@ export const HomeScreen = () => {
     <div style={{ width: "100dvw", height: "100dvh" }}>
       <div
         style={{
-          backgroundColor: "#468FAF",
+          backgroundColor: "#59aace",
         }}
       >
-        <div
-          style={{
-            maxWidth: "1000px",
-            width: "100%",
-            margin: "0 auto",
-            padding: "3rem 0",
-            display: "flex",
-            flexDirection: "column",
-            alignItems: "center",
-            gap: "2rem",
-          }}
-        >
+        <div className={s.section_first__wrapper}>
           <h1 style={UnboundedFont.style} className={s.h1}>
             Stocker
           </h1>

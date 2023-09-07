@@ -99,6 +99,17 @@
   height: calc(100dvh - 92px);
 }
 
+.section_first__wrapper {
+  max-width: 1000px;
+  width: 100%;
+  margin: 0 auto;
+  padding: 3rem 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2rem;
+}
+
 .section_first__image_wrapper {
   height: 300px;
   position: relative;
@@ -111,6 +122,8 @@
 .section_first__p {
   padding: 0 1rem;
   font-size: 0.8rem;
+  text-wrap: balance;
+  text-align: center;
   @media (min-width: 400px) {
     font-size: 1rem;
   }

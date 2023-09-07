@@ -17,6 +17,7 @@ import { PortfolioService } from "@/services/PortfolioService";
 import { TablePortfolio } from "@/components/TablePortfolio/TablePortfolio";
 import { Loader } from "@/components/Loader/Loader";
 import s from "./styles.module.scss";
+import { QueryCache, useQueryClient } from "react-query";
 
 export const PortfolioScreen = () => {
   const [portfolios, setPortfolios] = useState<ISupaPortfolio[] | null>(null);
@@ -32,6 +33,21 @@ export const PortfolioScreen = () => {
 
   const queryPortfolios = usePortfolios(user);
   const queryStocks = useStocks(selectedPortfolio);
+
+  // const client = useQueryClient();
+  // const queryCache = new QueryCache({
+  //   onSuccess(data, query) {
+  //     console.log("data", data);
+  //     console.log("query", query);
+  //   },
+  // });
+  // useEffect(() => {
+  //   console.log(client.getQueryData("stocks"));
+  // }, []);
+
+  // useEffect(() => {
+  //   console.log("change selectedPortfolio");
+  // }, [selectedPortfolio]);
 
   useEffect(() => {
     if (user) {

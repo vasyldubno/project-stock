@@ -131,9 +131,9 @@ export const DashboardScreen: FC = () => {
               </div>
 
               <div className={s.section__charts}>
-                {calendarEarning && (
-                  <CalendarEarnings calendarEarning={calendarEarning} />
-                )}
+                {/* {calendarEarning && ( */}
+                <CalendarEarnings calendarEarning={calendarEarning} />
+                {/* )} */}
 
                 <div className={s.sectionChartsRightWrapper}>
                   {stockPortfolio && stockPortfolio.length > 0 && (
