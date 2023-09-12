@@ -233,36 +233,39 @@ export class PortfolioService {
       },
     ];
 
-    const supaStockPortfolio = await supabaseClient
-      .from("stock_portfolio")
-      .select()
-      .eq("portfolio_id", portfolio?.id)
-      .eq("is_trading", true);
-
-    if (supaStockPortfolio.data) {
-      const tickers = supaStockPortfolio.data.map((item) => item.ticker);
-
-      const response = await supabaseClient
-        .from("stock")
+    if (portfolio && portfolio.id) {
+      const supaStockPortfolio = await supabaseClient
+        .from("stock_portfolio")
         .select()
-        .in("ticker", tickers)
-        .not("dividend_upcoming_value", "is", null)
-        .order("dividend_upcoming_date", { ascending: true });
+        .eq("portfolio_id", portfolio.id)
+        .eq("is_trading", true);
 
-      if (response.data) {
-        response.data.forEach((item) => {
-          const month = moment(item.dividend_upcoming_date).format("MM");
-          const current = result.find((item) => item.monthNumber === month);
-          if (current) {
-            const newValue = ROUND(
-              (current.amount += item.dividend_upcoming_value ?? 0)
-            );
-            current.amount = newValue;
+      if (supaStockPortfolio.data) {
+        const tickers = supaStockPortfolio.data.map((item) => item.ticker);
+
+        if (tickers.length) {
+          const response = await supabaseClient
+            .from("stock")
+            .select()
+            .in("ticker", tickers)
+            .not("dividend_upcoming_value", "is", null);
+
+          if (response.data) {
+            response.data.forEach((item) => {
+              const month = moment(item.dividend_upcoming_date).format("MM");
+              const current = result.find((item) => item.monthNumber === month);
+              if (current) {
+                const newValue = ROUND(
+                  (current.amount += item.dividend_upcoming_value ?? 0)
+                );
+                current.amount = newValue;
+              }
+            });
           }
-        });
-      }
+        }
 
-      return result;
+        return result;
+      }
     }
   }
 
