@@ -4,7 +4,6 @@ import { ROUND } from "@/utils/round";
 import axios from "axios";
 import moment from "moment";
 import { StockPortfolioService } from "./StockPortfolioService";
-import { UserService } from "./UserService";
 
 export class PortfolioService {
   static async addTransaction(
@@ -31,7 +30,7 @@ export class PortfolioService {
   static async getPortfolioSectors(portfolio: ISupaPortfolio | null) {
     let sectors: { sector: string; count: number }[] = [];
 
-    const stocks = await supabaseClient
+    const stockPortfolio = await supabaseClient
       .from("stock_portfolio")
       .select()
       .eq("is_trading", true)
@@ -41,28 +40,25 @@ export class PortfolioService {
         nullsFirst: false,
       });
 
-    if (stocks.data) {
-      const arrayTickers = stocks.data.map((item) => item.ticker);
-      const resultPromise = arrayTickers.map(async (ticker) => {
-        const stock = await supabaseClient
-          .from("stock")
-          .select()
-          .eq("ticker", ticker)
-          .select()
-          .single();
-        if (stock.data) {
-          const sector = stock.data.sector;
+    if (stockPortfolio.data) {
+      const arrayTickers = stockPortfolio.data.map((item) => item.ticker);
+      const stocks = await supabaseClient
+        .from("stock")
+        .select()
+        .in("ticker", arrayTickers);
+      if (stocks.data) {
+        stocks.data.forEach((stock) => {
+          const sector = stock.sector;
           const existingSectorIndex = sectors.findIndex(
             (item) => item.sector === sector
           );
           if (existingSectorIndex !== -1) {
             sectors[existingSectorIndex].count++;
           } else {
-            sectors.push({ sector: sector, count: 1 });
+            sectors.push({ sector, count: 1 });
           }
-        }
-      });
-      await Promise.all(resultPromise);
+        });
+      }
     }
 
     return sectors.sort((a, b) => b.count - a.count);
@@ -374,7 +370,7 @@ export class PortfolioService {
   }
 
   static async getPortfolios(user: IUser | null) {
-    if (user) {
+    if (user && user.id) {
       const portfolios = await supabaseClient
         .from("portfolio")
         .select()
@@ -430,7 +426,8 @@ export class PortfolioService {
 
   static async getGainValue(portfolio: ISupaPortfolio | null) {
     const stocks = await StockPortfolioService.getStocks(portfolio);
-    if (stocks) {
+
+    if (Array.isArray(stocks) && stocks.length > 0) {
       const cost = stocks.reduce(
         (acc, item) =>
           (acc +=

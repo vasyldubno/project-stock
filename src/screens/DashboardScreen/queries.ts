@@ -20,7 +20,7 @@ export const useCalendarEarning = (
   const { data } = useQuery({
     queryKey: ["calendarEarning", { user, portfolio }],
     queryFn: () => StockService.getCalendarEarnings(user, portfolio),
-    enabled: !!user,
+    enabled: !!user && !!portfolio,
   });
   return data ?? null;
 };
