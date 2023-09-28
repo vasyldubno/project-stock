@@ -1,4 +1,4 @@
-This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
+<!-- This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
 
 ## Getting Started
 
@@ -35,4 +35,15 @@ You can check out [the Next.js GitHub repository](https://github.com/vercel/next
 
 The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/deployment) for more details.
+Check out our [Next.js deployment documentation](https://nextjs.org/docs/deployment) for more details. -->
+# Stocker
+App that helps you track your investments in stocks and find new stocks to buy.
+<img src="https://github.com/vasyldubno/project-stock/blob/main/screenshot.png" />
+
+## Technologies
+Front-end - [Next.JS](https://nextjs.org)  
+Back-end - [Express.JS](https://expressjs.com)
+[Repository with Back-end](https://github.com/vasyldubno/stocker-server)
+
+## Deploy
+[Demo](https://stockercircle.vercel.app)
