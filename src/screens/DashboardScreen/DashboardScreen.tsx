@@ -6,7 +6,7 @@ import { Header } from "@/components/Header/Header";
 import { TabsPortfolio } from "@/components/TabsPortfolio/TabsPortfolio";
 import { useUser } from "@/hooks/useUser";
 import { ISupaPortfolio } from "@/types/types";
-import { FC, useEffect, useState } from "react";
+import { FC, useEffect, useRef, useState } from "react";
 import {
   useCalendarEarning,
   useDividendIncomeByYear,
@@ -29,6 +29,7 @@ import { TableUpcomingDividends } from "@/components/TableUpcomingDividends/Tabl
 import { RationItem } from "./RationItem/RationItem";
 import { AuthProvider } from "@/providers/AuthProvider/AuthProvider";
 import { Loader } from "@/components/Loader/Loader";
+import { ChartTreeMap } from "@/components/ChartTreeMap/ChartTreeMap";
 
 export const DashboardScreen: FC = () => {
   const user = useUser();
@@ -49,12 +50,9 @@ export const DashboardScreen: FC = () => {
   const dividendsList = useDividendsList(selectedPortfolio);
   const upcomingDividendList = useUpcomingDividendsList(selectedPortfolio);
   const portfolioSectors = usePortfolioSectors(selectedPortfolio);
+  const [sectionChartWidth, setSectionChartWidth] = useState(0);
 
-  useEffect(() => {
-    if (portfolios) {
-      setSelectedPortfolio(portfolios[0]);
-    }
-  }, [portfolios]);
+  const sectionChartRef = useRef<HTMLDivElement>(null);
 
   const isDisplay =
     !!calendarEarning &&
@@ -63,6 +61,19 @@ export const DashboardScreen: FC = () => {
     !!dividendsList &&
     !!upcomingDividends &&
     !!upcomingDividendList;
+
+  useEffect(() => {
+    if (portfolios) {
+      setSelectedPortfolio(portfolios[0]);
+    }
+  }, [portfolios]);
+
+  useEffect(() => {
+    if (isDisplay && sectionChartRef.current) {
+      const width = sectionChartRef.current.offsetWidth;
+      setSectionChartWidth(width);
+    }
+  }, [isDisplay]);
 
   return (
     <>
@@ -133,13 +144,29 @@ export const DashboardScreen: FC = () => {
               <div className={s.section__charts}>
                 <CalendarEarnings calendarEarning={calendarEarning} />
 
-                <div className={s.sectionChartsRightWrapper}>
+                <div
+                  className={s.sectionChartsRightWrapper}
+                  ref={sectionChartRef}
+                >
                   {stockPortfolio && stockPortfolio.length > 0 && (
                     <div className={s.chart__wrapper}>
                       <p className={s.chart__title}>Sectors</p>
                       <ChartSectors data={portfolioSectors} />
                     </div>
                   )}
+
+                  <div className={s.chart__wrapper}>
+                    <ChartTreeMap
+                      data={stockPortfolio.sort(
+                        (a, b) =>
+                          Number(b.amount_active_shares) *
+                            Number(b.average_cost_per_share) -
+                          Number(a.amount_active_shares) *
+                            Number(a.average_cost_per_share)
+                      )}
+                      width={sectionChartWidth}
+                    />
+                  </div>
 
                   {dividendIncomeInMonth &&
                     dividendIncomeInMonth.some((item) => item.amount > 0) && (
