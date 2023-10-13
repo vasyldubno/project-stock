@@ -274,16 +274,16 @@ const TickerPage: FC = () => {
 
 export default TickerPage;
 
-export const getServerSideProps: GetServerSideProps = async (
-  context: GetServerSidePropsContext
-) => {
-  const ticker = (context.params?.ticker as string).toUpperCase();
+// export const getServerSideProps: GetServerSideProps = async (
+//   context: GetServerSidePropsContext
+// ) => {
+//   const ticker = (context.params?.ticker as string).toUpperCase();
 
-  const data = await supabaseClient
-    .from("stock")
-    .select()
-    .eq("ticker", ticker)
-    .single();
+//   const data = await supabaseClient
+//     .from("stock")
+//     .select()
+//     .eq("ticker", ticker)
+//     .single();
 
-  return { props: { data: data.data } };
-};
+//   return { props: { data: data.data } };
+// };
