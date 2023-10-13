@@ -8,6 +8,7 @@ import { ChartTradingView } from "../../components/ChartTradingView/ChartTrading
 import millify from "millify";
 import { Header } from "@/components/Header/Header";
 import { ROUND } from "@/utils/round";
+import { Loader } from "@/components/Loader/Loader";
 
 type Props = {
   data: ISupaStock | null;
@@ -27,7 +28,7 @@ const TickerPage: FC<Props> = ({ data }) => {
       <Header />
 
       <Container>
-        {data && (
+        {data ? (
           <div>
             <p
               style={{
@@ -227,6 +228,8 @@ const TickerPage: FC<Props> = ({ data }) => {
             </div>
             <ChartTradingView data={data} />
           </div>
+        ) : (
+          <Loader />
         )}
       </Container>
     </>

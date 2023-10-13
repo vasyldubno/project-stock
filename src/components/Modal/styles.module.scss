@@ -10,13 +10,13 @@
 }
 
 .content {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
+  // position: absolute;
+  // top: 50%;
+  // left: 50%;
+  // transform: translate(-50%, -50%);
   background-color: white;
   padding: 1rem;
   border-radius: 0.5rem;
-  max-height: 95dvh;
+  max-height: 95vh;
   overflow: auto;
 }

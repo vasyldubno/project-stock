@@ -13,6 +13,8 @@ import { Popover } from "../Popover/Popover";
 import s from "./Header.module.scss";
 import { useBalance } from "./queries";
 import { FaviconIcon } from "@/icons/FaviconIcon/FaviconIcon";
+import { SearchIcon } from "@/icons/SearchIcon";
+import { ModalSearch } from "../ModalSearch/ModalSearch";
 
 export const Header: FC = () => {
   const router = useRouter();
@@ -20,6 +22,7 @@ export const Header: FC = () => {
   const balance = useBalance(user);
 
   const [isOpenModal, setIsOpenModal] = useState(false);
+  const [isOpenModalSearch, setIsOpenModalSearch] = useState(false);
   const [isOpenPopover, setIsOpenPopover] = useState(false);
   const [valueDeposit, setDepositValue] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
@@ -43,48 +46,63 @@ export const Header: FC = () => {
     }
   };
 
+  const handleSearch = () => {
+    setIsOpenModalSearch(true);
+  };
+
   return (
     <>
       <div className={s.wrapper}>
         <div className={s.content}>
           <DropdownMenu />
           <h1 className={s.title}>Stocker</h1>
-          <div className={s.user}>
-            <Popover
-              open={isOpenPopover}
-              setOpen={setIsOpenPopover}
-              trigger={<UserIcon size="2rem" />}
-              content={[
-                <>
-                  <p>Balance: ${balance}</p>
-                </>,
-                <>
-                  <p
-                    style={{ cursor: "pointer" }}
-                    onClick={() => {
-                      setIsOpenModal(true);
-                      setIsOpenPopover(false);
-                    }}
-                  >
-                    Deposit
-                  </p>
-                </>,
-                <>
-                  <p
-                    style={{ cursor: "pointer" }}
-                    onClick={() => {
-                      UserService.signOut();
-                      router.push("/login");
-                    }}
-                  >
-                    Sign Out
-                  </p>
-                </>,
-              ]}
-            />
+          <div style={{ display: "flex", gap: "1rem" }}>
+            <button className={s.search} onClick={handleSearch}>
+              <SearchIcon />
+            </button>
+            <div className={s.user}>
+              <Popover
+                open={isOpenPopover}
+                setOpen={setIsOpenPopover}
+                trigger={<UserIcon size="2rem" />}
+                content={[
+                  <>
+                    <p>Balance: ${balance}</p>
+                  </>,
+                  <>
+                    <p
+                      style={{ cursor: "pointer" }}
+                      onClick={() => {
+                        setIsOpenModal(true);
+                        setIsOpenPopover(false);
+                      }}
+                    >
+                      Deposit
+                    </p>
+                  </>,
+                  <>
+                    <p
+                      style={{ cursor: "pointer" }}
+                      onClick={() => {
+                        UserService.signOut();
+                        router.push("/login");
+                      }}
+                    >
+                      Sign Out
+                    </p>
+                  </>,
+                ]}
+              />
+            </div>
           </div>
         </div>
       </div>
+
+      <ModalSearch
+        open={isOpenModalSearch}
+        onClose={() => setIsOpenModalSearch(false)}
+      />
+
       <Modal open={isOpenModal} onClose={() => setIsOpenModal(false)}>
         <div className={s.modalWrapper}>
           <p className={s.modalTitle}>Deposit</p>

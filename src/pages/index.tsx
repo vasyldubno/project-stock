@@ -20,7 +20,20 @@ export default function Home() {
       <Head>
         <title>Stocker</title>
       </Head>
-      <HomeScreen />
+      {user && user.isLoaded && !user.id ? (
+        <HomeScreen />
+      ) : (
+        <div
+          style={{
+            position: "absolute",
+            top: "50%",
+            left: "50%",
+            transform: "translate(-50%, -50%)",
+          }}
+        >
+          <Loader />
+        </div>
+      )}
     </>
   );
 }

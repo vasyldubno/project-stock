@@ -5,7 +5,7 @@ type InputProps = {
   label?: string;
   name?: string;
   type?: HTMLInputTypeAttribute;
-  onChange?: any;
+  onChange?: (e: any) => void;
   onFocus?: any;
   onBlur?: any;
   onClick?: (props?: any) => void;
@@ -19,6 +19,7 @@ type InputProps = {
     };
   };
   step?: number;
+  placeholder?: string;
 };
 
 export const Input: FC<InputProps> = ({
@@ -33,6 +34,7 @@ export const Input: FC<InputProps> = ({
   defaultValue,
   icon,
   step,
+  placeholder,
 }) => {
   return (
     <div style={{ display: "block", width: "100%" }}>
@@ -48,6 +50,7 @@ export const Input: FC<InputProps> = ({
           defaultValue={defaultValue}
           step={step}
           onClick={onClick}
+          placeholder={placeholder}
         />
         {icon?.delete.open && (
           <div className={s.icon__clear} onClick={icon.delete.onClick}>

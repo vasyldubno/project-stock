@@ -1,23 +1,22 @@
 import { AddNewPortfolio } from "@/components/AddNewPortfolio/AddNewPortfolio";
 import { AddNewTransaction } from "@/components/AddNewTransaction/AddNewTransaction";
 import { Header } from "@/components/Header/Header";
+import { Loader } from "@/components/Loader/Loader";
+import { TablePortfolio } from "@/components/TablePortfolio/TablePortfolio";
 import { TabsPortfolio } from "@/components/TabsPortfolio/TabsPortfolio";
 import { useUser } from "@/hooks/useUser";
+import { DeleteIcon } from "@/icons/DeleteIcon";
+import { PortfolioService } from "@/services/PortfolioService";
 import { ISupaPortfolio, ISupaStockPortfolio } from "@/types/types";
 import { useEffect, useState } from "react";
 import { usePortfolios, useStocks } from "./queries";
+import s from "./styles.module.scss";
 import {
   portfolioDelete,
   portfolioInsert,
   stockPortfolioInsert,
   stockPortfolioUpdate,
 } from "./supabase";
-import { DeleteIcon } from "@/icons/DeleteIcon";
-import { PortfolioService } from "@/services/PortfolioService";
-import { TablePortfolio } from "@/components/TablePortfolio/TablePortfolio";
-import { Loader } from "@/components/Loader/Loader";
-import s from "./styles.module.scss";
-import { QueryCache, useQueryClient } from "react-query";
 
 export const PortfolioScreen = () => {
   const [portfolios, setPortfolios] = useState<ISupaPortfolio[] | null>(null);
@@ -33,21 +32,6 @@ export const PortfolioScreen = () => {
 
   const queryPortfolios = usePortfolios(user);
   const queryStocks = useStocks(selectedPortfolio);
-
-  // const client = useQueryClient();
-  // const queryCache = new QueryCache({
-  //   onSuccess(data, query) {
-  //     console.log("data", data);
-  //     console.log("query", query);
-  //   },
-  // });
-  // useEffect(() => {
-  //   console.log(client.getQueryData("stocks"));
-  // }, []);
-
-  // useEffect(() => {
-  //   console.log("change selectedPortfolio");
-  // }, [selectedPortfolio]);
 
   useEffect(() => {
     if (user) {
