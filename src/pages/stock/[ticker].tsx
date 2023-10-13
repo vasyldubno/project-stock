@@ -3,21 +3,48 @@ import { supabaseClient } from "@/config/supabaseClient";
 import { useUser } from "@/hooks/useUser";
 import { ISupaStock } from "@/types/types";
 import { GetServerSideProps, GetServerSidePropsContext } from "next";
-import { FC } from "react";
+import { FC, useEffect, useState } from "react";
 import { ChartTradingView } from "../../components/ChartTradingView/ChartTradingView";
 import millify from "millify";
 import { Header } from "@/components/Header/Header";
 import { ROUND } from "@/utils/round";
 import { Loader } from "@/components/Loader/Loader";
+import { useRouter } from "next/router";
 
 type Props = {
   data: ISupaStock | null;
 };
 
-const TickerPage: FC<Props> = ({ data }) => {
+const TickerPage: FC = () => {
+  const [data, setData] = useState<ISupaStock | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
+
   const yearRange = ROUND(
     (Number(data?.price_current) / Number(data?.price_year_high)) * 100
   );
+
+  const router = useRouter();
+
+  const ticker = router.query.ticker;
+
+  useEffect(() => {
+    // console.log("useEffect");
+
+    setIsLoading(true);
+    supabaseClient
+      .from("stock")
+      .select()
+      .eq("ticker", ticker)
+      .single()
+      .then((res) => {
+        if (res.data) {
+          // const d: ISupaStock = res.data;
+          // console.log(d);
+          setData(res.data);
+          setIsLoading(false);
+        }
+      });
+  }, [ticker]);
 
   return (
     <>
@@ -28,7 +55,7 @@ const TickerPage: FC<Props> = ({ data }) => {
       <Header />
 
       <Container>
-        {data ? (
+        {data && !isLoading ? (
           <div>
             <p
               style={{
@@ -229,7 +256,16 @@ const TickerPage: FC<Props> = ({ data }) => {
             <ChartTradingView data={data} />
           </div>
         ) : (
-          <Loader />
+          <div
+            style={{
+              position: "absolute",
+              top: "50%",
+              left: "50%",
+              transform: "translate(-50%, -50%)",
+            }}
+          >
+            <Loader />
+          </div>
         )}
       </Container>
     </>
