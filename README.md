@@ -6,6 +6,3 @@ App that helps you track your investments in stocks and find new stocks to buy.
 Front-end - [Next.JS](https://nextjs.org)  
 Back-end - [Express.JS](https://expressjs.com)  
 [Repository with Back-end](https://github.com/vasyldubno/stocker-server)
-
-## Deploy
-[Demo](https://stockercircle.vercel.app)
