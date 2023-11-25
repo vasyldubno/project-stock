@@ -5,12 +5,12 @@ import moment from "moment";
 const columnHelper = createColumnHelper<ISupaTransaction>();
 
 export const columns = [
-  columnHelper.accessor("ticker", {
-    header: "Ticker",
+  columnHelper.accessor("type", {
+    header: "Type",
     cell: (info) => <p style={{ textAlign: "center" }}>{info.getValue()}</p>,
   }),
-  columnHelper.accessor("count", {
-    header: "Amount Shares",
+  columnHelper.accessor("ticker", {
+    header: "Ticker",
     cell: (info) => <p style={{ textAlign: "center" }}>{info.getValue()}</p>,
   }),
   columnHelper.accessor("date", {
@@ -21,12 +21,16 @@ export const columns = [
       </p>
     ),
   }),
-  columnHelper.accessor("type", {
-    header: "Type",
+  columnHelper.accessor("count", {
+    header: "Shares",
     cell: (info) => <p style={{ textAlign: "center" }}>{info.getValue()}</p>,
   }),
   columnHelper.accessor("change", {
     header: "Change",
+    cell: (info) => <p style={{ textAlign: "center" }}>{info.getValue()}</p>,
+  }),
+  columnHelper.accessor("price", {
+    header: "Price",
     cell: (info) => <p style={{ textAlign: "center" }}>{info.getValue()}</p>,
   }),
 ];

@@ -1,4 +1,4 @@
-import { PortfolioService } from "@/services/PortfolioService";
+import { SortIcon } from "@/icons/SortIcon";
 import { ISupaTransaction } from "@/types/types";
 import {
   SortingState,
@@ -9,24 +9,16 @@ import {
   useReactTable,
 } from "@tanstack/react-table";
 import { FC, useEffect, useState } from "react";
-import { SortIcon } from "@/icons/SortIcon";
-import moment from "moment";
-import { columns } from "./table";
-import s from "./styles.module.scss";
-import { Button } from "../Button/Button";
 import { Pagination } from "../Pagination/Pagination";
+import s from "./styles.module.scss";
+import { columns } from "./table";
 
 type Props = {
   data: ISupaTransaction[];
 };
 
 export const TableActivity: FC<Props> = ({ data }) => {
-  // const [data, setData] = useState<ISupaTransaction[]>([]);
   const [sorting, setSorting] = useState<SortingState>([]);
-
-  // useEffect(() => {
-  //   PortfolioService.getTransactions().then((res) => setData(res));
-  // }, []);
 
   const table = useReactTable({
     columns: columns,

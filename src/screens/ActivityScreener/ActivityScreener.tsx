@@ -1,17 +1,14 @@
 import { Header } from "@/components/Header/Header";
 import { TableActivity } from "@/components/TableActivity/TableActivity";
-import { useUser } from "@/hooks/useUser";
-import { usePortfolios, useTransactions } from "./queries";
 import { TabsPortfolio } from "@/components/TabsPortfolio/TabsPortfolio";
+import { useUser } from "@/hooks/useUser";
 import { ISupaPortfolio } from "@/types/types";
 import { useEffect, useState } from "react";
-import { DeleteIcon } from "@/icons/DeleteIcon";
-import { PortfolioService } from "@/services/PortfolioService";
+import { usePortfolios, useTransactions } from "./queries";
 import s from "./styles.module.scss";
 
 export const ActivityScreener = () => {
   const user = useUser();
-  console.log("");
 
   const [selectedPortfolio, setSelectedPortfolio] =
     useState<ISupaPortfolio | null>(null);
@@ -47,11 +44,6 @@ export const ActivityScreener = () => {
                       {item.title}
                     </p>
                   ),
-                  // iconDelete: selectedPortfolio?.id === item.id && (
-                  //   <DeleteIcon size="1rem" />
-                  // ),
-                  // onDelete: () =>
-                  //   PortfolioService.deletePortfolio(selectedPortfolio, user),
                 }))}
               />
             )}

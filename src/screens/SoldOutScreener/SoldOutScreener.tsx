@@ -66,31 +66,6 @@ export const SoldOutScreener = () => {
             {exits && selectedPortfolio && (
               <TableSoldOut data={exits} portfolioId={selectedPortfolio?.id} />
             )}
-
-            {/* {exits && exits.length > 0 && (
-              <>
-                <div
-                  style={{
-                    display: "flex",
-                    marginBottom: "0.5rem",
-                    marginTop: "0.5rem",
-                  }}
-                >
-                  <p style={{ width: "25%", fontWeight: "bold" }}>Ticker</p>
-                  <p style={{ width: "25%", fontWeight: "bold" }}>
-                    Average Buy Price
-                  </p>
-                  <p style={{ width: "25%", fontWeight: "bold" }}>Exit Date</p>
-                  <p style={{ width: "25%", fontWeight: "bold" }}>Margin</p>
-                </div>
-                <div style={{ marginBottom: "0.5rem" }}>
-                  <TableDivider />
-                </div>
-                {exits.map((exit) => (
-                  <Item key={exit.id} exit={exit} />
-                ))}
-              </>
-            )} */}
           </Container>
         </>
       )}

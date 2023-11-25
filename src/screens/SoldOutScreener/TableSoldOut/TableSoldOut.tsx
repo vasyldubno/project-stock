@@ -72,24 +72,6 @@ export const TableSoldOut: FC<Props> = ({ portfolioId, data }) => {
                           header.getContext()
                         )}
                       </div>
-                      {/* {sorting.some((sort) => sort.id === header.column.id) ? (
-                        <span style={{ display: "flex", alignItems: "center" }}>
-                          {sorting.find((sort) => sort.id === header.column.id)
-                            ?.desc ? (
-                            <SortIcon size="1rem" type="desc" />
-                          ) : (
-                            <SortIcon size="1rem" type="asc" />
-                          )}
-                        </span>
-                      ) : (
-                        <div
-                          style={{
-                            backgroundColor: "white",
-                            width: "1rem",
-                            height: "1rem",
-                          }}
-                        ></div>
-                      )} */}
                     </div>
                   )}
                 </th>
