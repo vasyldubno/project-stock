@@ -11,6 +11,7 @@ import s from "./styles.module.scss";
 
 export const ActivityScreener = () => {
   const user = useUser();
+  console.log("");
 
   const [selectedPortfolio, setSelectedPortfolio] =
     useState<ISupaPortfolio | null>(null);
